@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.account.mapper.TransactionMapper">
+
+    <sql id="tableName">transaction</sql>
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into <include refid="tableName"/> (from_address,account_id,height,hash,tx_type,status,data,create_time)
+        value (#{fromAddress},#{accountId},#{height},#{hash},#{txType},#{status},#{data},NOW())
+    </insert>
+    <select id="findByAddress" resultType="com.aitos.xenon.account.domain.Transaction">
+        select * from <include refid="tableName"/> where address=#{address}
+    </select>
+    <select id="query" resultType="com.aitos.xenon.account.domain.Transaction">
+        select * from <include refid="tableName"/> where hash=#{txHash}
+    </select>
+    <select id="list" resultType="com.aitos.xenon.account.domain.Transaction">
+        select * from <include refid="tableName"/>
+        <where>
+            <if test="queryParams.height!=null">
+                height=#{queryParams.height}
+            </if>
+            <if test="queryParams.fromAddress!=null and queryParams.fromAddress!=''">
+               and from_address=#{queryParams.fromAddress}
+            </if>
+            <if test="queryParams.accountId!=null">
+               and from_address in (select address from device where account_id=#{queryParams.accountId})
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+</mapper>

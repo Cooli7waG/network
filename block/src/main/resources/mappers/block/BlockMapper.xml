@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.block.mapper.BlockMapper">
+
+    <sql id="tableName">block</sql>
+
+    <update id="genBlock" useGeneratedKeys="true" keyProperty="id">
+        update <include refid="tableName"/> set height=height+1,update_time=now()
+    </update>
+
+    <select id="getBlock" resultType="com.aitos.xenon.block.domain.Block">
+        select * from <include refid="tableName"/> limit 1
+    </select>
+
+</mapper>

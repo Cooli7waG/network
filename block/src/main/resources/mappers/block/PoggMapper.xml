@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.block.mapper.PoggMapper">
+
+    <sql id="tableName">pogg_challenge</sql>
+
+    <insert id="genChallenge">
+        insert into <include refid="tableName"/> (tx_hash,random,timeout,create_time)
+        value (#{txHash},#{random},#{timeout},now())
+    </insert>
+
+    <select id="activeChallenges" resultType="com.aitos.xenon.block.domain.PoggChallenge">
+        select * from <include refid="tableName"/> where timeout &gt; #{height} order by create_time asc;
+    </select>
+
+    <select id="queryChallenges" resultType="com.aitos.xenon.block.domain.PoggChallenge">
+        select * from <include refid="tableName"/> where tx_hash=#{txHash}
+    </select>
+
+
+    <insert id="saveChallengeRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into pogg_challenge_record (random,device_id,address,create_time)
+        value (#{random},#{deviceId},#{address},NOW())
+    </insert>
+
+    <update id="updatePoggChallengeRecordStatus">
+        update pogg_challenge_record set status=1,update_time=now() where id in <foreach collection="idList" item="id" open="(" close=")" separator=",">#{id}</foreach>
+    </update>
+
+    <select id="findChallengeRecordByRandom" resultType="com.aitos.xenon.block.domain.PoggChallengeRecord">
+        select * from pogg_challenge_record where address=#{address} and random=#{random} limit 1
+    </select>
+
+    <select id="findNoRewardChallengeList" resultType="com.aitos.xenon.block.domain.PoggChallengeRecordCount">
+        select d.account_id,count(pcr.address) as count,group_concat(pcr.id) as ids from  pogg_challenge_record pcr left join device d on pcr.device_id=d.id
+        where pcr.status=0
+        group by d.account_id
+    </select>
+
+</mapper>

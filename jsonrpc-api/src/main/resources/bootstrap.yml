@@ -1,0 +1,23 @@
+# Tomcat
+server: 
+  port: 9700
+
+# Spring
+spring: 
+  application:
+    # 应用名称
+    name: jsonrpc-api
+  main:
+    #允许存在多个Feign调用相同Service的接口
+    allow-bean-definition-overriding: true
+  profiles:
+    # 环境配置
+    active: dev
+  feign:
+    client:
+      config:
+        metaDataClient:
+          connect-timeout: 50000
+          read-timeout: 50000
+    hystrix:
+      enabled: true

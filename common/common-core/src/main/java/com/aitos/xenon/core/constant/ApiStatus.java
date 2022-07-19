@@ -1,0 +1,95 @@
+package com.aitos.xenon.core.constant;
+
+
+
+public enum ApiStatus implements ConstantsCode {
+
+    /**
+     * 操作成功
+     */
+    SUCCESS(0, "success"),
+    /**
+     * 操作失败
+     */
+    FAILED(1, "failed"),
+    //鉴权相关
+
+    VALIDATE_FAILED(1001,"Checkout failure"),
+
+    VALIDATE_TIMESTAMP_NOEMPTY(1001,"Timestamp can not be empty"),
+    VALIDATE_TIMESTAMP_EXPIRED(1002,"Timestamp has expired"),
+    VALIDATE_TIMESTAMP_FORMAT(1003,"Timestamp format error"),
+
+    VALIDATE_CLIENTID_NOEMPTY(1004,"client_id can't be empty"),
+    VALIDATE_CLIENTID_EXPIRED(1005,"client_id timestamp has expired"),
+    VALIDATE_CLIENTID_FAILED(1006,"client_id Incorrect"),
+
+    VALIDATE_SIGN_NOEMPTY(1007,"sign can't be empty"),
+    VALIDATE_SIGN_FAILED(1008,"sign Incorrect"),
+
+
+
+    //系统错误
+    ERROR(2000,"system abnormality"),
+    TIMEOUT(2001,"overtime"),
+    PARAMETER_FORMATE_ERROR(2002,"Parameter format error"),
+    HTTP_REQUEST_METHOD_NOT_SUPPORTED(2003,"Parameter format error"),
+    FORBIDDEN(2004,"No access rights, please contact the administrator for authorization"),
+    REPEAT_RECORD(2005,"record repeat"),
+
+    //业务错误
+    /**
+     * 设备相关
+     */
+    BUSINESS_DEVICE_ID_EXISTED(3001,"device id is existed"),
+
+    BUSINESS_DEVICE_PAYER_SIGN_ERROR(3002,"payer sign error"),
+
+    BUSINESS_DEVICE_OWNER_SIGN_ERROR(3003,"owner sign error"),
+
+    BUSINESS_DEVICE_MINER_SIGN_ERROR(3004,"miner sign error"),
+
+    BUSINESS_DEVICE_NOT_EXISTED(3005,"device  is not existed"),
+
+    BUSINESS_DEVICE_NO_ONBOARD(3006,"miner did not do onboard"),
+    BUSINESS_DEVICE_TERMINATE(3007,"miner did not do onboard"),
+    BUSINESS_DEVICE_BOUND(3008,"device is bound"),
+
+
+    // 账户相关
+    BUSINESS_ACCOUNT_EXISTED(4001,"account is existed"),
+    BUSINESS_ACCOUNT_NOT_EXIST(4002,"account is not exist"),
+    BUSINESS_PAYER_ACCOUNT_NOT_EXIST(4003,"payer account is not exist"),
+    BUSINESS_PAYER_ACCOUNT_NOT_ENOUGH(4004,"payer account not enough"),
+    BUSINESS_TRANSACTION_FAIL(4005,"transaction failed"),
+    BUSINESS_TRANSACTION_SIGN_ERROR(4006,"transaction signature error"),
+    BUSINESS_OWNER_ACCOUNT_NOT_EXIST(4007,"owner account is not exist"),
+
+
+    // pogg相关
+    BUSINESS_POGG_RANDOM_SIGN_ERROR(4101,"pogg random sign error"),
+
+    BUSINESS_POGG_RESPONSE_SIGN_ERROR(4102,"pogg response sign error"),
+
+    BUSINESS_POGG_CHALLENGE_EXPIRED(4103,"pogg challenge expired"),
+
+    BUSINESS_POGG_CHALLENGE_NO_HIT(4104,"pogg challenge no hit"),
+   ;
+
+
+    ApiStatus(Integer code, String msg) {
+        this.code = code;
+        this.msg = msg;
+    }
+
+    private Integer code;
+    private String msg;
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+}

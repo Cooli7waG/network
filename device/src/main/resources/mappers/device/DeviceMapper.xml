@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.device.mapper.DeviceMapper">
+
+    <sql id="tableName">device</sql>
+
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into <include refid="tableName"/> (address,miner_type,maker,account_id,location_type,latitude,longitude,h3index,staking_fee,create_time)
+        value (#{address},#{minerType},#{maker},#{accountId},#{locationType},#{latitude},#{longitude},#{h3index},#{stakingFee},NOW())
+    </insert>
+
+    <select id="findByAddress" resultType="com.aitos.xenon.device.domain.Device">
+        select * from <include refid="tableName"/> where address=#{address}
+    </select>
+    <select id="list" resultType="com.aitos.xenon.device.domain.Device">
+        select * from <include refid="tableName"/>
+          <where>
+              <if test="queryParams.accountId!=null">
+                  account_id=#{queryParams.accountId}
+              </if>
+              <if test="queryParams.address!=null and queryParams.address!=''">
+                 and  address=#{queryParams.address}
+              </if>
+          </where>
+         order by create_time desc
+    </select>
+    <select id="findByAccountId" resultType="com.aitos.xenon.device.domain.Device">
+        select * from <include refid="tableName"/>
+        where account_id=#{accountId}
+    </select>
+    <select id="queryByOwner" resultType="com.aitos.xenon.device.api.domain.vo.DeviceVo">
+        select * from <include refid="tableName"/>
+        where account_id=#{accountId}
+    </select>
+    <update id="bind">
+        update <include refid="tableName"/> set account_id=#{accountId} where address=#{address}
+    </update>
+    <update id="update">
+        update <include refid="tableName"/>
+            <set>
+                <if test="accountId!=null">
+                    account_id=#{accountId},
+                </if>
+                <if test="locationType!=null">
+                    location_type=#{locationType},
+                </if>
+                <if test="latitude!=null">
+                    latitude=#{latitude},
+                </if>
+                <if test="longitude!=null">
+                    longitude=#{longitude},
+                </if>
+                <if test="h3index!=null">
+                    h3index=#{h3index}
+                </if>
+            </set>
+            where id=#{id}
+    </update>
+
+</mapper>
