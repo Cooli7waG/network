@@ -19,6 +19,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -93,6 +94,8 @@ public class DeviceController {
 
         DeviceBindDto deviceBindDto= JSON.parseObject(params,DeviceBindDto.class);
         deviceBindDto.setTxData(params);
+        String txHash= DigestUtils.sha256Hex(deviceBindDto.getTxData());
+        deviceBindDto.setTxHash(txHash);
 
         Device deviceTemp=deviceService.findByAddress(deviceBindDto.getMinerAddress());
         if(deviceTemp==null){
@@ -105,8 +108,6 @@ public class DeviceController {
 
         deviceService.bind(deviceBindDto);
 
-
-        String txHash= deviceBindDto.getTxHash();
         return Result.ok(txHash);
     }
 

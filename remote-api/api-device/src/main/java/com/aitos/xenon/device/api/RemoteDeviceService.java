@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 public interface RemoteDeviceService {
 
     @PostMapping("/device/onboard")
-    Result onboard(@RequestBody String params);
+    Result<String> onboard(@RequestBody String params);
 
     @GetMapping("/device/queryByMiner")
     Result<DeviceVo> queryByMiner(@RequestParam("minerAddress") String minerAddress);

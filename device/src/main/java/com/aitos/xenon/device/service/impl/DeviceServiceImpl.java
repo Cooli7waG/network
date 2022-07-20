@@ -24,8 +24,10 @@ import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.aitos.xenon.device.mapper.DeviceMapper;
 import com.aitos.xenon.device.service.DeviceDetialService;
 import com.aitos.xenon.device.service.DeviceService;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Service
+@Slf4j
 public class DeviceServiceImpl implements DeviceService {
 
     @Autowired
@@ -79,7 +82,7 @@ public class DeviceServiceImpl implements DeviceService {
         transactionDto.setFromAddress(device.getAddress());
         transactionDto.setHeight(blockVoResult.getData());
         transactionDto.setData(deviceRegister.getTxData());
-        String txHash=Base58.encode(DigestUtils.sha256(deviceRegister.getTxData()));
+        String txHash=DigestUtils.sha256Hex(deviceRegister.getTxData());
         transactionDto.setHash(txHash);
         transactionDto.setTxType(BusinessConstants.TXType.TX_REGISTER_MINER);
         remoteTransactionService.transaction(transactionDto);
@@ -95,22 +98,24 @@ public class DeviceServiceImpl implements DeviceService {
     @Transactional(rollbackFor = Exception.class)
     public void bind(DeviceBindDto deviceBindDto) {
         //判断payer的金额是否满足
-        Result<AccountVo>  payerAccountVoResult= remoteAccountService.findByAddress(deviceBindDto.getPayerAddress());
+        /*Result<AccountVo>  payerAccountVoResult= remoteAccountService.findByAddress(deviceBindDto.getPayerAddress());
         AccountVo payerAccountVo=payerAccountVoResult.getData();
         if(payerAccountVo==null){
             throw new PayerAccountNotExistException("付款方账户不存在");
-        }
+        }*/
         /*if(payerAccountVo.getBalance().subtract(deviceBindDto.getStakingFee()).compareTo(new BigInteger("0"))>0){
             throw new PayerAccountNotEnoughException("账户额度不够");
         }*/
 
         Result<AccountVo>  ownerAccountVoResult= remoteAccountService.findByAddress(deviceBindDto.getOwnerAddress());
+        log.info("bind.ownerAccountVoResult=", JSON.toJSONString(ownerAccountVoResult));
         long accountId=0l;
         if(ownerAccountVoResult.getData()==null){
             AccountRegisterDto accountRegisterDto=new AccountRegisterDto();
             accountRegisterDto.setAddress(deviceBindDto.getOwnerAddress());
             accountRegisterDto.setAccountType(BusinessConstants.AccountType.MINER);
             Result<Long> registerResult=remoteAccountService.register(accountRegisterDto);
+            log.info("bind.registerResult=", JSON.toJSONString(registerResult));
             if(registerResult.getCode()!=ApiStatus.SUCCESS.getCode()){
                 throw new OwnerAccountNotExistException("owner账户创建失败");
             }else{
@@ -148,8 +153,8 @@ public class DeviceServiceImpl implements DeviceService {
         transactionDto.setFromAddress(device.getAddress());
         transactionDto.setHeight(blockVoResult.getData());
         transactionDto.setData(deviceBindDto.getTxData());
-        String txHash=Base58.encode(DigestUtils.sha256(deviceBindDto.getTxData()));
-        transactionDto.setHash(txHash);
+
+        transactionDto.setHash(deviceBindDto.getTxHash());
         transactionDto.setTxType(BusinessConstants.TXType.TX_ONBOARD_MINER);
         remoteTransactionService.transaction(transactionDto);
     }

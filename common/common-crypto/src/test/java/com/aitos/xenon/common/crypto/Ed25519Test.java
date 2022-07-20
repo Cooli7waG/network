@@ -33,11 +33,35 @@ public class Ed25519Test {
 
     }
 
+
+    @Test
+    public void test_verify58(){
+        String publickKey="DAiZeFMqonUF2rje3z6JZSxX2W4AKgb6A1fcCDBRsmDt";
+        byte[] publickKeyBase58=Base58.decode(publickKey);
+
+        byte[] randon=Hex.decode("67940fd7146640a181ccd4ab15e556df1a092b67e6c9466b8adbb3f3953bb1a1");
+
+        String privateKey="C219AC92FAC5CD420DCBE5A7D542E152C6E11C478545CCB4E70CE83CF0974496";
+
+        String sign=Ed25519.sign(privateKey,randon);
+        System.out.println(Base58.encode(Hex.decode(sign)));
+
+        String sign2="wCppHdPPa7uWnQu75QFSHiVWhUvoVwJeaSqS6y282Mu216hkcFm8dczxuLy9q6ZA6FsyCWFjyjYeZwfDxt4re2X";
+
+        Boolean verify=Ed25519.verifyBase58(publickKey,randon,sign2);
+        System.out.println(verify);
+
+    }
+
     @Test
     public void test_base58(){
         //设备公钥转base58
-        String publickKey="DA933CF6DB6C3381C7C29DCC933B944835F79C9FF01D0FB51314EFA50AAA14A2";
+        String publickKey="6ACD2F1C71AACC7672D183320F375CB59622D44742D63B63F3A38B450C11295A";
         System.out.println(Base58.encode(Hex.decode(publickKey)));
+
+        byte[] test=Base58.decode("4HwNfwinHd1DUucChL3e73xCPPL6bFeQDRXhaT79D9TJ");
+        String data= org.bouncycastle.util.encoders.Hex.toHexString(test);
+        System.out.println(data);
 
     }
 

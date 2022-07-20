@@ -62,7 +62,7 @@ public class PoggController {
         String randomSignature=paramsObject.getString("randomSignature");
         byte[] random= Hex.decode(paramsObject.getString("random"));
 
-        byte[] signature=Base58.decode(paramsObject.getString("signature"));
+        String signature=paramsObject.getString("signature");
 
         paramsObject.remove("signature");
         String data=paramsObject.toJSONString();
@@ -71,8 +71,7 @@ public class PoggController {
             return Result.failed(ApiStatus.BUSINESS_POGG_RANDOM_SIGN_ERROR);
         }
 
-
-        if(!Ed25519.verify(address,data.getBytes(),signature)){
+        if(!Ed25519.verifyBase58(address,data.getBytes(),signature)){
             return Result.failed(ApiStatus.BUSINESS_POGG_RESPONSE_SIGN_ERROR);
         }
 
@@ -101,14 +100,14 @@ public class PoggController {
         if(!challengeHit(poggResponseDto.getChallengeHash(),random,randomSignature)){
             return Result.failed(ApiStatus.BUSINESS_POGG_CHALLENGE_NO_HIT);
         }
-        PoggChallengeRecord poggChallengeRecordTemp= poggService.findChallengeRecordByRandom(poggResponseDto.getAddressToHex(),poggResponseDto.getRandom());
+        PoggChallengeRecord poggChallengeRecordTemp= poggService.findChallengeRecordByRandom(poggResponseDto.getAddress(),poggResponseDto.getRandom());
         if(poggChallengeRecordTemp!=null){
             return Result.failed(ApiStatus.REPEAT_RECORD);
         }
 
         PoggChallengeRecord poggChallengeRecord=new PoggChallengeRecord();
         poggChallengeRecord.setRandom(poggResponseDto.getRandom());
-        poggChallengeRecord.setAddress(poggResponseDto.getAddressToHex());
+        poggChallengeRecord.setAddress(poggResponseDto.getAddress());
         poggChallengeRecord.setDeviceId(deviceVoResult.getData().getId());
         poggChallengeRecord.setData(body);
         String txHash=poggService.saveChallengeRecord(poggChallengeRecord);

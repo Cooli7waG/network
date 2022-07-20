@@ -66,7 +66,7 @@ public class PoggServiceImpl implements PoggService {
         pogg.setTimeout(block.getHeight()+timeoutRange);
 
         String txData=JSON.toJSONString(pogg);
-        String txHash=Base58.encode(DigestUtils.sha256(txData));
+        String txHash=DigestUtils.sha256Hex(txData);
         pogg.setTxHash(txHash);
         poggMapper.genChallenge(pogg);
 
@@ -99,7 +99,7 @@ public class PoggServiceImpl implements PoggService {
         TransactionDto transactionDto =new TransactionDto();
         transactionDto.setFromAddress(poggChallengeRecord.getAddress());
         transactionDto.setHeight(block.getHeight());
-        String txHash=Base58.encode(DigestUtils.sha256(poggChallengeRecord.getData()));
+        String txHash=DigestUtils.sha256Hex(poggChallengeRecord.getData());
         transactionDto.setData(poggChallengeRecord.getData());
         transactionDto.setHash(txHash);
         transactionDto.setTxType(BusinessConstants.TXType.TX_RESPONSE_POGG);

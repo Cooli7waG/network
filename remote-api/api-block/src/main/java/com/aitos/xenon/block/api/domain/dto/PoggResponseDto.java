@@ -87,7 +87,4 @@ public class PoggResponseDto {
 
     private String  signature;
 
-    public String getAddressToHex() {
-        return Hex.toHexString(Base58.decode(address));
-    }
 }

@@ -44,7 +44,9 @@ public class AccountServiceImpl implements AccountService {
     public Account findByAddress(String address) {
         try{
             Account account=accountMapper.findByAddress(address);
-            if(account.getAccountType()== BusinessConstants.AccountType.FOUNDATION){
+            if(account==null){
+                return null;
+            }else if(account.getAccountType()== BusinessConstants.AccountType.FOUNDATION){
                 BigInteger balance= bmtERC20._foundations_left().send();
                 account.setBalance(balance.toString());
             }else{
