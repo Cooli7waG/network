@@ -15,7 +15,7 @@
       <el-input v-model="data.form.maker" />
     </el-form-item>
     <el-form-item label="基金会签名">
-      <el-input v-model="data.form.signature" />
+      <el-input v-model="data.form.foundationSignature" />
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="registerSubmit">注册</el-button>
@@ -47,7 +47,7 @@ export default {
         address:'',
         minerType:'1',
         maker:'',
-        signature:'',
+        foundationSignature:'',
       }
     })
 
