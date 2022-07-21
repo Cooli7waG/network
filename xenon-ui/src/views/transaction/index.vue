@@ -1,0 +1,167 @@
+<template>
+  <el-breadcrumb style="margin-bottom: 20px;">
+    <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+    <el-breadcrumb-item >交易列表</el-breadcrumb-item>
+  </el-breadcrumb>
+  <el-row :gutter="24">
+    <el-col :span="20">
+      <div class="mt-4">
+        <el-input v-model="data.query.keyword" placeholder="请输入交易hash或块高">
+          <template #append>
+            <el-button type="primary" @click="search">搜索</el-button>
+          </template>
+        </el-input>
+      </div>
+    </el-col>
+  </el-row>
+  <el-row :gutter="24">
+    <el-col :span="24">
+      <el-pagination
+          v-model:currentPage="data.query.page.currentPage"
+          v-model:page-size="data.query.page.pageSize"
+          :page-sizes="[100, 200, 300, 400]"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="data.query.page.total"
+          @size-change="pageSizeChange"
+          @current-change="pageCurrentChange"
+      />
+      <el-table :data="data.tableList" stripe border   style="width: 100%">
+        <el-table-column prop="hash" label="交易Hash" width="450">
+          <template #default="scope">
+            <router-link :to="'/tx/'+scope.row.hash">{{scope.row.hash}}</router-link>
+          </template>
+        </el-table-column>
+        <el-table-column prop="height" label="块高" width="180" >
+          <template #default="scope">
+            <el-link @click="()=>{data.query.keyword=scope.row.height;search();}">{{scope.row.height}}</el-link>
+          </template>
+        </el-table-column>
+        <el-table-column prop="txType" label="交易类型" width="180" >
+          <template #default="scope">
+            {{scope.row.txType?Constant.TXType[scope.row.txType]:''}}
+          </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="交易时间" >
+          <template #default="scope">
+            {{formatDate(scope.row.createTime, "yyyy-MM-dd hh:mm:ss")}}
+          </template>
+        </el-table-column>
+      </el-table>
+
+    </el-col>
+  </el-row>
+</template>
+
+<script>
+import Constant from '@/utils/constant.js'
+import { formatDate } from '@/utils/data_format.js'
+import {transactionList} from '@/api/transaction.js'
+import {onMounted, reactive} from "vue";
+import {useRoute, useRouter} from 'vue-router'
+export default {
+  props: {
+    msg: String
+  },
+  computed: {
+    formatDate() {
+      return formatDate
+    },
+    Constant() {
+      return Constant
+    }
+  },
+  setup(){
+
+    const data = reactive({
+      query:{
+        keyword:'',
+        page:{
+          currentPage:1,
+          pageSize:10,
+          total:0
+        }
+      },
+      tableList :[]
+    })
+    const router = useRouter()
+    const route= useRoute()
+
+    const pageSizeChange = (pageSize) => {
+      data.query.page.pageSize=pageSize
+      loadTransactionList()
+    }
+    const pageCurrentChange = (currentPage) => {
+      data.query.page.currentPage=currentPage
+      loadTransactionList()
+    }
+
+    const search=()=>{
+      if(!data.query.keyword) {
+        data.query.page.keyword=''
+        data.query.page.currentPage=1
+        data.query.page.pageSize=10
+        loadTransactionList()
+      }else if(/^\d+$/.test(data.query.keyword)){
+        data.query.page.currentPage=1
+        data.query.page.pageSize=10
+        loadTransactionList(data.query.keyword)
+      }else{
+        router.push({
+          name:"TransactionInfo",
+          path: '/tx/'+data.query.keyword,
+          params:{
+            hash:data.query.keyword
+          }
+        })
+      }
+    }
+
+    const loadTransactionList=(height)=>{
+      const params={
+        offset:data.query.page.currentPage,
+        limit:data.query.page.pageSize
+      }
+      if(height){
+        params['height']=height
+      }
+      transactionList(params).then((result)=>{
+          data.query.page.total=result.data.total
+          data.tableList=result.data.items
+      }).catch((err) =>{
+        console.log(err);
+      });
+    }
+
+    onMounted(() => {
+      console.log("onMounted")
+      if(route.query.keyword){
+        data.query.keyword=route.query.keyword
+      }
+      loadTransactionList()
+    })
+
+    return {
+      data,
+      pageSizeChange,
+      pageCurrentChange,
+      search,
+      loadTransactionList
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+.box-card {
+  .item{
+    margin-bottom: 20px;
+    .lable{
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+  }
+
+}
+.el-pagination{
+  justify-content: flex-end;
+}
+</style>
