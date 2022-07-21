@@ -138,6 +138,7 @@ public class DeviceController {
         DeviceDetial  deviceDetial=BeanConvertor.toBean(deviceDetialDto,DeviceDetial.class);
         Device device=deviceService.findByAddress(deviceDetialDto.getAddress());
         deviceDetial.setDeviceId(device.getId());
+        log.info("updateDeviceDetial:",JSON.toJSONString(deviceDetial));
         deviceDetialService.updateDeviceDetial(deviceDetial);
         return Result.ok();
     }
