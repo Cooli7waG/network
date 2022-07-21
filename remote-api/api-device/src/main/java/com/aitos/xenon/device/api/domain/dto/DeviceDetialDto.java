@@ -39,78 +39,78 @@ public class DeviceDetialDto extends BaseModel {
     /**
      * 发电电压
      */
-    private Float sGVoltage;
+    private float sGVoltage;
     /**
      * 发电电流
      */
-    private Float sGCurrent;
+    private float sGCurrent;
     /**
      * 发电功率（低）
      */
-    private Float sGPowerLow;
+    private float sGPowerLow;
 
     /**
      * 发电功率（高）
      */
-    private Float sGPowerHigh;
+    private float sGPowerHigh;
 
     /**
      * 蓄电池电压
      */
-    private Float sBVoltage;
+    private float sBVoltage;
 
     /**
      * 蓄电池电压
      */
-    private Float sBCurrent;
+    private float sBCurrent;
 
     /**
      * 蓄电池功率（低）
      */
-    private Float sBPowerLow;
+    private float sBPowerLow;
 
     /**
      * 蓄电池功率（高）
      */
-    private Float sBPowerHigh;
+    private float sBPowerHigh;
 
     /**
      * 负载电压
      */
-    private Float sLVoltage;
+    private float sLVoltage;
 
     /**
      * 负载电压
      */
-    private Float sLCurrent;
+    private float sLCurrent;
     /**
      * 负载功率（低）
      */
-    private Float sLPowerLow;
+    private float sLPowerLow;
 
     /**
      *负载功率（高）
      */
-    private Float sLPowerHigh;
+    private float sLPowerHigh;
 
     /**
      * 当日累计充电量
      */
-    private Float todayChargeVol;
+    private float todayChargeVol;
 
     /**
      * 当日累计用电量
      */
-    private Float todayUsageVol;
+    private float todayUsageVol;
 
     /**
      * 当日累计充电量
      */
-    private Float intervalChargeVol;
+    private float intervalChargeVol;
 
     /**
      * 当日累计用电量
      */
-    private Float intervalUsageVol;
+    private float intervalUsageVol;
 
 }
