@@ -16,6 +16,7 @@ import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
 import com.aitos.xenon.device.api.domain.dto.DeviceRegisterDto;
 import com.aitos.xenon.device.api.domain.dto.DeviceSearchDto;
+import com.aitos.xenon.device.api.domain.dto.DeviceTerminateMinerDto;
 import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.domain.DeviceDetial;
 import com.aitos.xenon.device.api.domain.dto.DeviceBindDto;
@@ -198,5 +199,9 @@ public class DeviceServiceImpl implements DeviceService {
         return deviceDetialService.findByDeviceId(deviceId);
     }
 
+    @Override
+    public void terminate(DeviceTerminateMinerDto deviceTerminateMinerDto) {
+        deviceMapper.terminate(deviceTerminateMinerDto);
+    }
 
 }
