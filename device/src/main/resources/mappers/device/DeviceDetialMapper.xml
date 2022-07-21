@@ -18,7 +18,7 @@
                 start_height=#{startHeight},energy=#{energy},capabilities=#{capabilities},device_model=#{deviceModel},device_serial_num=#{deviceSerialNum},
                 sGVoltage=#{sGVoltage},sGCurrent=#{sGCurrent},sGCurrent=#{sGCurrent},sGPowerLow=#{sGPowerLow},sGPowerHigh=#{sGPowerHigh},sGPowerHigh=#{sBVoltage},
                 sBVoltage=#{sBVoltage},sBCurrent=#{sBCurrent},sBPowerLow=#{sBPowerLow},sBPowerHigh=#{sBPowerHigh},sLVoltage=#{sLVoltage},sLCurrent=#{sLCurrent},
-                sLPowerLow=#{sLPowerLow},sLPowerHigh=#{sLPowerHigh},totalChargeVol=#{totalChargeVol},totalUsageVol=#{totalUsageVol},update_time=now()
+                sLPowerLow=#{sLPowerLow},sLPowerHigh=#{sLPowerHigh},totalChargeVol=totalChargeVol+#{intervalChargeVol},totalUsageVol=totalUsageVol+#{intervalUsageVol},update_time=now()
             </set>
         where device_id=#{deviceId}
     </update>

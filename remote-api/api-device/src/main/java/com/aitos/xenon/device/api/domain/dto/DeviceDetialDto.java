@@ -94,13 +94,23 @@ public class DeviceDetialDto extends BaseModel {
     private Float sLPowerHigh;
 
     /**
-     * 负载功率（高）
+     * 当日累计充电量
      */
-    private Float totalChargeVol;
+    private Float todayChargeVol;
 
     /**
-     * 总累计用电量
+     * 当日累计用电量
      */
-    private Float totalUsageVol;
+    private Float todayUsageVol;
+
+    /**
+     * 当日累计充电量
+     */
+    private Float intervalChargeVol;
+
+    /**
+     * 当日累计用电量
+     */
+    private Float intervalUsageVol;
 
 }

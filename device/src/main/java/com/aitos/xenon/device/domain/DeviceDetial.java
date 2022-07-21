@@ -111,5 +111,15 @@ public class DeviceDetial extends BaseModel {
      */
     private Float totalUsageVol;
 
+    /**
+     * 当日累计充电量
+     */
+    private Float intervalChargeVol;
+
+    /**
+     * 当日累计用电量
+     */
+    private Float intervalUsageVol;
+
     private Long deviceId;
 }
