@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -51,7 +52,12 @@ public class PoggController {
         return Result.ok(poggChallengeVo);
     }
 
-
+    @PostMapping("/poggHitPerBlocks")
+    public Result<HashMap<String,String>> poggHitPerBlocks(){
+        HashMap<String,String> hashMap=new HashMap<>();
+        hashMap.put("challengeHit",challengeHit+"");
+        return Result.ok(hashMap);
+    }
 
     @PostMapping("/response")
     public Result response(@RequestBody String body){

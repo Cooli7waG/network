@@ -109,7 +109,6 @@ public class PoggServiceImpl implements PoggService {
         }
         DeviceDetialDto deviceDetialDto=JSON.parseObject(poggChallengeRecord.getData(),DeviceDetialDto.class);
         deviceDetialDto.setAddress(poggChallengeRecord.getAddress());
-        log.info("saveChallengeRecord:",JSON.toJSONString(deviceDetialDto));
         Result deviceResult=remoteDeviceService.updateDeviceDetial(deviceDetialDto);
         if(deviceResult.getCode()!= ApiStatus.SUCCESS.getCode()){
             throw new ServiceException(result.getMsg());

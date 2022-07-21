@@ -25,7 +25,7 @@
     </select>
 
     <select id="minerStats" resultType="com.aitos.xenon.block.domain.MinerStatistics">
-        select sum(totalChargeVol) as totalPowerLow ,sum(totalUsageVol) as totalUsageVol from device_detial;
+        select sum(totalChargeVol) as totalChargeVol ,sum(totalUsageVol) as totalUsageVol from device_detial;
     </select>
 
 </mapper>
