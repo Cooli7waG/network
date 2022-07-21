@@ -5,10 +5,7 @@ import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.model.Page;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
-import com.aitos.xenon.device.api.domain.dto.DeviceBindDto;
-import com.aitos.xenon.device.api.domain.dto.DeviceDetialDto;
-import com.aitos.xenon.device.api.domain.dto.DeviceRegisterDto;
-import com.aitos.xenon.device.api.domain.dto.DeviceSearchDto;
+import com.aitos.xenon.device.api.domain.dto.*;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.domain.DeviceDetial;
@@ -22,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/device")
 @Slf4j
+@RefreshScope
 public class DeviceController {
 
     @Autowired
@@ -43,7 +42,7 @@ public class DeviceController {
     @PostMapping("/register")
     public Result register(@RequestBody DeviceRegisterDto deviceRegister){
 
-        Boolean verify= Ed25519.verifyBase58(foundationPublicKey,deviceRegister.getAddress(),deviceRegister.getSignature());
+        Boolean verify= Ed25519.verifyBase58(foundationPublicKey,deviceRegister.getAddress(),deviceRegister.getFoundationSignature());
         if(!verify){
             return Result.failed(ApiStatus.VALIDATE_SIGN_FAILED);
         }
@@ -111,6 +110,17 @@ public class DeviceController {
         return Result.ok(txHash);
     }
 
+    @PostMapping("/terminate")
+    public Result terminate(@RequestBody DeviceTerminateMinerDto deviceTerminateMinerDto){
+        log.info("terminate.params:{}",JSON.toJSONString(deviceTerminateMinerDto));
+
+        if(!Ed25519.verifyBase58(foundationPublicKey,deviceTerminateMinerDto.getAddress(),deviceTerminateMinerDto.getFoundationSignature())){
+            return Result.failed(ApiStatus.BUSINESS_FOUNDATION_SIGN_ERROR);
+        }
+        deviceService.terminate(deviceTerminateMinerDto);
+        return Result.ok();
+    }
+
     @GetMapping("/queryByMiner")
     public Result<DeviceVo> queryByMiner(@RequestParam("minerAddress")String minerAddress){
        DeviceVo device= deviceService.queryByMiner(minerAddress);
@@ -135,6 +145,7 @@ public class DeviceController {
 
     @PutMapping("/detial")
     public Result updateDeviceDetial(@RequestBody DeviceDetialDto deviceDetialDto){
+        log.info("updateDeviceDetial:",JSON.toJSONString(deviceDetialDto));
         DeviceDetial  deviceDetial=BeanConvertor.toBean(deviceDetialDto,DeviceDetial.class);
         Device device=deviceService.findByAddress(deviceDetialDto.getAddress());
         deviceDetial.setDeviceId(device.getId());

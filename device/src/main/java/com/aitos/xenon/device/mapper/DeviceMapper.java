@@ -2,6 +2,7 @@ package com.aitos.xenon.device.mapper;
 
 import com.aitos.xenon.core.model.QueryParams;
 import com.aitos.xenon.device.api.domain.dto.DeviceSearchDto;
+import com.aitos.xenon.device.api.domain.dto.DeviceTerminateMinerDto;
 import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -25,4 +26,6 @@ public interface DeviceMapper {
     List<Device> findByAccountId(Long accountId);
 
     List<DeviceVo> queryByOwner(Long accountId);
+
+    void terminate(DeviceTerminateMinerDto deviceTerminateMinerDto);
 }

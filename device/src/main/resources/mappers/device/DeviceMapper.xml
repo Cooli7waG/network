@@ -59,5 +59,8 @@
             </set>
             where id=#{id}
     </update>
+    <update id="terminate">
+        update <include refid="tableName"/> set terminate=1 where address=#{address}
+    </update>
 
 </mapper>
