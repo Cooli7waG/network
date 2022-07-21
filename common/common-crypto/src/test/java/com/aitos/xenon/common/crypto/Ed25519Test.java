@@ -59,7 +59,7 @@ public class Ed25519Test {
         String publickKey="6ACD2F1C71AACC7672D183320F375CB59622D44742D63B63F3A38B450C11295A";
         System.out.println(Base58.encode(Hex.decode(publickKey)));
 
-        byte[] test=Base58.decode("4HwNfwinHd1DUucChL3e73xCPPL6bFeQDRXhaT79D9TJ");
+        byte[] test=Base58.decode("4GMXckWtgP62Z6qwZ7ZFWHYEbPqwkCe99TvXD9yUF5oY");
         String data= org.bouncycastle.util.encoders.Hex.toHexString(test);
         System.out.println(data);
 

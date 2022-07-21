@@ -113,7 +113,7 @@ public class DeviceServiceImpl implements DeviceService {
         if(ownerAccountVoResult.getData()==null){
             AccountRegisterDto accountRegisterDto=new AccountRegisterDto();
             accountRegisterDto.setAddress(deviceBindDto.getOwnerAddress());
-            accountRegisterDto.setAccountType(BusinessConstants.AccountType.MINER);
+            accountRegisterDto.setAccountType(BusinessConstants.AccountType.OWNER);
             Result<Long> registerResult=remoteAccountService.register(accountRegisterDto);
             log.info("bind.registerResult=", JSON.toJSONString(registerResult));
             if(registerResult.getCode()!=ApiStatus.SUCCESS.getCode()){
