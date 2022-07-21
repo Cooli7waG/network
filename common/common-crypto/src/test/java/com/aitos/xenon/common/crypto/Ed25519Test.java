@@ -56,7 +56,7 @@ public class Ed25519Test {
     @Test
     public void test_base58(){
         //设备公钥转base58
-        String publickKey="6ACD2F1C71AACC7672D183320F375CB59622D44742D63B63F3A38B450C11295A";
+        String publickKey="D12DF9EE3D32D5942C45525645F524FAB55B935848DBC9C492667D7409FDFC4F";
         System.out.println(Base58.encode(Hex.decode(publickKey)));
 
         byte[] test=Base58.decode("4GMXckWtgP62Z6qwZ7ZFWHYEbPqwkCe99TvXD9yUF5oY");
