@@ -7,9 +7,6 @@ public interface BusinessConstants
      * 基金会
      */
     interface ArgonFoundation{
-        String publicKey="4d7e10c17f92fb1cfbb2a8268c42198bfc632e973e465531ba68194a277f9247";
-        String privateKey="946b840beca0d06950b64438f86cf5c24ce714321b535ea910db2dd97e828d8e";
-
         String web3PublicKey="0xD909b78898AE965C90bb57056da4B18a00582d0E";
         String web3PrivateKey="fcaf466fe5337fb6259245ed23076592d560636924e2f3706ca855f0234d559a";
     }

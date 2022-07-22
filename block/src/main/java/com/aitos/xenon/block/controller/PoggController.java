@@ -73,11 +73,11 @@ public class PoggController {
         paramsObject.remove("signature");
         String data=paramsObject.toJSONString();
 
-        if(!Ed25519.verifyBase58(address,random,randomSignature)){
+        if(!Ed25519.verify(address,random,randomSignature)){
             return Result.failed(ApiStatus.BUSINESS_POGG_RANDOM_SIGN_ERROR);
         }
 
-        if(!Ed25519.verifyBase58(address,data.getBytes(),signature)){
+        if(!Ed25519.verify(address,data.getBytes(),signature)){
             return Result.failed(ApiStatus.BUSINESS_POGG_RESPONSE_SIGN_ERROR);
         }
 

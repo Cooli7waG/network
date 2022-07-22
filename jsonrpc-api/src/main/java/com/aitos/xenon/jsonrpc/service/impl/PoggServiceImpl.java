@@ -9,6 +9,7 @@ import com.aitos.xenon.jsonrpc.service.PoggService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Service("pogg")
@@ -30,6 +31,23 @@ public class PoggServiceImpl implements PoggService {
                 rpcResult.setTxhash(list.get(result.getData().size()-1).getTxHash());
                 rpcResult.setResult(list.get(result.getData().size()-1));
             }
+        }else{
+            rpcResult.setVersion(1);
+            rpcResult.setCode(result.getCode());
+            rpcResult.setMessage(result.getMsg());
+        }
+        return rpcResult;
+    }
+
+    @Override
+    public RpcResult poggHitPerBlocks() {
+        Result<HashMap<String,String>> result= remotePoggService.poggHitPerBlocks();
+        RpcResult  rpcResult=new RpcResult();
+        if(result.getCode()== ApiStatus.SUCCESS.getCode())
+        {
+            rpcResult.setVersion(1);
+            rpcResult.setCode(result.getCode());
+            rpcResult.setResult(result.getData());
         }else{
             rpcResult.setVersion(1);
             rpcResult.setCode(result.getCode());

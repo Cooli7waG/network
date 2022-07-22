@@ -42,7 +42,7 @@ public class DeviceController {
     @PostMapping("/register")
     public Result register(@RequestBody DeviceRegisterDto deviceRegister){
 
-        Boolean verify= Ed25519.verifyBase58(foundationPublicKey,deviceRegister.getAddress(),deviceRegister.getFoundationSignature());
+        Boolean verify= Ed25519.verify(foundationPublicKey,deviceRegister.getAddress(),deviceRegister.getFoundationSignature());
         if(!verify){
             return Result.failed(ApiStatus.VALIDATE_SIGN_FAILED);
         }
@@ -81,13 +81,13 @@ public class DeviceController {
         String minerData=paramsObject.toJSONString();
         log.info("onboard.minerData:{}",minerData);
 
-        if(!Ed25519.verifyBase58(payerAddress,payerData,payerSignature)){
+        if(!Ed25519.verify(payerAddress,payerData,payerSignature)){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_PAYER_SIGN_ERROR);
         }
-        if(!Ed25519.verifyBase58(ownerAddress,ownerData,ownerSignature)){
+        if(!Ed25519.verify(ownerAddress,ownerData,ownerSignature)){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_OWNER_SIGN_ERROR);
         }
-        if(!Ed25519.verifyBase58(minerAddress,minerData,minerSignature)){
+        if(!Ed25519.verify(minerAddress,minerData,minerSignature)){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_MINER_SIGN_ERROR);
         }
 
@@ -114,7 +114,7 @@ public class DeviceController {
     public Result terminate(@RequestBody DeviceTerminateMinerDto deviceTerminateMinerDto){
         log.info("terminate.params:{}",JSON.toJSONString(deviceTerminateMinerDto));
 
-        if(!Ed25519.verifyBase58(foundationPublicKey,deviceTerminateMinerDto.getAddress(),deviceTerminateMinerDto.getFoundationSignature())){
+        if(!Ed25519.verify(foundationPublicKey,deviceTerminateMinerDto.getAddress(),deviceTerminateMinerDto.getFoundationSignature())){
             return Result.failed(ApiStatus.BUSINESS_FOUNDATION_SIGN_ERROR);
         }
         deviceService.terminate(deviceTerminateMinerDto);

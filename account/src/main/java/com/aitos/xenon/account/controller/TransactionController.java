@@ -19,6 +19,7 @@ import com.aitos.xenon.core.utils.BeanConvertor;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +28,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/transaction")
 public class TransactionController {
+
+    @Value("${foundation.publicKey}")
+    private String foundationPublicKey;
 
     @Autowired
     private TransactionService transactionService;
@@ -42,7 +46,7 @@ public class TransactionController {
     public Result transfer(@RequestBody TransferDto transferDto){
         byte[] signatureBytes= Base58.decode(transferDto.getSignature());
         byte[] addressBytes= Base58.decode(transferDto.getPayments().get(0).getPayee());
-        Boolean verify= Ed25519.verify(BusinessConstants.ArgonFoundation.publicKey,addressBytes,signatureBytes);
+        Boolean verify= Ed25519.verify(foundationPublicKey,addressBytes,signatureBytes);
         if(!verify){
             return Result.failed(ApiStatus.BUSINESS_TRANSACTION_SIGN_ERROR);
         }

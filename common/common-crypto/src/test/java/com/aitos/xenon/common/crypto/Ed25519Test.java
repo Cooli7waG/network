@@ -10,80 +10,46 @@ public class Ed25519Test {
 
     @Test
     public void test_gen(){
-        Ed25519KeyPair ed25519KeyPair= Ed25519.gen();
+        Ed25519KeyPair ed25519KeyPair= Ed25519.gerateKeyPair();
         System.out.println(ed25519KeyPair.getPrivateKey());
         System.out.println(ed25519KeyPair.getPublicKey());
-        System.out.println(Base58.encode(Hex.decode(ed25519KeyPair.getPublicKey())));
+    }
+
+    @Test
+    public void test_getPublickKey(){
+        String publickKey= Ed25519.getPublickKey("H5EUV4jrUY1ddSjrfvpCXSYTa5PT7FB9WGt896g5nrXx");
+        System.out.println(publickKey);
     }
 
     @Test
     public void test_sign(){
 
-        String privateKey="302e020100300506032b657004220420b524fe064dbc213d0c92cdba8870e0ab0ea3ce92c872fa0e9ca7cbaac3b4e357";
-        String sign=Ed25519.sign(privateKey,"100000000000000000000000000000001".getBytes());
-        System.out.println(Base58.encode(Hex.decode(sign)));
+        String privateKey="H5EUV4jrUY1ddSjrfvpCXSYTa5PT7FB9WGt896g5nrXx";
+        String sign=Ed25519.sign(privateKey,"6DVtNLWnbiyJ7NWt2wLR5PCS84h36UK68eBw9dUbhGbx".getBytes());
+        System.out.println(sign);
     }
 
     @Test
     public void test_verify(){
-        String publickKey="CB23252E6F49C497D9C9367FCF973DA4FB165B4B66F2F67B33D3AA26B3DBEB01";
-        String sign="A189CD3B83AEABD160EA37D0465062E90696011E001549149887BA44FE65E558DF9DDB5EA3FE0FCA60F8FADFE45CB66CE413169B5CAB96A4438F55BE34D0140F";
-        Boolean verify=Ed25519.verify(publickKey,Hex.decode("112233445566"),Hex.decode(sign));
+        String publickKey="8kh5fpTiTRf54wTgbdq88um8pjj3Pd3kJS6XC2P9EfBM";
+        String sign="3BKa44Gbnzu5aSbSBcE5qTD7uwZV2Jdtgv8Xjf4bgTgdxgUyhM2idfLMHqJ41fxYXDhXHQ11faitpaSLd9TLZxNN";
+        Boolean verify=Ed25519.verify(publickKey,"6DVtNLWnbiyJ7NWt2wLR5PCS84h36UK68eBw9dUbhGbx".getBytes(),sign);
         System.out.println(verify);
 
     }
 
 
     @Test
-    public void test_verify58(){
+    public void test_verify2(){
         String publickKey="DAiZeFMqonUF2rje3z6JZSxX2W4AKgb6A1fcCDBRsmDt";
-        byte[] publickKeyBase58=Base58.decode(publickKey);
 
         byte[] randon=Hex.decode("67940fd7146640a181ccd4ab15e556df1a092b67e6c9466b8adbb3f3953bb1a1");
 
-        String privateKey="C219AC92FAC5CD420DCBE5A7D542E152C6E11C478545CCB4E70CE83CF0974496";
-
-        String sign=Ed25519.sign(privateKey,randon);
-        System.out.println(Base58.encode(Hex.decode(sign)));
-
         String sign2="wCppHdPPa7uWnQu75QFSHiVWhUvoVwJeaSqS6y282Mu216hkcFm8dczxuLy9q6ZA6FsyCWFjyjYeZwfDxt4re2X";
 
-        Boolean verify=Ed25519.verifyBase58(publickKey,randon,sign2);
+        Boolean verify=Ed25519.verify(publickKey,randon,sign2);
         System.out.println(verify);
 
-    }
-
-    @Test
-    public void test_base58(){
-        //设备公钥转base58
-        String publickKey="D12DF9EE3D32D5942C45525645F524FAB55B935848DBC9C492667D7409FDFC4F";
-        System.out.println(Base58.encode(Hex.decode(publickKey)));
-
-        byte[] test=Base58.decode("4GMXckWtgP62Z6qwZ7ZFWHYEbPqwkCe99TvXD9yUF5oY");
-        String data= org.bouncycastle.util.encoders.Hex.toHexString(test);
-        System.out.println(data);
-
-    }
-
-    @Test
-    public void test_ArgonFoundation_sign(){
-        String argonFoundationPublickKey="302a300506032b65700321004d7e10c17f92fb1cfbb2a8268c42198bfc632e973e465531ba68194a277f9247";
-        String argonFoundationPrivateKey="302e020100300506032b657004220420946b840beca0d06950b64438f86cf5c24ce714321b535ea910db2dd97e828d8e";
-        byte[] data=Hex.decode("CB23252E6F49C497D9C9367FCF973DA4FB165B4B66F2F67B33D3AA26B3DBEB01");
-        String sign=Ed25519.sign(argonFoundationPrivateKey,data);
-        System.out.println(Base58.encode(Hex.decode(sign)));
-    }
-
-    @Test
-    public void test_ArgonFoundation_signbase58(){
-        String argonFoundationPublickKey="302a300506032b65700321004d7e10c17f92fb1cfbb2a8268c42198bfc632e973e465531ba68194a277f9247";
-        String argonFoundationPrivateKey="302e020100300506032b657004220420946b840beca0d06950b64438f86cf5c24ce714321b535ea910db2dd97e828d8e";
-        String address=Base58.encode(Hex.decode("CB23252E6F49C497D9C9367FCF973DA4FB165B4B66F2F67B33D3AA26B3DBEB01"));
-        System.out.println(address);
-        byte[] data=Base58.decode(address);
-        String sign=Ed25519.sign(argonFoundationPrivateKey,data);
-        sign=Base58.encode(Hex.decode(sign));
-        System.out.println(sign);
     }
 
 

@@ -6,6 +6,7 @@ import com.aitos.xenon.common.crypto.ed25519.Ed25519;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.codec.Hex;
 import org.web3j.utils.Convert;
@@ -21,18 +22,20 @@ public class AccountServiceTest {
     @Autowired
     private AccountService  accountService;
 
+    @Value("${foundation.privateKey}")
+    private String privateKey;
+
+    @Value("${foundation.publicKey}")
+    private String publicKey;
+
     @Test
     public void test_save_sign(){
-        String privateKey=Base58.encode(org.bouncycastle.util.encoders.Hex.decode(BusinessConstants.ArgonFoundation.privateKey));
-        String publicKey=Base58.encode(org.bouncycastle.util.encoders.Hex.decode(BusinessConstants.ArgonFoundation.publicKey));
-        String data=Base58.encode(org.bouncycastle.util.encoders.Hex.decode("CB23252E6F49C497D9C9367FCF973DA4FB165B4B66F2F67B33D3AA26B3DBEB01"));
-        String sign= Ed25519.signBase58(privateKey,data);
+        String data=Base58.encode(org.bouncycastle.util.encoders.Hex.decode("73331A39E6A03D49724EBA76FECC062FA9293464F149A933813DB8D6F70D03B8"));
+        String sign= Ed25519.sign(privateKey,data);
 
         System.out.println(sign);
 
-        Boolean verify=Ed25519.verifyBase58(publicKey,
-                data,
-                sign);
+        Boolean verify=Ed25519.verify(publicKey,data,sign);
         System.out.println(verify);
     }
 
