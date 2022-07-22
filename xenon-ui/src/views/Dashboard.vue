@@ -3,15 +3,15 @@
     <el-col :span="8">
       <el-card class="box-card" >
         <div  class="text item">
-          <div class="lable">Virtual Miner数量</div>
+          <div class="lable">{{$t('dashboard.virtualMiners')}}</div>
           <div class="content">{{ data.blockchainstats.virtualMiners }}</div>
         </div>
         <div  class="text item">
-          <div class="lable">Light Solar Miner数量</div>
+          <div class="lable">{{$t('dashboard.lightSolarMiners')}}</div>
           <div class="content">{{ data.blockchainstats.lightSolarMiners }}</div>
         </div>
         <div  class="text item">
-          <div class="lable">区块数量（块高）</div>
+          <div class="lable">{{$t('dashboard.blocks')}}</div>
           <div class="content">{{ data.blockchainstats.blocks }}</div>
         </div>
 
@@ -20,16 +20,16 @@
     <el-col :span="8">
       <el-card class="box-card">
         <div  class="text item">
-          <div class="lable">PoGG挑战数量</div>
+          <div class="lable">{{$t('dashboard.poggChallenges')}}</div>
           <div class="content">{{ data.blockchainstats.poggChallenges }}</div>
         </div>
 
         <div  class="text item">
-          <div class="lable">交易数量</div>
+          <div class="lable">{{$t('dashboard.transactions')}}</div>
           <div class="content">{{ data.blockchainstats.transactions }}</div>
         </div>
         <div  class="text item">
-          <div class="lable">BMT总流通量</div>
+          <div class="lable">{{$t('dashboard.tokenSupply')}}</div>
           <div class="content">{{ data.blockchainstats.tokenSupply }}</div>
         </div>
       </el-card>
@@ -37,19 +37,19 @@
     <el-col :span="8">
       <el-card class="box-card">
         <div  class="text item" style="float:left">
-          <div class="lable">全网总功率（低）</div>
+          <div class="lable">{{$t('dashboard.totalPowerLow')}}</div>
           <div class="content">{{ data.minerStatistics.totalPowerLow }}</div>
         </div>
         <div  class="text item" style="text-align: right;">
-          <div class="lable">全网总功率（高）</div>
+          <div class="lable">{{$t('dashboard.totalPowerHigh')}}</div>
           <div class="content">{{ data.minerStatistics.totalPowerHigh }}</div>
         </div>
         <div  class="text item" style="float:left">
-          <div class="lable">全网总发电量</div>
+          <div class="lable">{{$t('dashboard.totalChargeVol')}}</div>
           <div class="content">{{ data.minerStatistics.totalChargeVol }}</div>
         </div>
         <div  class="text item" style="text-align: right;">
-          <div class="lable">全网总用电量</div>
+          <div class="lable">{{$t('dashboard.totalUsageVol')}}</div>
           <div class="content">{{ data.minerStatistics.totalUsageVol }}</div>
         </div>
         <div  class="text item" >

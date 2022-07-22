@@ -8,11 +8,17 @@
               class="el-menu-vertical-demo"
               :router="true"
           >
+            <el-menu-item index="/tools/sign">
+              <span>编解码</span>
+            </el-menu-item>
             <el-menu-item index="/tools/register">
               <span>Miner注册</span>
             </el-menu-item>
             <el-menu-item index="/tools/onboard">
               <span>Miner绑定</span>
+            </el-menu-item>
+            <el-menu-item index="/tools/virtualminer">
+              <span>Virtual Miner</span>
             </el-menu-item>
           </el-menu>
         </el-aside>

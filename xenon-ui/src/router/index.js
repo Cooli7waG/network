@@ -66,6 +66,11 @@ const routes = [
         component: () => import('@/views/tools/index.vue'),
         children:[
             {
+                path: "sign",
+                name: "Sign",
+                component: () => import('@/views/tools/sign.vue')
+            },
+            {
                 path: "register",
                 name: "MinerRegister",
                 component: () => import('@/views/tools/register.vue')
@@ -74,6 +79,11 @@ const routes = [
                 path: "onboard",
                 name: "MinerOnboard",
                 component: () => import('@/views/tools/onboard.vue')
+            },
+            {
+                path: "virtualminer",
+                name: "Virtualminer",
+                component: () => import('@/views/tools/virtualminer.vue')
             }
         ]
     }
