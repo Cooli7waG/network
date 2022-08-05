@@ -2,7 +2,7 @@ package com.aitos.xenon.device.api;
 
 
 import com.aitos.xenon.core.model.Result;
-import com.aitos.xenon.device.api.domain.dto.DeviceDetialDto;
+import com.aitos.xenon.device.api.domain.dto.DeviceDto;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +16,6 @@ public interface RemoteDeviceService {
     @GetMapping("/device/queryByMiner")
     Result<DeviceVo> queryByMiner(@RequestParam("minerAddress") String minerAddress);
 
-    @PutMapping("/device/detial")
-    Result updateDeviceDetial(@RequestBody DeviceDetialDto deviceDetialDto);
+    @PutMapping("/device/update")
+    Result update(@RequestBody DeviceDto deviceDto);
 }

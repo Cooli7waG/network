@@ -2,9 +2,8 @@ package com.aitos.xenon.device.service;
 
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.utils.BeanConvertor;
-import com.aitos.xenon.device.api.domain.dto.DeviceDetialDto;
+import com.aitos.xenon.device.api.domain.dto.DeviceInfoDto;
 import com.aitos.xenon.device.api.domain.dto.DeviceRegisterDto;
-import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.domain.DeviceDetial;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
@@ -19,14 +18,11 @@ public class DeviceServiceTest {
     @Autowired
     private DeviceService  deviceService;
 
-    @Autowired
-    private  DeviceDetialService  deviceDetialService;
-
     @Test
     public void test_save(){
         DeviceRegisterDto device=new DeviceRegisterDto();
         device.setAddress("100000000000000000000000000000001");
-        device.setMinerType(BusinessConstants.DeviceMinerType.VIRTUAL_MINER);
+        device.setMinerType(BusinessConstants.DeviceMinerType.GAME_MINER);
         device.setMaker("test");
         deviceService.save(device);
     }
@@ -45,18 +41,9 @@ public class DeviceServiceTest {
     public void test_json2(){
 
         String json="{\"version\":1,\"address\":\"Cf8z2Fo23hDp5vLwDVpZv4PtD8CDwE2CRCkei6gBgAoD\",\"random\":\"e93ede0a64544d09829d7cacf4e3d9ad02d54da368e8405ba8cc849a11b73f43\",\"randomSignature\":\"5wkhVYfdTFaT1eVLbB1LA88sfxb4XCYfAweuRGFmMGWs7ZB3SgDttFRoDGQAJ1erE84eART248qRs97aDCCgvzH9\",\"challengeHash\":\"bac67125c87e95d32a3c2dd42eb5f740cb9efb6441e5347c69204a66ffd3da9c\",\"todayChargeVol\":40.078431372549019,\"todayUsageVol\":66.313725490196077,\"intervalChargeVol\":59.921568627450981,\"intervalUsageVol\":56.666666666666664,\"signature\":\"37LPbYvBgR2czpfXyzMH2oPvb2BzCTxn1TkBMvSh1mEyNMzewqkSjXjMXgX4K6UaQZVtyZZQAx2aD6MMadegpJ27\"}";
-        DeviceDetialDto params = JSONObject.parseObject(json, DeviceDetialDto.class);
+        DeviceInfoDto params = JSONObject.parseObject(json, DeviceInfoDto.class);
 
         DeviceDetial  deviceDetial= BeanConvertor.toBean(params,DeviceDetial.class);
         System.out.println(deviceDetial);
-    }
-
-    @Test
-    public void test_updateDeviceDetial(){
-        DeviceDetial deviceDetial=new DeviceDetial();
-        deviceDetial.setDeviceId(1l);
-        deviceDetial.setIntervalChargeVol(1f);
-        deviceDetial.setIntervalUsageVol(1f);
-        deviceDetialService.updateDeviceDetial(deviceDetial);
     }
 }

@@ -44,6 +44,11 @@ const routes = [
         component: () => import('@/views/account/info.vue'),
     },
     {
+        path: "/blocks",
+        name: "Blocks",
+        component: () => import('@/views/block/index.vue'),
+    },
+    {
         path: "/console/",
         name: "Console",
         component: Console,

@@ -1,14 +1,14 @@
 <template>
   <el-breadcrumb style="margin-bottom: 20px;">
-    <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-    <el-breadcrumb-item >交易列表</el-breadcrumb-item>
+    <el-breadcrumb-item :to="{ path: '/' }">{{$t('txs.path.home')}}</el-breadcrumb-item>
+    <el-breadcrumb-item >{{$t('txs.path.txs')}}</el-breadcrumb-item>
   </el-breadcrumb>
   <el-row :gutter="24">
     <el-col :span="20">
       <div class="mt-4">
-        <el-input v-model="data.query.keyword" placeholder="请输入交易hash或块高">
+        <el-input v-model="data.query.keyword" :placeholder="$t('txs.query.searchPlaceHolder')">
           <template #append>
-            <el-button type="primary" @click="search">搜索</el-button>
+            <el-button type="primary" @click="search">{{$t('txs.query.searchButton')}}</el-button>
           </template>
         </el-input>
       </div>
@@ -26,22 +26,22 @@
           @current-change="pageCurrentChange"
       />
       <el-table :data="data.tableList" stripe border   style="width: 100%">
-        <el-table-column prop="hash" label="交易Hash" width="450">
+        <el-table-column prop="hash" :label="$t('txs.table.hash')" width="450">
           <template #default="scope">
             <router-link :to="'/tx/'+scope.row.hash">{{scope.row.hash}}</router-link>
           </template>
         </el-table-column>
-        <el-table-column prop="height" label="块高" width="180" >
+        <el-table-column prop="height" :label="$t('txs.table.height')" width="180" >
           <template #default="scope">
             <el-link @click="()=>{data.query.keyword=scope.row.height;search();}">{{scope.row.height}}</el-link>
           </template>
         </el-table-column>
-        <el-table-column prop="txType" label="交易类型" width="180" >
+        <el-table-column prop="txType" :label="$t('txs.table.txType')" width="180" >
           <template #default="scope">
             {{scope.row.txType?Constant.TXType[scope.row.txType]:''}}
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="交易时间" >
+        <el-table-column prop="createTime" :label="$t('txs.table.txTime')" >
           <template #default="scope">
             {{formatDate(scope.row.createTime, "yyyy-MM-dd hh:mm:ss")}}
           </template>

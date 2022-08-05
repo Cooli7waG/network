@@ -6,12 +6,24 @@
 
     <sql id="tableName">block</sql>
 
-    <update id="genBlock" useGeneratedKeys="true" keyProperty="id">
-        update <include refid="tableName"/> set height=height+1,update_time=now()
-    </update>
+    <insert id="save">
+        insert into <include refid="tableName"/> (height,block_interval_time,create_time)
+        values(#{height},#{blockIntervalTime},#{createTime})
+    </insert>
 
-    <select id="getBlock" resultType="com.aitos.xenon.block.domain.Block">
-        select * from <include refid="tableName"/> limit 1
+    <select id="getCurrentBlock" resultType="com.aitos.xenon.block.domain.Block">
+        select * from <include refid="tableName"/> order by height desc  limit 1
+    </select>
+    <select id="list" resultType="com.aitos.xenon.block.api.domain.vo.BlockVo">
+        select b.*,t.amountTransaction from block b left join
+            (select height,count(1) AS amountTransaction from transaction group by height) t
+            on b.height =t.height
+        <where>
+            <if test="queryParams.height!=null">
+                b.height=#{queryParams.height}
+            </if>
+        </where>
+        order by b.create_time desc
     </select>
 
 </mapper>

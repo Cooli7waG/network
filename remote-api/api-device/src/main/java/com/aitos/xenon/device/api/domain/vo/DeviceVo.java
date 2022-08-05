@@ -2,6 +2,7 @@ package com.aitos.xenon.device.api.domain.vo;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -9,6 +10,7 @@ public class DeviceVo  {
 
     private Long id;
     private String address;
+    private String ownerAddress;
 
     private String name;
 
@@ -34,14 +36,46 @@ public class DeviceVo  {
 
     private Long h3index;
 
-    private DeviceDetialVo  deviceDetial;
-
     /**
      * 设备是否终止,0。表示未终止，1表示终止
      */
     private Integer terminate;
 
-    private Long accountId;
+    /**
+     * 总挖矿收入
+     */
+    private String earningMint;
+    /**
+     * 总服务收入
+     */
+    private String earningService;
+
+    /**
+     * 电力来源：
+     * 0.光伏，1.风能，2.水能
+     */
+    private Integer energy;
+    /**
+     * 设备能力
+     */
+    private String capabilities;
+    /**
+     * 设备型号
+     */
+    private String deviceModel;
+    /**
+     * 设备序列号
+     */
+    private String deviceSerialNum;
+
+    /**
+     * 平均发电功率
+     */
+    private String power;
+    /**
+     * 总发电量（千瓦时）
+     */
+    private String totalEnergyGeneration;
 
     private LocalDateTime createTime;
 

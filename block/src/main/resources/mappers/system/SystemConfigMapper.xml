@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.block.mapper.SystemConfigMapper">
+
+    <sql id="tableName">sys_config</sql>
+
+    <select id="findConfig" resultType="com.aitos.xenon.block.domain.SystemConfig">
+        select * from <include refid="tableName"/> limit 1
+    </select>
+
+    <!--<update id="update">
+        update <include refid="tableName"/>
+            <set>
+                <if test="">
+
+                </if>
+            </set>
+            set status=#{status},update_time=#{updateTime} where id=#{id}
+    </update>-->
+</mapper>

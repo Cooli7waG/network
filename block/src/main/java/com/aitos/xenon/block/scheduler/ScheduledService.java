@@ -18,6 +18,8 @@ public class ScheduledService {
     @Autowired
     private PoggService poggService;
 
+    private static int POGG_COMMIT_EPOCH=60;
+    private int index=0;
     /**
      * 产生区块和挑战
      */
@@ -26,26 +28,40 @@ public class ScheduledService {
     public void genBlockTask(){
         log.info("block create");
         blockService.genBlock();
-        poggService.genChallenge();
+        if(index%POGG_COMMIT_EPOCH==0){
+            log.info("poggCommitTask");
+            poggService.commit();
+        }
+        index++;
     }
 
     /**
-     * 产生挑战
-     */
-    /*@Scheduled(cron = "${schedule.genChallenge}")
+     * commit
+     * 每小时执行
+     *//*
+    @Scheduled(cron = "0 0 * * * *")
     @Transactional(rollbackFor = Exception.class)
-    public void genChallengeTask(){
-        log.info("genChallenge create");
-        poggService.genChallenge();
+    public void poggCommitTask(){
+        log.info("poggCommitTask");
+        poggService.commit();
     }*/
+    /**
+     *  奖励计算
+     */
+    @Scheduled(cron = "30 0 * * * *")
+    @Transactional(rollbackFor = Exception.class)
+    public void rewardCalculationTask(){
+        log.info("rewardCalculationTask");
+        poggService.rewardCalculation();
+    }
 
     /**
-     *  发放奖励
+     *  奖励发放
      */
-    @Scheduled(cron = "${schedule.reward}")
+    @Scheduled(cron = "0 30 * * * *")
     @Transactional(rollbackFor = Exception.class)
-    public void rewardTask(){
-        log.info("reward");
-        poggService.reward();
+    public void giveOutRewardsTask(){
+        log.info("rewardCalculationTask");
+        poggService.giveOutRewards();
     }
 }

@@ -55,6 +55,12 @@ public enum ApiStatus implements ConstantsCode {
     BUSINESS_DEVICE_TERMINATE(3007,"miner did not do onboard"),
     BUSINESS_DEVICE_BOUND(3008,"device is bound"),
 
+    BUSINESS_AIRDROPDEVICE_NOT_EXISTED(3009,"airdrop device is not exist"),
+    BUSINESS_AIRDROPDEVICE_EXISTED(3010,"airdrop device is existed"),
+    BUSINESS_AIRDROPDEVICE_CLAIMED(3011,"airdrop device is claimed"),
+    BUSINESS_AIRDROPDEVICE_CLAIM_EXPIRED(3012,"airdrop device is claim expired"),
+
+
 
     // 账户相关
     BUSINESS_ACCOUNT_EXISTED(4001,"account is existed"),
@@ -68,7 +74,7 @@ public enum ApiStatus implements ConstantsCode {
 
 
     // pogg相关
-    BUSINESS_POGG_RANDOM_SIGN_ERROR(4101,"pogg random sign error"),
+    BUSINESS_POGG_REPORT_SIGN_ERROR(4101,"pogg report sign error"),
 
     BUSINESS_POGG_RESPONSE_SIGN_ERROR(4102,"pogg response sign error"),
 

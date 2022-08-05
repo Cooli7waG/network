@@ -1,32 +1,32 @@
 <template>
   <el-breadcrumb style="margin-bottom: 20px;">
-    <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-    <el-breadcrumb-item :to="{ path: '/txs' }">交易列表</el-breadcrumb-item>
-    <el-breadcrumb-item >交易详情</el-breadcrumb-item>
+    <el-breadcrumb-item :to="{ path: '/' }">{{$t('txinfo.path.home')}}</el-breadcrumb-item>
+    <el-breadcrumb-item :to="{ path: '/txs' }">{{$t('txinfo.path.txs')}}</el-breadcrumb-item>
+    <el-breadcrumb-item >{{$t('txinfo.path.info')}}</el-breadcrumb-item>
   </el-breadcrumb>
   <div v-if="data.transaction">
     <el-row :gutter="20">
-      <el-col :span="4">交易hash:</el-col>
+      <el-col :span="4">{{$t('txinfo.info.hash')}}:</el-col>
       <el-col :span="16">{{data.transaction.hash}}</el-col>
     </el-row>
     <el-row :gutter="20">
-      <el-col :span="4">状态:</el-col>
+      <el-col :span="4">{{$t('txinfo.info.status')}}:</el-col>
       <el-col :span="16">{{data.transaction.status}}</el-col>
     </el-row>
     <el-row :gutter="20">
-      <el-col :span="4">Block高:</el-col>
+      <el-col :span="4">{{$t('txinfo.info.height')}}:</el-col>
       <el-col :span="16">{{data.transaction.height}}</el-col>
     </el-row>
     <el-row :gutter="20">
-      <el-col :span="4">交易类型:</el-col>
+      <el-col :span="4">{{$t('txinfo.info.txType')}}:</el-col>
       <el-col :span="16">{{data.transaction.txType?Constant.TXType[data.transaction.txType]:''}}</el-col>
     </el-row>
     <el-row :gutter="20">
-      <el-col :span="4">交易时间:</el-col>
+      <el-col :span="4">{{$t('txinfo.info.txTime')}}:</el-col>
       <el-col :span="16">{{formatDate(data.transaction.createTime, "yyyy-MM-dd hh:mm:ss")}}</el-col>
     </el-row>
     <el-row :gutter="20">
-      <el-col :span="4">交易数据:</el-col>
+      <el-col :span="4">{{$t('txinfo.info.txData')}}:</el-col>
       <el-col :span="16">{{data.transaction.data}}</el-col>
     </el-row>
   </div>
@@ -34,10 +34,10 @@
     <el-col :sm="12" :lg="6">
       <el-result
           icon="warning"
-          title="没有找到数据"
+          :title="$t('txinfo.msg.noData')"
       >
         <template #extra>
-          <router-link to="/txs">返回</router-link>
+          <router-link to="/txs">{{ $t('common.button.back') }}</router-link>
         </template>
       </el-result>
     </el-col>

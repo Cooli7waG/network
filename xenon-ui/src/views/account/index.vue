@@ -1,14 +1,14 @@
 <template>
   <el-breadcrumb style="margin-bottom: 20px;">
-    <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-    <el-breadcrumb-item >账户列表</el-breadcrumb-item>
+    <el-breadcrumb-item :to="{ path: '/' }">{{$t('account.path.home')}}</el-breadcrumb-item>
+    <el-breadcrumb-item >{{$t('account.path.accounts')}}</el-breadcrumb-item>
   </el-breadcrumb>
   <el-row :gutter="24">
     <el-col :span="20">
       <div class="mt-4">
-        <el-input v-model="data.query.address" placeholder="请输入账户 Address">
+        <el-input v-model="data.query.address" :placeholder="$t('account.query.searchPlaceHolder')">
           <template #append>
-            <el-button type="primary" @click="search">搜索</el-button>
+            <el-button type="primary" @click="search">{{$t('account.query.searchButton')}}</el-button>
           </template>
         </el-input>
       </div>
@@ -26,19 +26,21 @@
           @current-change="pageCurrentChange"
       />
       <el-table :data="data.tableList" stripe border   style="width: 100%">
-        <el-table-column prop="address" label="Address" width="450">
+        <el-table-column prop="address" :label="$t('account.table.address')" width="450">
           <template #default="scope">
             <router-link :to="'/account/'+scope.row.address">{{scope.row.address}}</router-link>
           </template>
         </el-table-column>
-        <el-table-column prop="accountType" label="账户类型" width="180" >
+        <el-table-column prop="accountType" :label="$t('account.table.accountType')" width="180" >
           <template #default="scope">
             {{Constant.AccountType[scope.row.accountType]}}
           </template>
         </el-table-column>
-        <el-table-column prop="nonce" label="nonce" width="180" />
-        <el-table-column prop="balance" label="balance" width="200" align="right"/>
-        <el-table-column prop="createTime" label="创建时间" width="180">
+        <el-table-column prop="balance" :label="$t('account.table.balance')" width="200" align="right"/>
+        <el-table-column prop="earningMint" :label="$t('account.table.earningMint')" width="180" />
+        <el-table-column prop="earningService" :label="$t('account.table.earningService')" width="180" />
+        <el-table-column prop="amountMiner" :label="$t('account.table.amountMiner')" width="180" />
+        <el-table-column prop="createTime" :label="$t('account.table.createTime')" width="180">
           <template #default="scope">
             {{formatDate(scope.row.createTime, "yyyy-MM-dd hh:mm:ss")}}
           </template>

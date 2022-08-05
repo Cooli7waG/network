@@ -1,1 +1,3 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.aitos.xenon.core.utils.JacksonCustomizerConfig
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.aitos.xenon.core.utils.JacksonCustomizerConfig,\
+  com.aitos.xenon.core.exceptions.GlobalExceptionHandler

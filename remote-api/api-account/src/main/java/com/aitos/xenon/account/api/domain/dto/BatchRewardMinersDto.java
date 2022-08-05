@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 
 @Data
 public class BatchRewardMinersDto {
-    private Long accountId;
+    private String address;
 
     private BigDecimal reward;
 

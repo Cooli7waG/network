@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class DeviceSearchDto extends QueryParams {
 
-    private Long accountId;
+    private String ownerAddress;
 
     private String address;
 

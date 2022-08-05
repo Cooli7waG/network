@@ -1,59 +1,39 @@
+import i18n from '@/locales'
 const Constant={
     /**
      * 交易类型
      */
     TXType: {
-        /**
-         * TX_Register_Miner
-         */
-        1: "TX_REGISTER_MINER",
-
-        /**
-         * TX_Onboard_Miner
-         */
-        2: "TX_ONBOARD_MINER",
-
-        /**
-         * TX_Transfer_Miner
-         */
-        3: "TX_TRANSFER_MINER",
-
-        /**
-         * TX_Terminate_Miner
-         */
-        4: "TX_TERMINATE_MINER",
-
-        /**
-         * TX_Challenge_PoGG
-         */
-        5: "TX_CHALLENGE_POGG",
-
-        /**
-         * TX_Response_PoGG
-         */
-        6: "TX_RESPONSE_POGG",
-
-        /**
-         * TX_Reward_PoGG
-         */
-        7: "TX_REWARD_POGG"
+        1: i18n.global.t('common.constant.tXType.1'),
+        2: i18n.global.t('common.constant.tXType.2'),
+        3: i18n.global.t('common.constant.tXType.3'),
+        4: i18n.global.t('common.constant.tXType.4'),
+        5: i18n.global.t('common.constant.tXType.5'),
+        6: i18n.global.t('common.constant.tXType.6'),
+        7: i18n.global.t('common.constant.tXType.7'),
+        8: i18n.global.t('common.constant.tXType.8'),
+        9: i18n.global.t('common.constant.tXType.9'),
+        10: i18n.global.t('common.constant.tXType.10'),
     },
     /**
-     * 交易类型
+     * miner type
      */
     MinerType: {
-        1: "Virtual Miner",
-        2: "API Miner",
-        3: "DTU Miner",
-        4: "Light Solar Miner"
+        1: i18n.global.t('common.constant.minerType.1'),
+        2: i18n.global.t('common.constant.minerType.2'),
+        3: i18n.global.t('common.constant.minerType.3'),
+        4: i18n.global.t('common.constant.minerType.4'),
+        5: i18n.global.t('common.constant.minerType.5')
     },
     /**
      * 账户类型
      */
     AccountType: {
-        1: "Owner账户",
-        2: "Miner账户",
-        3: "基金会账户"
+        1: i18n.global.t('common.constant.accountType.1'),
+        2: i18n.global.t('common.constant.accountType.2'),
+        3: i18n.global.t('common.constant.accountType.3'),
+        4: i18n.global.t('common.constant.accountType.4'),
+        5: i18n.global.t('common.constant.accountType.5'),
     }
 }
 export default Constant;

@@ -24,5 +24,11 @@ public class AccountVo {
      */
     private Integer  accountType;
 
+    private long earningMint;
+
+    private long earningService;
+
+    private int amountMiner;
+
     private LocalDateTime createTime;
 }

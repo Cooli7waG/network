@@ -14,10 +14,6 @@ const request = axios.create(config);
 request.interceptors.response.use(
     response => {
         if (response.data.code) {
-            switch (response.status) {
-                case 301:
-                    console.log('登录过期');
-            }
         }
         return response.data
     },

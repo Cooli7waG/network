@@ -1,19 +1,14 @@
 package com.aitos.xenon.account.controller;
 
-import com.aitos.xenon.account.api.domain.dto.BatchRewardMinersDto;
-import com.aitos.xenon.account.api.domain.dto.TransactionDto;
-import com.aitos.xenon.account.api.domain.dto.TransactionSearchDto;
-import com.aitos.xenon.account.api.domain.dto.TransferDto;
-import com.aitos.xenon.account.api.domain.vo.AccountVo;
+import com.aitos.xenon.account.api.domain.dto.*;
 import com.aitos.xenon.account.api.domain.vo.TransactionVo;
 import com.aitos.xenon.account.domain.Transaction;
 import com.aitos.xenon.account.service.TransactionService;
+import com.aitos.xenon.common.crypto.XenonCrypto;
 import com.aitos.xenon.common.crypto.ed25519.Base58;
 import com.aitos.xenon.common.crypto.ed25519.Ed25519;
 import com.aitos.xenon.core.constant.ApiStatus;
-import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.model.Page;
-import com.aitos.xenon.core.model.QueryParams;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
 import com.alibaba.fastjson.JSON;
@@ -46,7 +41,7 @@ public class TransactionController {
     public Result transfer(@RequestBody TransferDto transferDto){
         byte[] signatureBytes= Base58.decode(transferDto.getSignature());
         byte[] addressBytes= Base58.decode(transferDto.getPayments().get(0).getPayee());
-        Boolean verify= Ed25519.verify(foundationPublicKey,addressBytes,signatureBytes);
+        Boolean verify= XenonCrypto.verify(foundationPublicKey,addressBytes,signatureBytes);
         if(!verify){
             return Result.failed(ApiStatus.BUSINESS_TRANSACTION_SIGN_ERROR);
         }
@@ -55,10 +50,10 @@ public class TransactionController {
         return Result.ok();
     }
 
-    @PostMapping("/batchRewardMiners")
-    public Result batchRewardMiners(@RequestBody List<BatchRewardMinersDto> batchRewardMinersDtoList){
-        transactionService.batchRewardMiners(batchRewardMinersDtoList);
-        return Result.ok();
+    @PostMapping("/poggReward")
+    public Result<String> poggReward(@RequestBody PoggRewardDto poggRewardDto){
+        String txHash=transactionService.poggReward(poggRewardDto);
+        return Result.ok(txHash);
     }
 
     @GetMapping("/query")

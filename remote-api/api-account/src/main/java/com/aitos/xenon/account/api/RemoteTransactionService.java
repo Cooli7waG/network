@@ -1,7 +1,7 @@
 package com.aitos.xenon.account.api;
 
 
-import com.aitos.xenon.account.api.domain.dto.BatchRewardMinersDto;
+import com.aitos.xenon.account.api.domain.dto.PoggRewardDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionDto;
 import com.aitos.xenon.account.api.domain.dto.TransferDto;
 import com.aitos.xenon.account.api.domain.vo.TransactionVo;
@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
-
 @FeignClient(name = "account")
 public interface RemoteTransactionService {
 
@@ -23,7 +21,7 @@ public interface RemoteTransactionService {
      * @return
      */
     @PostMapping("/transaction/transaction")
-    Result transaction(@RequestBody TransactionDto transactionDto);
+    Result<String> transaction(@RequestBody TransactionDto transactionDto);
 
     /**
      * 转账
@@ -33,8 +31,8 @@ public interface RemoteTransactionService {
     @PostMapping("/transaction/transfer")
     Result transfer(@RequestBody TransferDto transferDto);
 
-    @PostMapping("/transaction/batchRewardMiners")
-    Result batchRewardMiners (@RequestBody List<BatchRewardMinersDto> batchRewardMinersDtoList);
+    @PostMapping("/transaction/poggReward")
+    Result poggReward (@RequestBody PoggRewardDto poggRewardDto);
 
     /**
      * 根据hash查询交易

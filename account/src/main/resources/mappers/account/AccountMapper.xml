@@ -35,6 +35,16 @@
         </set>
         where id=#{id}
     </update>
+    <update id="updateEarning">
+        <foreach collection="rewards" item="item" separator=";">
+            update <include refid="tableName"/>
+            <set>
+                earning_mint=earning_mint+#{item.amount},
+                update_time=now()
+            </set>
+            where address=#{item.address}
+        </foreach>
+    </update>
 
     <select id="findListByPage" resultType="com.aitos.xenon.account.domain.Account">
         select * from <include refid="tableName"/>
@@ -52,13 +62,15 @@
         select * from <include refid="tableName"/> where address=#{address}
     </select>
     <select id="list" resultType="com.aitos.xenon.account.api.domain.vo.AccountVo">
-        select * from <include refid="tableName"/>
-          <where>
-              <if test="queryParams.address!=null and queryParams.address!=''">
-                  address=#{queryParams.address}
-              </if>
-          </where>
-        order by create_time desc
+        select a.*,d.amount_miner from account a left join
+            (select owner_address,count(1) AS amount_miner from device where owner_address is NOT NULL group by owner_address) d
+        on a.address =d.owner_address
+        <where>
+            <if test="queryParams.address!=null and queryParams.address!=''">
+                a.address=#{queryParams.address}
+            </if>
+        </where>
+        order by a.create_time desc
     </select>
     <select id="findListByIds" resultType="com.aitos.xenon.account.domain.Account">
         select * from <include refid="tableName"/> where id in <foreach collection="idsList" open="(" close=")" separator="," item="id">#{id}</foreach>

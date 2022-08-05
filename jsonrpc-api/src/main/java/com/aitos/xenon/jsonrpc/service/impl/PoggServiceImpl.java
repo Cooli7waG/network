@@ -19,27 +19,6 @@ public class PoggServiceImpl implements PoggService {
     private RemotePoggService remotePoggService;
 
     @Override
-    public RpcResult fetch() {
-        Result<List<PoggChallengeVo>> result= remotePoggService.activeChallenges();
-        RpcResult  rpcResult=new RpcResult();
-        if(result.getCode()== ApiStatus.SUCCESS.getCode())
-        {
-            rpcResult.setVersion(1);
-            rpcResult.setCode(result.getCode());
-            List<PoggChallengeVo> list=result.getData();
-            if(list.size()>0){
-                rpcResult.setTxhash(list.get(result.getData().size()-1).getTxHash());
-                rpcResult.setResult(list.get(result.getData().size()-1));
-            }
-        }else{
-            rpcResult.setVersion(1);
-            rpcResult.setCode(result.getCode());
-            rpcResult.setMessage(result.getMsg());
-        }
-        return rpcResult;
-    }
-
-    @Override
     public RpcResult poggHitPerBlocks() {
         Result<HashMap<String,String>> result= remotePoggService.poggHitPerBlocks();
         RpcResult  rpcResult=new RpcResult();
@@ -57,15 +36,16 @@ public class PoggServiceImpl implements PoggService {
     }
 
     @Override
-    public RpcResult response(String body) {
-        Result result= remotePoggService.response(body);
+    public RpcResult report(String body) {
+        Result<String> result= remotePoggService.report(body);
         RpcResult  rpcResult=new RpcResult();
         if(result.getCode()== ApiStatus.SUCCESS.getCode())
         {
+            String txHash=result.getData();
             rpcResult.setVersion(1);
             rpcResult.setCode(result.getCode());
-            rpcResult.setTxhash(result.getData().toString());
-            rpcResult.setResult(result.getData());
+            rpcResult.setTxhash(txHash);
+            rpcResult.setResult(txHash);
         }else{
             rpcResult.setVersion(1);
             rpcResult.setCode(result.getCode());

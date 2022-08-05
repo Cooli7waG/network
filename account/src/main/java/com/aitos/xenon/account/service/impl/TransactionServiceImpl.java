@@ -3,6 +3,8 @@ package com.aitos.xenon.account.service.impl;
 import com.aitos.blockchain.web3j.BmtERC20;
 import com.aitos.blockchain.web3j.We3jUtils;
 import com.aitos.xenon.account.api.domain.dto.BatchRewardMinersDto;
+import com.aitos.xenon.account.api.domain.dto.PoggRewardDetailDto;
+import com.aitos.xenon.account.api.domain.dto.PoggRewardDto;
 import com.aitos.xenon.account.api.domain.dto.TransferDto;
 import com.aitos.xenon.account.domain.Account;
 import com.aitos.xenon.account.domain.Transaction;
@@ -30,6 +32,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,9 +47,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private AccountService accountService;
-
-    @Autowired
-    private RemoteBlockService remoteBlockService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -88,38 +88,40 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void batchRewardMiners(List<BatchRewardMinersDto> batchRewardMinersDtoList) {
-
+    public String poggReward(PoggRewardDto poggRewardDto) {
         try{
-           List<Long>  idsList= batchRewardMinersDtoList.stream().map(item->item.getAccountId()).collect(Collectors.toList());
-
-           List<Account> list=accountService.findListByIds(idsList);
-
-
             List<String> addressList=new ArrayList<>();
             List<BigInteger> rewardList=new ArrayList<>();
 
-           //更新账户余额
-            batchRewardMinersDtoList.stream().forEach(item->{
-               Account accountTemp= list.stream().filter(account->account.getId().equals(item.getAccountId())).findFirst().get();
-                addressList.add(accountTemp.getAddress());
-                BigDecimal blanceEther=  Convert.toWei(item.getReward(), Convert.Unit.ETHER);
-                rewardList.add(blanceEther.toBigInteger());
-            });
+            Map<String, List<PoggRewardDetailDto>> groupBy=poggRewardDto.getRewards().stream().collect(Collectors.groupingBy(PoggRewardDetailDto::getOwnerAddress));
+            for (Map.Entry<String, List<PoggRewardDetailDto>> entry : groupBy.entrySet()) {
+                String ownerAddress = entry.getKey();
+                BigDecimal ownerAmount = entry.getValue().stream()
+                        .map(item->item.getAmount()).reduce(BigDecimal::add)
+                        .orElse(BigDecimal.ZERO);
+                addressList.add(ownerAddress);
 
+                BigDecimal blanceEther=  Convert.toWei(ownerAmount, Convert.Unit.ETHER);
+                rewardList.add(blanceEther.toBigInteger());
+            }
             //调用合约发送奖励
-            bmtERC20.rewardMiner_multi(addressList,rewardList).send();
+            TransactionReceipt transactionReceipt = bmtERC20.rewardMiner_multi(addressList, rewardList).send();
+
+            // todo 更新miner账户余额
+            accountService.updateEarning(poggRewardDto.getRewards());
+
 
             //记录交易
-            String data=JSON.toJSONString(batchRewardMinersDtoList);
+            String data=JSON.toJSONString(poggRewardDto);
             String txHash= DigestUtils.sha256Hex(data);
 
             Transaction transaction =new Transaction();
             transaction.setData(data);
             transaction.setHash(txHash);
-            transaction.setHeight(batchRewardMinersDtoList.get(0).getHeight());
+            transaction.setHeight(poggRewardDto.getHeight());
             transaction.setTxType(BusinessConstants.TXType.TX_REWARD_POGG);
             this.transaction(transaction);
+            return transactionReceipt.getTransactionHash();
         }catch (Exception e){
             log.error("transfer.error:{}",e);
             throw new ServiceException(e.getMessage());

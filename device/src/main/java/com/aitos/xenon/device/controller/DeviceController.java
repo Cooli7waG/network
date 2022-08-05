@@ -1,6 +1,6 @@
 package com.aitos.xenon.device.controller;
 
-import com.aitos.xenon.common.crypto.ed25519.Ed25519;
+import com.aitos.xenon.common.crypto.XenonCrypto;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.model.Page;
 import com.aitos.xenon.core.model.Result;
@@ -8,8 +8,6 @@ import com.aitos.xenon.core.utils.BeanConvertor;
 import com.aitos.xenon.device.api.domain.dto.*;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.aitos.xenon.device.domain.Device;
-import com.aitos.xenon.device.domain.DeviceDetial;
-import com.aitos.xenon.device.service.DeviceDetialService;
 import com.aitos.xenon.device.service.DeviceService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -20,6 +18,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,16 +32,13 @@ public class DeviceController {
     @Autowired
     private DeviceService deviceService;
 
-    @Autowired
-    private DeviceDetialService deviceDetialService;
-
     @Value("${foundation.publicKey}")
     private String foundationPublicKey;
 
     @PostMapping("/register")
     public Result register(@RequestBody DeviceRegisterDto deviceRegister){
 
-        Boolean verify= Ed25519.verify(foundationPublicKey,deviceRegister.getAddress(),deviceRegister.getFoundationSignature());
+        Boolean verify= XenonCrypto.verify(foundationPublicKey,deviceRegister.getAddress(),deviceRegister.getFoundationSignature());
         if(!verify){
             return Result.failed(ApiStatus.VALIDATE_SIGN_FAILED);
         }
@@ -66,8 +62,8 @@ public class DeviceController {
 
         String payerAddress=paramsObject.getString("payerAddress");
         String payerSignature=paramsObject.getString("payerSignature");
-        String ownerAddress=paramsObject.getString("ownerAddress");
-        String ownerSignature=paramsObject.getString("ownerSignature");
+        /*String ownerAddress=paramsObject.getString("ownerAddress");
+        String ownerSignature=paramsObject.getString("ownerSignature");*/
         String minerAddress=paramsObject.getString("minerAddress");
         String minerSignature=paramsObject.getString("minerSignature");
 
@@ -75,19 +71,19 @@ public class DeviceController {
         String payerData=paramsObject.toJSONString();
         log.info("onboard.payerData:{}",payerData);
         paramsObject.remove("ownerSignature");
-        String ownerData=paramsObject.toJSONString();
-        log.info("onboard.ownerData:{}",ownerData);
+        /*String ownerData=paramsObject.toJSONString();
+        log.info("onboard.ownerData:{}",ownerData);*/
         paramsObject.remove("minerSignature");
         String minerData=paramsObject.toJSONString();
         log.info("onboard.minerData:{}",minerData);
 
-        if(!Ed25519.verify(payerAddress,payerData,payerSignature)){
+        if(!XenonCrypto.verify(payerAddress,payerData.getBytes(),payerSignature)){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_PAYER_SIGN_ERROR);
         }
-        if(!Ed25519.verify(ownerAddress,ownerData,ownerSignature)){
+        /*if(!XenonCrypto.verify(ownerAddress,ownerData,ownerSignature)){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_OWNER_SIGN_ERROR);
-        }
-        if(!Ed25519.verify(minerAddress,minerData,minerSignature)){
+        }*/
+        if(!XenonCrypto.verify(minerAddress,minerData.getBytes(),minerSignature)){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_MINER_SIGN_ERROR);
         }
 
@@ -99,11 +95,10 @@ public class DeviceController {
         Device deviceTemp=deviceService.findByAddress(deviceBindDto.getMinerAddress());
         if(deviceTemp==null){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_NOT_EXISTED);
-        }else if(deviceTemp!=null&&deviceTemp.getAccountId()!=null){
+        }else if(deviceTemp!=null&& StringUtils.hasText(deviceTemp.getOwnerAddress())){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_BOUND);
         }
         deviceBindDto.setDeviceId(deviceTemp.getId());
-
 
         deviceService.bind(deviceBindDto);
 
@@ -114,7 +109,7 @@ public class DeviceController {
     public Result terminate(@RequestBody DeviceTerminateMinerDto deviceTerminateMinerDto){
         log.info("terminate.params:{}",JSON.toJSONString(deviceTerminateMinerDto));
 
-        if(!Ed25519.verify(foundationPublicKey,deviceTerminateMinerDto.getAddress(),deviceTerminateMinerDto.getFoundationSignature())){
+        if(!XenonCrypto.verify(foundationPublicKey,deviceTerminateMinerDto.getAddress(),deviceTerminateMinerDto.getFoundationSignature())){
             return Result.failed(ApiStatus.BUSINESS_FOUNDATION_SIGN_ERROR);
         }
         deviceService.terminate(deviceTerminateMinerDto);
@@ -123,36 +118,21 @@ public class DeviceController {
 
     @GetMapping("/queryByMiner")
     public Result<DeviceVo> queryByMiner(@RequestParam("minerAddress")String minerAddress){
-       DeviceVo device= deviceService.queryByMiner(minerAddress);
-        return Result.ok(device);
-    }
-
-    @GetMapping("/queryByOwner")
-    public Result<List<DeviceVo>> queryByOwner(@RequestParam("ownerAddress") String ownerAddress){
-        List<DeviceVo> list=deviceService.queryByOwner(ownerAddress);
-        List<DeviceVo> deviceDetialVo=BeanConvertor.toList(list,DeviceVo.class);
-        return Result.ok(deviceDetialVo);
+        DeviceVo deviceVo= deviceService.queryByMiner(minerAddress);
+        return Result.ok(deviceVo);
     }
 
     @GetMapping("/list")
     public Result<Page<DeviceVo>> list(DeviceSearchDto queryParams){
-        IPage<Device> listPage= deviceService.list(queryParams);
-
-        List<DeviceVo> deviceVoList=BeanConvertor.toList(listPage.getRecords(),DeviceVo.class);
-        Page<DeviceVo> deviceVoPage=new Page<DeviceVo>(listPage.getTotal(),deviceVoList);
+        IPage<DeviceVo> listPage= deviceService.list(queryParams);
+        Page<DeviceVo> deviceVoPage=new Page<DeviceVo>(listPage.getTotal(),listPage.getRecords());
         return Result.ok(deviceVoPage);
     }
 
-    @PutMapping("/detial")
-    public Result updateDeviceDetial(@RequestBody DeviceDetialDto deviceDetialDto){
-        log.info("updateDeviceDetial:",JSON.toJSONString(deviceDetialDto));
-        DeviceDetial  deviceDetial=BeanConvertor.toBean(deviceDetialDto,DeviceDetial.class);
-        Device device=deviceService.findByAddress(deviceDetialDto.getAddress());
-        deviceDetial.setDeviceId(device.getId());
-        log.info("updateDeviceDetial:",JSON.toJSONString(deviceDetial));
-        deviceDetialService.updateDeviceDetial(deviceDetial);
+    @PutMapping("/update")
+    public Result update(@RequestBody DeviceDto deviceDto){
+        Device device=BeanConvertor.toBean(deviceDto,Device.class);
+        deviceService.update(device);
         return Result.ok();
     }
-
-
 }

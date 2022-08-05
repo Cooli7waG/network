@@ -15,25 +15,44 @@ public interface BusinessConstants
      * 设备类型
      */
     interface DeviceMinerType{
-        int VIRTUAL_MINER=1;
-        int API_MINER=2;
-        int DTU_MINER=3;
-        int LIGHT_SOLAR_MINER=4;
+        int GAME_MINER =1;
+        int VIRTUAL_MINER=2;
+        int API_MINER=3;
+        int LITE_PV_MINER=4;
+        int STANDARD_PV_MINER=5;
+    }
+
+    /**
+     * 设备空投状态
+     */
+    interface DeviceAirdropStatus{
+        /**
+         * 未申领
+         */
+        int NOT_CLAIM =0;
+        /**
+         * 已申领
+         */
+        int CLAIMED=1;
     }
 
     interface AccountType{
         /**
          * owner账户
          */
-        int OWNER=1;
+        int WALLET =1;
         /**
          * miner账户
          */
         int MINER=2;
         /**
-         * miner账户
+         * 基金会
          */
-        int FOUNDATION=3;
+        int NETWORK =3;
+
+        int VALIDATOR=4;
+
+        int MAKER=5;
     }
 
     /**
@@ -61,19 +80,68 @@ public interface BusinessConstants
         int TX_TERMINATE_MINER=4;
 
         /**
-         * TX_Challenge_PoGG
+         * TX_Airdrop_Miner
          */
-        int TX_CHALLENGE_POGG=5;
+        int TX_AIRDROP_MINER=5;
 
         /**
-         * TX_Response_PoGG
+         * TX_Claim_Miner
          */
-        int TX_RESPONSE_POGG=6;
+        int TX_CLAIM_MINER=6;
+
+        /**
+         * TX_Commit_PoGG
+         */
+        int TX_COMMIT_POGG=7;
+
+        /**
+         * TX_Report_PoGG
+         */
+        int TX_REPORT_POGG=8;
 
         /**
          * TX_Reward_PoGG
          */
-        int TX_REWARD_POGG=7;
+        int TX_REWARD_POGG=9;
 
+        /**
+         * TX_Transfer
+         */
+        int TX_TRANSFER=10;
+
+    }
+    /**
+     * pogg commit 状态
+     */
+    interface POGGCommitStatus{
+        /**
+         * 未结束
+         */
+        int NOT_OVER=0;
+        /**
+         * 已结束
+         */
+        int OVER=1;
+        /**
+         * 奖励已计算
+         */
+        int REWARD_CALCULATED=2;
+    }
+    /**
+     * POGG奖励发放状态
+     */
+    interface POGGRewardStatus{
+        /**
+         * 未发放
+         */
+        int UN_ISSUED=1;
+        /**
+         * 已发放
+         */
+        int ISSUED=2;
+        /**
+         * 发放失败
+         */
+        int ISSUED_FAILED=3;
     }
 }

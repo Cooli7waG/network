@@ -1,32 +1,32 @@
 <template>
   <el-row :gutter="24">
-    <el-col :span="8">
+    <el-col :span="12">
       <el-card class="box-card" >
         <div  class="text item">
-          <div class="lable">{{$t('dashboard.virtualMiners')}}</div>
-          <div class="content">{{ data.blockchainstats.virtualMiners }}</div>
+          <div class="lable">{{$t('dashboard.miners')}}</div>
+          <div class="content">{{ data.minerStatistics.miners }}</div>
         </div>
         <div  class="text item">
-          <div class="lable">{{$t('dashboard.lightSolarMiners')}}</div>
-          <div class="content">{{ data.blockchainstats.lightSolarMiners }}</div>
+          <div class="lable">{{$t('dashboard.totalPowerLow')}}</div>
+          <div class="content">{{ data.minerStatistics.totalPowerLow }}</div>
         </div>
         <div  class="text item">
-          <div class="lable">{{$t('dashboard.blocks')}}</div>
-          <div class="content">{{ data.blockchainstats.blocks }}</div>
+          <div class="lable">{{$t('dashboard.totalChargeVol')}}</div>
+          <div class="content">{{ data.minerStatistics.totalChargeVol }}</div>
         </div>
 
       </el-card>
     </el-col>
-    <el-col :span="8">
+    <el-col :span="12">
       <el-card class="box-card">
         <div  class="text item">
-          <div class="lable">{{$t('dashboard.poggChallenges')}}</div>
-          <div class="content">{{ data.blockchainstats.poggChallenges }}</div>
+          <div class="lable">{{$t('dashboard.uSDBmtMarketPrice')}}</div>
+          <div class="content">{{ data.blockchainstats.uSDBmtMarketPrice }}</div>
         </div>
 
         <div  class="text item">
-          <div class="lable">{{$t('dashboard.transactions')}}</div>
-          <div class="content">{{ data.blockchainstats.transactions }}</div>
+          <div class="lable">{{$t('dashboard.totalBMTMarket')}}</div>
+          <div class="content">{{ data.blockchainstats.totalBMTMarket }}</div>
         </div>
         <div  class="text item">
           <div class="lable">{{$t('dashboard.tokenSupply')}}</div>
@@ -34,29 +34,10 @@
         </div>
       </el-card>
     </el-col>
-    <el-col :span="8">
-      <el-card class="box-card">
-        <div  class="text item" style="float:left">
-          <div class="lable">{{$t('dashboard.totalPowerLow')}}</div>
-          <div class="content">{{ data.minerStatistics.totalPowerLow }}</div>
-        </div>
-        <div  class="text item" style="text-align: right;">
-          <div class="lable">{{$t('dashboard.totalPowerHigh')}}</div>
-          <div class="content">{{ data.minerStatistics.totalPowerHigh }}</div>
-        </div>
-        <div  class="text item" style="float:left">
-          <div class="lable">{{$t('dashboard.totalChargeVol')}}</div>
-          <div class="content">{{ data.minerStatistics.totalChargeVol }}</div>
-        </div>
-        <div  class="text item" style="text-align: right;">
-          <div class="lable">{{$t('dashboard.totalUsageVol')}}</div>
-          <div class="content">{{ data.minerStatistics.totalUsageVol }}</div>
-        </div>
-        <div  class="text item" >
-          <div class="lable">&nbsp;</div>
-          <div class="content">&nbsp;</div>
-        </div>
-      </el-card>
+  </el-row>
+  <el-row>
+    <el-col>
+
     </el-col>
   </el-row>
 </template>
@@ -74,18 +55,14 @@ export default {
 
     const data = reactive({
       blockchainstats:{
-        blocks: 0,
-        lightSolarMiners: 0,
-        poggChallenges: 0,
-        tokenSupply: 0,
-        transactions: 0,
-        virtualMiners: 0
+        uSDBmtMarketPrice: 0,
+        totalBMTMarket: 0,
+        tokenSupply: 0
       },
       minerStatistics:{
+        miners: 0,
         totalPowerLow: 0.0,
-        totalPowerHigh: 0.0,
-        totalChargeVol: 0.0,
-        totalUsageVol: 0
+        totalChargeVol: 0.0
       }
     })
 

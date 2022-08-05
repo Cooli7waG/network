@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.block.mapper.PoggRewardMapper">
+
+    <sql id="tableName">pogg_reward</sql>
+
+    <insert id="save">
+        insert into <include refid="tableName"/> (height,verifiable_evidence,start_epoch,end_epoch,rewards_json,create_time)
+        value (#{height},#{verifiableEvidence},#{startEpoch},#{endEpoch},#{rewardsJson},#{createTime})
+    </insert>
+
+    <update id="updateStatus">
+        update <include refid="tableName"/> set status=#{status},msg=#{msg},update_time=#{updateTime} where id=#{id}
+    </update>
+
+    <select id="findListUnIssued" resultType="com.aitos.xenon.block.domain.PoggReward">
+        select * from <include refid="tableName"/> where status=0
+    </select>
+</mapper>

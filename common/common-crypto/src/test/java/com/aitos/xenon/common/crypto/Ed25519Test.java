@@ -1,8 +1,9 @@
 package com.aitos.xenon.common.crypto;
 
 import com.aitos.xenon.common.crypto.ed25519.Base58;
-import com.aitos.xenon.common.crypto.ed25519.Ed25519;
 import com.aitos.xenon.common.crypto.ed25519.Ed25519KeyPair;
+import com.aitos.xenon.common.crypto.ed25519.Ed25519;
+import org.bouncycastle.crypto.CryptoException;
 import org.junit.Test;
 import org.springframework.security.crypto.codec.Hex;
 
@@ -11,29 +12,29 @@ public class Ed25519Test {
     @Test
     public void test_gen(){
         Ed25519KeyPair ed25519KeyPair= Ed25519.gerateKeyPair();
-        System.out.println(ed25519KeyPair.getPrivateKey());
-        System.out.println(ed25519KeyPair.getPublicKey());
+        System.out.println(Hex.encode(ed25519KeyPair.getPrivateKey()));
+        System.out.println(Hex.encode(ed25519KeyPair.getPublicKey()));
     }
 
     @Test
     public void test_getPublickKey(){
-        String publickKey= Ed25519.getPublickKey("H5EUV4jrUY1ddSjrfvpCXSYTa5PT7FB9WGt896g5nrXx");
-        System.out.println(publickKey);
+        byte[] publickKey= Ed25519.getPublickKey(Base58.decode("H5EUV4jrUY1ddSjrfvpCXSYTa5PT7FB9WGt896g5nrXx"));
+        System.out.println(Hex.encode(publickKey));
     }
 
     @Test
-    public void test_sign(){
+    public void test_sign() throws CryptoException {
 
         String privateKey="H5EUV4jrUY1ddSjrfvpCXSYTa5PT7FB9WGt896g5nrXx";
-        String sign=Ed25519.sign(privateKey,"6DVtNLWnbiyJ7NWt2wLR5PCS84h36UK68eBw9dUbhGbx".getBytes());
-        System.out.println(sign);
+        byte[] sign= Ed25519.sign(Base58.decode(privateKey),Base58.decode("6DVtNLWnbiyJ7NWt2wLR5PCS84h36UK68eBw9dUbhGbx"));
+        System.out.println(Base58.encode(sign));
     }
 
     @Test
     public void test_verify(){
         String publickKey="8kh5fpTiTRf54wTgbdq88um8pjj3Pd3kJS6XC2P9EfBM";
-        String sign="3BKa44Gbnzu5aSbSBcE5qTD7uwZV2Jdtgv8Xjf4bgTgdxgUyhM2idfLMHqJ41fxYXDhXHQ11faitpaSLd9TLZxNN";
-        Boolean verify=Ed25519.verify(publickKey,"6DVtNLWnbiyJ7NWt2wLR5PCS84h36UK68eBw9dUbhGbx".getBytes(),sign);
+        String sign="2zX8BDuGWJV47yH2gPaN2paP2ZYSW4pv1DcMJARH6dDZmvtjcte8YiT2pAK6avf5NvZHDKPLp2dcEidPLMKvF37X";
+        Boolean verify= Ed25519.verify(Base58.decode(publickKey),Base58.decode("6DVtNLWnbiyJ7NWt2wLR5PCS84h36UK68eBw9dUbhGbx"),Base58.decode(sign));
         System.out.println(verify);
 
     }
@@ -47,24 +48,24 @@ public class Ed25519Test {
 
         String sign2="wCppHdPPa7uWnQu75QFSHiVWhUvoVwJeaSqS6y282Mu216hkcFm8dczxuLy9q6ZA6FsyCWFjyjYeZwfDxt4re2X";
 
-        Boolean verify=Ed25519.verify(publickKey,randon,sign2);
+        Boolean verify= Ed25519.verify(Base58.decode(publickKey),randon,Base58.decode(sign2));
         System.out.println(verify);
 
     }
 
 
     @Test
-    public void test_onbord(){
+    public void test_onbord() throws CryptoException {
         //miner
         String privateKey="1067a26273521836dbf1a0118227a610d0365617af99785f5baa83171bedb166";
         String publickKey="be0b5cb397a680f7d235e1637d6dfccb1c0de2235577afe9db32476dc385eca6";
         System.out.println("publicKey:"+Base58.encode(Hex.decode(publickKey)));
         String data="{\"version\":1,\"minerAddress\":\"GfHq2tTVk9z4eXgyN19dJf6qN5UuoQe8Kxm22TaLrTRXKXESDDCHVAxk3gbN\",\"ownerAddress\":\"GfHq2tTVk9z4eXgyHGZj8SQVRhkmERPXPUUDixb6KyAziRouLAsLJ7cWNV1V\",\"payerAddress\":\"GfHq2tTVk9z4eXgyHGZj8SQVRhkmERPXPUUDixb6KyAziRouLAsLJ7cWNV1V\",\"locationType\":0,\"latitude\":130.55555,\"longitude\":130.55555,\"h3index\":1,\"minerInfo\":{\"version\":1,\"startBlock\":1,\"latitude\":130.55555,\"longitude\":130.55555,\"h3index\":1,\"energy\":0,\"capabilities\":\"设备能力\",\"deviceModel\":\"设备型号\",\"deviceSerialNum\":\"设备序列号\",\"sGVoltage\":1,\"sGCurrent\":1,\"sGPowerLow\":1}}";
-        String sign=Ed25519.sign(privateKey,data.getBytes());
+        String sign= Base58.encode(Ed25519.sign(Base58.decode(privateKey),data.getBytes()));
         sign=Base58.encode(Hex.decode(sign));
         System.out.println("sign="+sign);
 
-        Boolean verify=Ed25519.verify(publickKey,data.getBytes(),Base58.decode(sign));
+        Boolean verify= Ed25519.verify(Base58.decode(publickKey),data.getBytes(),Base58.decode(sign));
         System.out.println(verify);
 
         //owner
@@ -73,12 +74,12 @@ public class Ed25519Test {
          System.out.println("publicKey:"+Base58.encode(Hex.decode(publickKey)));
          data="{\"version\":1,\"minerAddress\":\"DC938yd2TSbLqgv1jJQtCyRbUfXKhrXSQTTemiuyhz8u\",\"ownerAddress\":\"GRbSTTpUiLMDuYDAbHaFibKfgAsLVNcweoorDu3irtTV\",\"payerAddress\":\"DC938yd2TSbLqgv1jJQtCyRbUfXKhrXSQTTemiuyhz8u\",\"location\":{\"version\":1,\"locationType\":0,\"latitude\":0,\"longitude\":0},\"minerInfo\":{\"version\":1,\"startHeight\":1,\"location\":\"{\\\"version\\\":1,\\\"locationType\\\":0,\\\"latitude\\\":0,\\\"longitude\\\":0}\",\"energy\":0,\"capabilities\":1,\"totalChargeVol\":0,\"totalUsageVol\":0},\"stakingFee\":0,\"minerSignature\":\"3666Yvd9hrJkYtDV4ZRV3uUAHBY9dbhMkawHKWtwZAtp9tcqLXMudfrYtXyb9oEqvdzyDh1pmi9vP9UFkHWyVMz\"}";
         System.out.println(data);
-         sign=Ed25519.sign(privateKey,data.getBytes());
+         sign= Base58.encode(Ed25519.sign(Base58.decode(privateKey),data.getBytes()));
 
          sign=Base58.encode(Hex.decode(sign));
          System.out.println("sign="+sign);
 
-         verify=Ed25519.verify(publickKey,data.getBytes(),Base58.decode(sign));
+         verify= Ed25519.verify(Base58.decode(publickKey),data.getBytes(),Base58.decode(sign));
          System.out.println(verify);
 
         //payer
@@ -86,11 +87,11 @@ public class Ed25519Test {
         publickKey="E52C2EFA035C217B7E36EBC9E05FA572D051ACB184913086799F96415F93E8A4";
         System.out.println("publicKey:"+Base58.encode(Hex.decode(publickKey)));
         data="{\"version\":1,\"minerAddress\":\"DC938yd2TSbLqgv1jJQtCyRbUfXKhrXSQTTemiuyhz8u\",\"ownerAddress\":\"GRbSTTpUiLMDuYDAbHaFibKfgAsLVNcweoorDu3irtTV\",\"payerAddress\":\"DC938yd2TSbLqgv1jJQtCyRbUfXKhrXSQTTemiuyhz8u\",\"location\":{\"version\":1,\"locationType\":0,\"latitude\":0,\"longitude\":0},\"minerInfo\":{\"version\":1,\"startHeight\":1,\"location\":\"{\\\"version\\\":1,\\\"locationType\\\":0,\\\"latitude\\\":0,\\\"longitude\\\":0}\",\"energy\":0,\"capabilities\":1,\"totalChargeVol\":0,\"totalUsageVol\":0},\"stakingFee\":0,\"minerSignature\":\"3666Yvd9hrJkYtDV4ZRV3uUAHBY9dbhMkawHKWtwZAtp9tcqLXMudfrYtXyb9oEqvdzyDh1pmi9vP9UFkHWyVMz\",\"ownerSignature\":\"28McCoXfzxgsRfboNSsamKehKkLGT9DchFGVwCzCVbZuueR9gCsCfzS4ijUDn7TU8R4ivGMN21tKmooZy379bM1b\"}";
-        sign=Ed25519.sign(privateKey,data.getBytes());
+        sign= Base58.encode(Ed25519.sign(Base58.decode(privateKey),data.getBytes()));
         sign=Base58.encode(Hex.decode(sign));
         System.out.println("sign="+sign);
 
-        verify=Ed25519.verify(publickKey,data.getBytes(),Base58.decode(sign));
+        verify= Ed25519.verify(Base58.decode(publickKey),data.getBytes(),Base58.decode(sign));
         System.out.println(verify);
     }
 

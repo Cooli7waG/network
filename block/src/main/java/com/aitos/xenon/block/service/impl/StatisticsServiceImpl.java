@@ -1,6 +1,7 @@
 package com.aitos.xenon.block.service.impl;
 
 import com.aitos.xenon.account.api.RemoteAccountService;
+import com.aitos.xenon.account.api.domain.vo.BmtStatisticsVo;
 import com.aitos.xenon.block.domain.BlockChainStatistics;
 import com.aitos.xenon.block.domain.MinerStatistics;
 import com.aitos.xenon.block.mapper.StatisticsMapper;
@@ -20,20 +21,18 @@ public class StatisticsServiceImpl implements StatisticsService {
     private StatisticsMapper statisticsMapper;
 
     @Autowired
-    private BlockService blockService;
-
-    @Autowired
     private RemoteAccountService remoteAccountService;
+
+    private final String uSDBmtMarketPrice="1";
 
     @Override
     public BlockChainStatistics blockchainstats() {
-        Result<String> result= remoteAccountService.bmtCirculation();
+        Result<BmtStatisticsVo> result= remoteAccountService.bmtStatistics();
+        BmtStatisticsVo bmtStatisticsVo=result.getData();
         BlockChainStatistics  blockChainStatistics=new BlockChainStatistics();
-        blockChainStatistics.setVirtualMiners(statisticsMapper.virtualMinersCount());
-        blockChainStatistics.setLightSolarMiners(statisticsMapper.lightSolarMinersCount());
-        blockChainStatistics.setTransactions(statisticsMapper.transactionsCount());
-        blockChainStatistics.setTokenSupply(result.getData());
-        blockChainStatistics.setBlocks(blockService.getBlock().getHeight());
+        blockChainStatistics.setUSDBmtMarketPrice(uSDBmtMarketPrice);
+        blockChainStatistics.setTotalBMTMarket(bmtStatisticsVo.getTotalBMTMarket());
+        blockChainStatistics.setTokenSupply(bmtStatisticsVo.getTokenSupply());
         return blockChainStatistics;
     }
 

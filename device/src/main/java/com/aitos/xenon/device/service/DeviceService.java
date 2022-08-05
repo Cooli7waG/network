@@ -1,9 +1,11 @@
 package com.aitos.xenon.device.service;
 
-import com.aitos.xenon.core.model.QueryParams;
-import com.aitos.xenon.device.api.domain.dto.*;
-import com.aitos.xenon.device.domain.Device;
+import com.aitos.xenon.device.api.domain.dto.DeviceBindDto;
+import com.aitos.xenon.device.api.domain.dto.DeviceRegisterDto;
+import com.aitos.xenon.device.api.domain.dto.DeviceSearchDto;
+import com.aitos.xenon.device.api.domain.dto.DeviceTerminateMinerDto;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
+import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.domain.DeviceDetial;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
@@ -17,13 +19,13 @@ public interface DeviceService {
 
     void bind(DeviceBindDto deviceBindDto);
 
-    IPage<Device> list(DeviceSearchDto queryParams);
+    void update(Device  device);
 
-    List<DeviceVo> queryByOwner(String ownerAddress);
+    IPage<DeviceVo> list(DeviceSearchDto queryParams);
+
+    List<Device> queryByOwner(String ownerAddress);
 
     DeviceVo queryByMiner(String minerAddress);
-
-    DeviceDetial findDetialByDeviceId(Long deviceId);
 
     void terminate(DeviceTerminateMinerDto deviceTerminateMinerDto);
 }

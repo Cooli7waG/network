@@ -22,7 +22,7 @@ public class DeviceBindDto {
 
     private DeviceLocationDto  location;
 
-    private DeviceDetialDto minerInfo;
+    private DeviceInfoDto minerInfo;
 
     /**
      * Onboard费用

@@ -1,14 +1,14 @@
 <template>
   <el-breadcrumb style="margin-bottom: 20px;">
-    <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-    <el-breadcrumb-item >Miners列表</el-breadcrumb-item>
+    <el-breadcrumb-item :to="{ path: '/' }">{{$t('miners.path.home')}}</el-breadcrumb-item>
+    <el-breadcrumb-item >{{$t('miners.path.miners')}}</el-breadcrumb-item>
   </el-breadcrumb>
   <el-row :gutter="24">
     <el-col :span="20">
       <div class="mt-4">
-        <el-input v-model="data.query.address" placeholder="请输入Miner Address">
+        <el-input v-model="data.query.address" :placeholder="$t('miners.query.searchPlaceHolder')">
           <template #append>
-            <el-button type="primary" @click="search">搜索</el-button>
+            <el-button type="primary" @click="search">{{$t('miners.query.searchButton')}}</el-button>
           </template>
         </el-input>
       </div>
@@ -26,22 +26,22 @@
           @current-change="pageCurrentChange"
       />
       <el-table :data="data.tableList" stripe border   style="width: 100%">
-        <el-table-column prop="address" label="Address" width="450">
+        <el-table-column prop="address" :label="$t('miners.table.address')" width="450">
           <template #default="scope">
             <router-link :to="'/miner/'+scope.row.address">{{scope.row.address}}</router-link>
           </template>
         </el-table-column>
-        <el-table-column prop="minerType" label="miner 类型" width="180" >
+        <el-table-column prop="minerType" :label="$t('miners.table.minerType')" width="180" >
           <template #default="scope">
             {{scope.row.minerType?Constant.MinerType[scope.row.minerType]:''}}
           </template>
         </el-table-column>
-        <el-table-column prop="maker" label="Maker" width="180" />
-        <el-table-column prop="locationType" label="LocationType"  />
-        <el-table-column prop="latitude" label="latitude"  />
-        <el-table-column prop="longitude" label="longitude"  />
-        <el-table-column prop="h3index" label="h3index"  />
-        <el-table-column prop="createTime" label="创建时间" width="180">
+        <el-table-column prop="ownerAddress" :label="$t('miners.table.ownerAddress')" width="180" />
+        <el-table-column prop="earningMint" :label="$t('miners.table.earningMint')" width="180" />
+        <el-table-column prop="earningService" :label="$t('miners.table.earningService')"  />
+        <el-table-column prop="power" :label="$t('miners.table.power')"  />
+        <el-table-column prop="totalEnergyGeneration" :label="$t('miners.table.totalEnergyGeneration')"  />
+        <el-table-column prop="createTime" :label="$t('miners.table.createTime')" width="180">
           <template #default="scope">
             {{formatDate(scope.row.createTime, "yyyy-MM-dd hh:mm:ss")}}
           </template>

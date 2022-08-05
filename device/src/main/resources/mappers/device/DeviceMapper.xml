@@ -8,56 +8,67 @@
 
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        insert into <include refid="tableName"/> (address,miner_type,maker,account_id,location_type,latitude,longitude,h3index,staking_fee,create_time)
-        value (#{address},#{minerType},#{maker},#{accountId},#{locationType},#{latitude},#{longitude},#{h3index},#{stakingFee},NOW())
+        insert into <include refid="tableName"/> (address,miner_type,maker,create_time)
+        value (#{address},#{minerType},#{maker},NOW())
     </insert>
 
     <select id="findByAddress" resultType="com.aitos.xenon.device.domain.Device">
-        select * from <include refid="tableName"/> where address=#{address}
-    </select>
-    <select id="list" resultType="com.aitos.xenon.device.domain.Device">
         select * from <include refid="tableName"/>
+        where address=#{address}
+    </select>
+    <select id="list" resultType="com.aitos.xenon.device.api.domain.vo.DeviceVo">
+        select d.*,a.earning_mint,a.earning_service from <include refid="tableName"/> d left join account a on d.address=a.address
           <where>
-              <if test="queryParams.accountId!=null">
-                  account_id=#{queryParams.accountId}
+              <if test="queryParams.ownerAddress!=null and queryParams.ownerAddress!=''">
+                  a.owner_address=#{queryParams.ownerAddress}
               </if>
               <if test="queryParams.address!=null and queryParams.address!=''">
-                 and  address=#{queryParams.address}
+                 and  d.address=#{queryParams.address}
               </if>
           </where>
          order by create_time desc
     </select>
-    <select id="findByAccountId" resultType="com.aitos.xenon.device.domain.Device">
+    <select id="findByOwnerAddress" resultType="com.aitos.xenon.device.domain.Device">
         select * from <include refid="tableName"/>
-        where account_id=#{accountId}
+        where owner_address=#{ownerAddress}
     </select>
-    <select id="queryByOwner" resultType="com.aitos.xenon.device.api.domain.vo.DeviceVo">
-        select * from <include refid="tableName"/>
-        where account_id=#{accountId}
+    <select id="queryByMiner" resultType="com.aitos.xenon.device.api.domain.vo.DeviceVo">
+        select d.*,a.earning_mint,a.earning_service from <include refid="tableName"/> d left join account a on d.address=a.address
+        <where>
+            d.address=#{minerAddress}
+        </where>
+        order by create_time desc
     </select>
     <update id="bind">
-        update <include refid="tableName"/> set account_id=#{accountId} where address=#{address}
+        update <include refid="tableName"/>
+            <set>
+                location_type=#{locationType},
+                latitude=#{latitude},
+                longitude=#{longitude},
+                h3index=#{h3index},
+                owner_address=#{ownerAddress},
+                energy=#{energy},
+                power=#{power},
+                capabilities=#{capabilities},
+                <if test="deviceModel!=null and deviceModel!=''">
+                    device_model=#{deviceModel},
+                </if>
+                <if test="deviceSerialNum!=null and deviceSerialNum!=''">
+                    device_serial_num=#{deviceSerialNum},
+                </if>
+                update_time=#{updateTime}
+            </set>
+        where address=#{address}
     </update>
     <update id="update">
         update <include refid="tableName"/>
             <set>
-                <if test="accountId!=null">
-                    account_id=#{accountId},
+                <if test="totalEnergyGeneration!=null">
+                    total_energy_generation=#{totalEnergyGeneration},
                 </if>
-                <if test="locationType!=null">
-                    location_type=#{locationType},
-                </if>
-                <if test="latitude!=null">
-                    latitude=#{latitude},
-                </if>
-                <if test="longitude!=null">
-                    longitude=#{longitude},
-                </if>
-                <if test="h3index!=null">
-                    h3index=#{h3index}
-                </if>
+                update_time=#{updateTime}
             </set>
-            where id=#{id}
+            where address=#{address}
     </update>
     <update id="terminate">
         update <include refid="tableName"/> set terminate=1 where address=#{address}

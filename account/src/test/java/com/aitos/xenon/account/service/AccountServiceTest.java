@@ -1,9 +1,7 @@
 package com.aitos.xenon.account.service;
 
 import com.aitos.xenon.account.domain.Account;
-import com.aitos.xenon.common.crypto.ed25519.Base58;
-import com.aitos.xenon.common.crypto.ed25519.Ed25519;
-import com.aitos.xenon.core.constant.BusinessConstants;
+import com.aitos.xenon.common.crypto.XenonCrypto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,12 +28,21 @@ public class AccountServiceTest {
 
     @Test
     public void test_save_sign(){
-        String data=Base58.encode(org.bouncycastle.util.encoders.Hex.decode("73331A39E6A03D49724EBA76FECC062FA9293464F149A933813DB8D6F70D03B8"));
-        String sign= Ed25519.sign(privateKey,data);
-
+        String data="11AN9qPdD9fCWQKkhpkUxe6jeVw1xA8Q4otZfhbZK7P6ek";
+        String sign= XenonCrypto.sign(privateKey,data);
         System.out.println(sign);
 
-        Boolean verify=Ed25519.verify(publicKey,data,sign);
+        Boolean verify=XenonCrypto.verify(publicKey,data,sign);
+        System.out.println(verify);
+    }
+
+    @Test
+    public void test_save_sign2(){
+        String data="{\"version\":1,\"minerAddress\":\"1162eqbyXo8p4JPxbLVt94e8zL8TVgyqyeF9Ytg7PhC55o\",\"ownerAddress\":\"11D1gq3XVrkp2UEgJ25afSdEZuoncyz9JngBfKZjfjQxRW\",\"location\":{\"version\":1,\"locationType\":0,\"latitude\":0,\"longitude\":0},\"minerInfo\":{\"version\":1,\"energy\":0,\"capabilities\":1,\"power\":10,\"deviceModel\":\"AD40\",\"deviceSerialNum\":\"100100101\"}}";
+        String sign= XenonCrypto.sign(privateKey,data.getBytes());
+        System.out.println(sign);
+
+        Boolean verify=XenonCrypto.verify(publicKey,data.getBytes(),sign);
         System.out.println(verify);
     }
 

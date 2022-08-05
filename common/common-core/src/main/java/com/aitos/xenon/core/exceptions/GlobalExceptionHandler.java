@@ -111,7 +111,7 @@ public class GlobalExceptionHandler
      * 校验异常
      */
     @ExceptionHandler(value = ConstraintViolationException.class)
-    public Result ConstraintViolationExceptionHandler(ConstraintViolationException ex) {
+    public Result constraintViolationExceptionHandler(ConstraintViolationException ex) {
         Set<ConstraintViolation<?>> constraintViolations = ex.getConstraintViolations();
         Iterator<ConstraintViolation<?>> iterator = constraintViolations.iterator();
         List<String> msgList = new ArrayList<>();
@@ -120,6 +120,14 @@ public class GlobalExceptionHandler
             msgList.add(cvl.getMessageTemplate());
         }
         return Result.failed(ApiStatus.PARAMETER_FORMATE_ERROR,String.join(",",msgList));
+    }
+
+    /**
+     * 校验异常
+     */
+    @ExceptionHandler(value = ParamValidateInvalidException.class)
+    public Result paramValidateInvalidExceptionHandler(ParamValidateInvalidException ex) {
+        return Result.failed(ApiStatus.PARAMETER_FORMATE_ERROR,ex.getMessage());
     }
 
     /**

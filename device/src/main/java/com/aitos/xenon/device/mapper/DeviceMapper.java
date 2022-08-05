@@ -1,10 +1,9 @@
 package com.aitos.xenon.device.mapper;
 
-import com.aitos.xenon.core.model.QueryParams;
 import com.aitos.xenon.device.api.domain.dto.DeviceSearchDto;
 import com.aitos.xenon.device.api.domain.dto.DeviceTerminateMinerDto;
-import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
+import com.aitos.xenon.device.domain.Device;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -17,15 +16,15 @@ public interface DeviceMapper {
 
     Device findByAddress(String address);
 
-    void bind(@Param("address") String minerAddressToHex,@Param("accountId") Long id);
+    void bind(Device device);
 
     void update(Device device);
 
-    IPage<Device> list(Page<Device> page, @Param("queryParams") DeviceSearchDto queryParams);
+    IPage<DeviceVo> list(Page<DeviceVo> page, @Param("queryParams") DeviceSearchDto queryParams);
 
-    List<Device> findByAccountId(Long accountId);
-
-    List<DeviceVo> queryByOwner(Long accountId);
+    List<Device> findByOwnerAddress(String ownerAddress);
 
     void terminate(DeviceTerminateMinerDto deviceTerminateMinerDto);
+
+    DeviceVo queryByMiner(@Param("minerAddress")String minerAddress);
 }

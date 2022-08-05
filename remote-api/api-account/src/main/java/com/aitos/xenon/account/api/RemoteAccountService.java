@@ -3,6 +3,7 @@ package com.aitos.xenon.account.api;
 
 import com.aitos.xenon.account.api.domain.dto.AccountRegisterDto;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
+import com.aitos.xenon.account.api.domain.vo.BmtStatisticsVo;
 import com.aitos.xenon.core.model.Result;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,4 +28,7 @@ public interface RemoteAccountService {
 
     @GetMapping("/account/bmtCirculation")
     Result<String> bmtCirculation();
+
+    @GetMapping("/account/bmtStatistics")
+    Result<BmtStatisticsVo> bmtStatistics();
 }

@@ -3,6 +3,7 @@ package com.aitos.xenon.account.controller;
 import com.aitos.xenon.account.api.domain.dto.AccountRegisterDto;
 import com.aitos.xenon.account.api.domain.dto.AccountSearchDto;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
+import com.aitos.xenon.account.api.domain.vo.BmtStatisticsVo;
 import com.aitos.xenon.account.domain.Account;
 import com.aitos.xenon.account.service.AccountService;
 import com.aitos.xenon.core.constant.ApiStatus;
@@ -69,5 +70,11 @@ public class AccountController {
     public Result<String> bmtCirculation(){
         BigInteger value= accountService.bmtCirculation();
         return Result.ok(value.toString());
+    }
+
+    @GetMapping("/bmtStatistics")
+    public Result<BmtStatisticsVo> bmtStatistics(){
+        BmtStatisticsVo bmtStatisticsVo= accountService.bmtStatistics();
+        return Result.ok(bmtStatisticsVo);
     }
 }
