@@ -1,6 +1,8 @@
 package com.aitos.xenon.block.service.impl;
 
 import com.aitos.xenon.account.api.RemoteTransactionService;
+import com.aitos.xenon.account.api.domain.dto.PoggRewardDetailDto;
+import com.aitos.xenon.account.api.domain.dto.PoggRewardDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionDto;
 import com.aitos.xenon.block.domain.*;
 import com.aitos.xenon.block.mapper.PoggMapper;
@@ -18,6 +20,7 @@ import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.exceptions.ServiceException;
 import com.aitos.xenon.core.model.Result;
+import com.aitos.xenon.core.utils.BeanConvertor;
 import com.aitos.xenon.device.api.RemoteDeviceService;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -156,6 +159,7 @@ public class PoggServiceImpl implements PoggService {
         poggReward.setVerifiableEvidence(poggCommit.getPrivateKey());
         poggReward.setStartEpoch(startEpoch);
         poggReward.setEndEpoch(endEpoch);
+        poggReward.setStatus(BusinessConstants.POGGRewardStatus.UN_ISSUED);
         poggReward.setRewardsJson(JSON.toJSONString(rewards));
         poggReward.setCreateTime(LocalDateTime.now());
         poggRewardMapper.save(poggReward);
@@ -263,22 +267,15 @@ public class PoggServiceImpl implements PoggService {
     public void giveOutRewards() {
         List<PoggReward> unIssuedPoggRewardList = poggRewardMapper.findListUnIssued();
         unIssuedPoggRewardList.forEach(item->{
-
             int status=BusinessConstants.POGGRewardStatus.ISSUED;
             String msg="";
 
-            item.setRewards(JSON.parseArray(item.getRewardsJson(),PoggRewardDetail.class));
+            PoggRewardDto poggRewardDto= BeanConvertor.toBean(item,PoggRewardDto.class);
+            List<PoggRewardDetailDto> poggRewardDetailDtos = JSON.parseArray(item.getRewardsJson(), PoggRewardDetailDto.class);
+            poggRewardDto.setRewards(poggRewardDetailDtos);
 
-            String txData=JSON.toJSONString(item);
-            String txHash=DigestUtils.sha256Hex(txData);
-
-            TransactionDto transactionDto =new TransactionDto();
-            transactionDto.setHeight(item.getEndEpoch());
-            transactionDto.setData(txData);
-            transactionDto.setHash(txHash);
-            transactionDto.setTxType(BusinessConstants.TXType.TX_COMMIT_POGG);
-            Result<String> result=remoteTransactionService.transaction(transactionDto);
-            log.info("giveOutRewards.result=",JSON.toJSONString(result));
+            Result<String> result=remoteTransactionService.poggReward(poggRewardDto);
+            log.info("giveOutRewards.result={}",JSON.toJSONString(result));
             if(result.getCode()!= ApiStatus.SUCCESS.getCode()){
                 msg=result.getMsg();
                 status=BusinessConstants.POGGRewardStatus.ISSUED_FAILED;

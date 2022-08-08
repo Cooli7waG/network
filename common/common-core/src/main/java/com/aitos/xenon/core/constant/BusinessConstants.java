@@ -134,14 +134,14 @@ public interface BusinessConstants
         /**
          * 未发放
          */
-        int UN_ISSUED=1;
+        int UN_ISSUED=0;
         /**
          * 已发放
          */
-        int ISSUED=2;
+        int ISSUED=1;
         /**
          * 发放失败
          */
-        int ISSUED_FAILED=3;
+        int ISSUED_FAILED=2;
     }
 }

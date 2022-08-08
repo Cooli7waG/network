@@ -1,6 +1,6 @@
 <template>
   <el-menu
-      default-active="/"
+      :default-active="$route.path"
       class="el-menu-demo"
       mode="horizontal"
       background-color="#545c64"
@@ -17,6 +17,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'Menus',
   props: {

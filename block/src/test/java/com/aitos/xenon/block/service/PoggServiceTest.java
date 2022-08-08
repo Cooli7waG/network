@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,15 +42,7 @@ public class PoggServiceTest {
 
     @Test
     public void test_2(){
-        int index=0;
-        for (int i = 1; i < 2017; i++) {
-            BigInteger bigInteger= BigInteger.valueOf(i).remainder(BigInteger.valueOf(60));
-            if(bigInteger.compareTo(BigInteger.valueOf(0))==0){
-                System.out.println(i);
-                index++;
-            }
-        }
-        System.out.println(index);
+        System.out.println(LocalDateTime.now().getMinute());
     }
 
     @Test

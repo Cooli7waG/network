@@ -8,6 +8,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Component
 @Slf4j
 public class ScheduledService {
@@ -28,11 +30,11 @@ public class ScheduledService {
     public void genBlockTask(){
         log.info("block create");
         blockService.genBlock();
+        index=LocalDateTime.now().getMinute()+1;
         if(index%POGG_COMMIT_EPOCH==0){
             log.info("poggCommitTask");
             poggService.commit();
         }
-        index++;
     }
 
     /**

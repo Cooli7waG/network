@@ -19,7 +19,7 @@
       <el-pagination
           v-model:currentPage="data.query.page.currentPage"
           v-model:page-size="data.query.page.pageSize"
-          :page-sizes="[100, 200, 300, 400]"
+          :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
           :total="data.query.page.total"
           @size-change="pageSizeChange"
@@ -33,7 +33,7 @@
         </el-table-column>
         <el-table-column prop="amountTransaction" :label="$t('block.table.amountTransaction')" width="200" align="right"/>
         <el-table-column prop="blockTime" :label="$t('block.table.blockTime')" width="180" />
-        <el-table-column prop="createTime" :label="$t('block.table.createTime')" width="180">
+        <el-table-column prop="createTime" :label="$t('block.table.createTime')">
           <template #default="scope">
             {{formatDate(scope.row.createTime, "yyyy-MM-dd hh:mm:ss")}}
           </template>

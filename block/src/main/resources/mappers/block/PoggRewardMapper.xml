@@ -7,8 +7,8 @@
     <sql id="tableName">pogg_reward</sql>
 
     <insert id="save">
-        insert into <include refid="tableName"/> (height,verifiable_evidence,start_epoch,end_epoch,rewards_json,create_time)
-        value (#{height},#{verifiableEvidence},#{startEpoch},#{endEpoch},#{rewardsJson},#{createTime})
+        insert into <include refid="tableName"/> (height,verifiable_evidence,start_epoch,end_epoch,rewards_json,status,create_time)
+        value (#{height},#{verifiableEvidence},#{startEpoch},#{endEpoch},#{rewardsJson},#{status},#{createTime})
     </insert>
 
     <update id="updateStatus">

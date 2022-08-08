@@ -59,7 +59,7 @@
 
     <el-row :gutter="20">
       <el-col :span="4">{{$t('minerinfo.info.totalEnergyGeneration')}}:</el-col>
-      <el-col :span="16">{{data.device.totalEnergyGeneration}}</el-col>
+      <el-col :span="16">{{(data.device.totalEnergyGeneration/1000/1000).toFixed(3)}}</el-col>
     </el-row>
 
 

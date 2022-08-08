@@ -4,9 +4,14 @@
       <el-header>
         <Menus/>
       </el-header>
-      <el-main>
-        <router-view />
-      </el-main>
+      <el-container>
+        <el-main>
+          <router-view />
+        </el-main>
+        <el-footer>
+          © 2022 . aitos.io
+        </el-footer>
+      </el-container>
     </el-container>
   </div>
 </template>
@@ -38,9 +43,23 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color var(--el-transition-duration-fast);
-  overflow: hidden;
 }
-.el-header{
-  --el-header-padding: 0 0px;
+.el-container{
+  width: 100% !important;
+  .el-header{
+    --el-header-padding: 0 0px;
+    position: relative;
+    width: 100%;
+    height: 60px !important;
+  }
+  .el-container{
+    height: calc(100vh - 80px);
+    .el-main{
+    }
+    .el-footer{
+      height: 10px;
+      text-align: center;
+    }
+  }
 }
 </style>

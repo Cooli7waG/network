@@ -40,7 +40,7 @@ public class XenonCryptoTest {
     public void test_getPublickKey2(){
         XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair(Network.MAINNET,Algorithm.ED25519);
 
-        String publickKey = XenonCrypto.getPublickKey(Base58.encode(Hex.decode("00000A372C66614C33A926EBEB8A2D76617A7794C380EC4086CE58421ED6AD42AC7B")));
+        String publickKey = XenonCrypto.getPublickKey(Base58.encode(Hex.decode("0000F3B5DF432D1A33578DE7A57DE25C992E97C096E7F66DE5E5CAA2E591AA0C29B0")));
         System.out.println(publickKey);
     }
 

@@ -19,7 +19,7 @@
       <el-pagination
           v-model:currentPage="data.query.page.currentPage"
           v-model:page-size="data.query.page.pageSize"
-          :page-sizes="[100, 200, 300, 400]"
+          :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
           :total="data.query.page.total"
           @size-change="pageSizeChange"

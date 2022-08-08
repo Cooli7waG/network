@@ -1,32 +1,32 @@
 export default {
     common:{
         msg:{
-            timeout:"系统接口请求超时",
-            networkError:"后端接口连接异常",
+            timeout:"System interface request timeout",
+            networkError:"Backend interface connection exception",
         },
         button:{
-            back:"返回"
+            back:"Back"
         },
         constant:{
             accountType: {
-                1:"WALLET",
+                1:"Wallet",
                 2:"Miner",
-                3:"NETWORK",
-                4:"VALIDATOR",
-                5:"MAKER"
+                3:"Network",
+                4:"Validator",
+                5:"Maker"
             },
             minerType:{
-                1:"GAME_MINER",
-                2:"VIRTUAL_MINER",
-                3:"API_MINER",
-                4:"LITE_PV_MINER",
-                5:"STANDARD_PV_MINER",
+                1:"Game Miner",
+                2:"Virtual Miner",
+                3:"Api Miner",
+                4:"Lite Pv Miner",
+                5:"Standard Pv Miner",
             },
             tXType:{
-                1:"TX_REGISTER_MINER",
-                2:"TX_ONBOARD_MINER",
-                3:"TX_TRANSFER_MINER",
-                4:"TX_TERMINATE_MINER",
+                1:"TX_Register_miner",
+                2:"TX_Onboard_Miner",
+                3:"TX_Transfer_Miner",
+                4:"TX_Terminate_Miner",
                 5:"TX_Airdrop_Miner",
                 6:"TX_Claim_Miner",
                 7:"TX_Commit_PoGG",
@@ -44,28 +44,28 @@ export default {
         txs:"Transactions",
     },
     dashboard: {
-        miners: '全网矿机数量',
-        totalPowerLow: '全网总功率',
-        totalChargeVol: '全网总发电量',
+        miners: 'The number of mining machines in the whole network',
+        totalPowerLow: 'The total power of the whole network',
+        totalChargeVol: 'The total power generation of the whole network',
 
-        uSDBmtMarketPrice: '美元计BMT市场价格',
-        totalBMTMarket: 'BMT市场总量',
-        tokenSupply: 'BMT总流通量'
+        uSDBmtMarketPrice: 'BMT market price in USD',
+        totalBMTMarket: 'Total BMT Market',
+        tokenSupply: 'Total BMT Circulation'
     },
     txs: {
         path:{
             home:"Home",
-            txs:"Transaction list"
+            txs:"Transaction List"
         },
         query:{
-            searchButton:"搜索",
-            searchPlaceHolder:"请输入交易hash或块高"
+            searchButton:"Search",
+            searchPlaceHolder:"Please enter transaction hash or block height"
         },
         table:{
-            hash:"交易Hash",
-            height:"块高",
-            txType:"交易类型",
-            txTime:"交易时间"
+            hash:"Transaction Hash",
+            height:"Block Height",
+            txType:"Transaction Type",
+            txTime:"Transaction Hour"
         },
         msg:{
 
@@ -75,18 +75,18 @@ export default {
         path:{
             home:"Home",
             txs:"Transaction list",
-            info:"交易详情",
+            info:"Transaction Details",
         },
         info:{
-            hash:"hash",
-            status:"状态",
-            height:"Block高",
-            txType:"交易类型",
-            txTime:"交易时间",
-            txData:"交易数据"
+            hash:"Transaction Hash",
+            status:"Status",
+            height:"Block Height",
+            txType:"Transaction Type",
+            txTime:"Transaction Hour",
+            txData:"Transaction Data"
         },
         msg:{
-            noData:"没有找到数据",
+            noData:"No data found",
         }
     },
     miners: {
@@ -95,17 +95,17 @@ export default {
             miners:"Miner list"
         },
         query:{
-            searchButton:"搜索",
-            searchPlaceHolder:"请输入Miners地址"
+            searchButton:"Search",
+            searchPlaceHolder:"Please enter Miners address"
         },
         table:{
             address:"Address",
             ownerAddress:"Owner Address",
             minerType:"Miner Type",
-            earningMint:"总挖矿收入",
-            earningService:"总服务收入",
-            power:"平均发电功率(kWp)",
-            totalEnergyGeneration:"总发电量（kWh）",
+            earningMint:"Total Mining Revenue",
+            earningService:"Total Service Revenue",
+            power:"Average power generation (kWp)",
+            totalEnergyGeneration:"Total Power Generation (kWh)",
             createTime:"Create Time",
         },
         msg:{
@@ -116,7 +116,7 @@ export default {
         path:{
             home:"Home",
             miners:"Miner list",
-            info:"Miner 详情",
+            info:"Miner Details",
         },
         info:{
             address:"Address",
@@ -126,15 +126,15 @@ export default {
             locationType:"Location Type",
             latlog:"Latitude Longitude",
             h3index:"H3 Index",
-            terminate:"是否终止",
-            earningMint:"总挖矿收入",
-            earningService:"总服务收入",
-            power:"平均发电功率(kWp)",
-            totalEnergyGeneration:"总发电量（kWh）",
+            terminate:"Terminate",
+            earningMint:"Total Mining Revenue",
+            earningService:"Total Service Revenue",
+            power:"Average power generation (kWp)",
+            totalEnergyGeneration:"Total Power Generation (kWh)",
             createTime:"Create Time",
         },
         msg:{
-            noData:"没有找到数据",
+            noData:"No data found",
         }
     },
     account: {
@@ -143,16 +143,16 @@ export default {
             accounts:"Account list"
         },
         query:{
-            searchButton:"搜索",
-            searchPlaceHolder:"请输入Account地址"
+            searchButton:"Search",
+            searchPlaceHolder:"Please enter Account address"
         },
         table:{
             address:"Address",
             accountType:"Account Type",
             balance:"Balance",
-            earningMint:"earningMint",
-            earningService:"earningService",
-            amountMiner:"amount Miner",
+            earningMint:"Earning Mint",
+            earningService:"Earning Service",
+            amountMiner:"Amount Miner",
             createTime:"Create Time",
         },
         msg:{
@@ -162,20 +162,20 @@ export default {
     accountinfo: {
         path:{
             home:"Home",
-            accounts:"acount list",
-            info:"acount 详情",
+            accounts:"Account list",
+            info:"Account Details",
         },
         info:{
             address:"Address",
             accountType:"Account Type",
             balance:"Balance",
-            earningMint:"earningMint",
-            earningService:"earningService",
-            amountMiner:"amount Miner",
+            earningMint:"Earning Mint",
+            earningService:"Earning Service",
+            amountMiner:"Amount Miner",
             createTime:"Create Time",
         },
         msg:{
-            noData:"没有找到数据",
+            noData:"No data found",
         }
     },
     block: {
@@ -184,16 +184,13 @@ export default {
             blocks:"Block list"
         },
         query:{
-            searchButton:"搜索",
-            searchPlaceHolder:"请输入block地址"
+            searchButton:"Search",
+            searchPlaceHolder:"Please enter the block address"
         },
         table:{
             height:"height",
-            amountTransaction:"Transaction 数量",
-            blockTime:"blockTime",
-            earningMint:"earningMint",
-            earningService:"earningService",
-            amountMiner:"amount Miner",
+            amountTransaction:"Transaction quantity",
+            blockTime:"Block Time",
             createTime:"Create Time",
         },
         msg:{
