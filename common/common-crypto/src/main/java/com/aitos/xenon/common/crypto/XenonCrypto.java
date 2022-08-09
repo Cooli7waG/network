@@ -1,12 +1,15 @@
 package com.aitos.xenon.common.crypto;
 
 import com.aitos.xenon.common.crypto.ecdsa.EcdsaKeyPair;
+import com.aitos.xenon.common.crypto.ecdsa.Hash;
 import com.aitos.xenon.common.crypto.ecdsa.Keccak256Secp256k1;
 import com.aitos.xenon.common.crypto.ed25519.Base58;
 import com.aitos.xenon.common.crypto.ed25519.Ed25519;
 import com.aitos.xenon.common.crypto.ed25519.Ed25519KeyPair;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.encoders.Hex;
 
 import javax.crypto.KeyAgreement;
 import java.security.*;
@@ -86,7 +89,34 @@ public class XenonCrypto {
             System.arraycopy(originalPublicKeyBytes, 0, publicKeyBytes, 2, originalPublicKeyBytes.length);
             return Base58.encode(publicKeyBytes);
         }else if(algorithm.equals(Algorithm.ECDSA)){
+            byte[] originalPrivateKeyBytes=Base58.decode(xenonKeyPair.getOriginalPrivateKey());
+            byte[] publicKey = Keccak256Secp256k1.getPublicKey(Hex.toHexString(originalPrivateKeyBytes));
 
+            byte[] publicKeyBytes=new byte[publicKey.length+2];
+            publicKeyBytes[0]=(byte) network.getCode();
+            publicKeyBytes[1]=(byte)algorithm.getCode();
+            System.arraycopy(publicKey, 0, publicKeyBytes, 2, publicKey.length);
+            return Base58.encode(publicKeyBytes);
+        }
+        return null;
+    }
+    public static String getAddress(String publicKey){
+        XenonKeyPair xenonKeyPair=convertorPublicKey(publicKey);
+        Network network=xenonKeyPair.getNetwork();
+        Algorithm algorithm=xenonKeyPair.getAlgorithm();
+        if(algorithm.equals(Algorithm.ED25519)){
+            return publicKey;
+        }else if(algorithm.equals(Algorithm.ECDSA)){
+            byte[] originalPublicKeyBytes=Base58.decode(xenonKeyPair.getOriginalPublicKey());
+            byte[] hash = Hash.sha3(originalPublicKeyBytes);
+            byte[] address=Arrays.copyOfRange(hash, hash.length - 20, hash.length);
+            return Hex.toHexString(address);
+
+            /*Keccak.Digest256 digest256 = new Keccak.Digest256();
+            digest256.update(originalPublicKeyBytes,1,originalPublicKeyBytes.length-1);
+            byte[] kcck = digest256.digest();
+            byte[] address=Arrays.copyOfRange(kcck,kcck.length-20,kcck.length);
+            return Hex.toHexString(address);*/
         }
         return null;
     }
@@ -98,10 +128,12 @@ public class XenonCrypto {
             Algorithm algorithm = xenonKeyPair.getAlgorithm();
             if (algorithm.equals(Algorithm.ED25519)) {
                 byte[] originalPrivateKeyBytes = Base58.decode(xenonKeyPair.getOriginalPrivateKey());
-                byte[] originalPublicKeyBytes = Ed25519.sign(originalPrivateKeyBytes, Base58.decode(data));
-                return Base58.encode(originalPublicKeyBytes);
+                byte[] signBytes = Ed25519.sign(originalPrivateKeyBytes, Base58.decode(data));
+                return Base58.encode(signBytes);
             } else if (algorithm.equals(Algorithm.ECDSA)) {
-
+                String originalPrivateKey=Hex.toHexString(Base58.decode(xenonKeyPair.getOriginalPrivateKey()));
+                String sign = Keccak256Secp256k1.sign(originalPrivateKey,Base58.decode(data));
+                return Base58.encode(Hex.decode(sign));
             }
         }catch (Exception e){
             log.error("sign.error={}",e);
@@ -119,7 +151,9 @@ public class XenonCrypto {
                 byte[] originalPublicKeyBytes= Ed25519.sign(originalPrivateKeyBytes,data);
                 return Base58.encode(originalPublicKeyBytes);
             }else if(algorithm.equals(Algorithm.ECDSA)){
-
+                String originalPrivateKey=Hex.toHexString(Base58.decode(xenonKeyPair.getOriginalPrivateKey()));
+                String sign = Keccak256Secp256k1.sign(originalPrivateKey,data);
+                return Base58.encode(Hex.decode(sign));
             }
         }catch (Exception e){
             log.error("sign.error={}",e);
@@ -137,6 +171,11 @@ public class XenonCrypto {
             byte[] originalPublicKeyBytes=Base58.decode(xenonKeyPair.getOriginalPublicKey());
             Boolean verify = Ed25519.verify(originalPublicKeyBytes,data,signatureBytes);
             return verify;
+        }else if(algorithm.equals(Algorithm.ECDSA)){
+            byte[] originalPublicKeyBytes=Base58.decode(xenonKeyPair.getOriginalPublicKey());
+            String originalPublicKey=Hex.toHexString(originalPublicKeyBytes);
+            Boolean verify = Keccak256Secp256k1.verify(originalPublicKey,data,signature);
+            return verify;
         }
         return false;
     }
@@ -152,6 +191,11 @@ public class XenonCrypto {
             byte[] originalPublicKeyBytes=Base58.decode(xenonKeyPair.getOriginalPublicKey());
             Boolean verify = Ed25519.verify(originalPublicKeyBytes,dataBytes,signatureBytes);
             return verify;
+        }else if(algorithm.equals(Algorithm.ECDSA)){
+            byte[] originalPublicKeyBytes=Base58.decode(xenonKeyPair.getOriginalPublicKey());
+            String originalPublicKey=Hex.toHexString(originalPublicKeyBytes);
+            Boolean verify = Keccak256Secp256k1.verify(originalPublicKey,dataBytes,Hex.toHexString(signatureBytes));
+            return verify;
         }
         return false;
     }
@@ -164,6 +208,11 @@ public class XenonCrypto {
         if(algorithm.equals(Algorithm.ED25519)){
             byte[] originalPublicKeyBytes=Base58.decode(xenonKeyPair.getOriginalPublicKey());
             Boolean verify = Ed25519.verify(originalPublicKeyBytes,data,signature);
+            return verify;
+        }else if(algorithm.equals(Algorithm.ECDSA)){
+            byte[] originalPublicKeyBytes=Base58.decode(xenonKeyPair.getOriginalPublicKey());
+            String originalPublicKey=Hex.toHexString(originalPublicKeyBytes);
+            Boolean verify = Keccak256Secp256k1.verify(originalPublicKey,data,Hex.toHexString(signature));
             return verify;
         }
         return false;
@@ -183,7 +232,7 @@ public class XenonCrypto {
         return xenonKeyPair;
     }
 
-    private static XenonKeyPair convertorPublicKey(String publicKey){
+    public static XenonKeyPair convertorPublicKey(String publicKey){
         XenonKeyPair  xenonKeyPair=new XenonKeyPair();
         byte[] publicKeyBytes= Base58.decode(publicKey);
         xenonKeyPair.setNetwork(Network.findByCode(publicKeyBytes[0]));

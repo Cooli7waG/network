@@ -119,7 +119,7 @@ public class PoggServiceImpl implements PoggService {
         SystemConfig systemConfig = systemConfigService.findConfig(false);
 
         //统计自定范围内miner上报的记录数
-        long startEpoch=poggCommit.getEpoch()-poggCommit.getEpoch()*systemConfig.getCalDataRange();
+        long startEpoch=poggCommit.getEpoch()-systemConfig.getCalDataRange();
         long endEpoch=poggCommit.getEpoch();
 
         /**

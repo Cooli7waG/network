@@ -1,8 +1,6 @@
 package com.aitos.xenon.account.service.impl;
 
-import com.aitos.blockchain.web3j.BmtERC20;
-import com.aitos.blockchain.web3j.We3jUtils;
-import com.aitos.xenon.account.api.domain.dto.BatchRewardMinersDto;
+import com.aitos.blockchain.web3j.Erc20Service;
 import com.aitos.xenon.account.api.domain.dto.PoggRewardDetailDto;
 import com.aitos.xenon.account.api.domain.dto.PoggRewardDto;
 import com.aitos.xenon.account.api.domain.dto.TransferDto;
@@ -11,12 +9,10 @@ import com.aitos.xenon.account.domain.Transaction;
 import com.aitos.xenon.account.mapper.TransactionMapper;
 import com.aitos.xenon.account.service.AccountService;
 import com.aitos.xenon.account.service.TransactionService;
-import com.aitos.xenon.block.api.RemoteBlockService;
-import com.aitos.xenon.core.constant.ApiStatus;
+import com.aitos.xenon.common.crypto.XenonCrypto;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.exceptions.ServiceException;
 import com.aitos.xenon.core.model.QueryParams;
-import com.aitos.xenon.core.model.Result;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -43,7 +39,7 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionMapper transactionMapper;
 
     @Autowired
-    private BmtERC20 bmtERC20;
+    private Erc20Service erc20Service;
 
     @Autowired
     private AccountService accountService;
@@ -63,7 +59,7 @@ public class TransactionServiceImpl implements TransactionService {
             Account account= accountService.findByAddress(transferDto.getPayments().get(0).getPayeeToHex());
 
             BigDecimal fee = Convert.fromWei(transferDto.getFee().toString(), Convert.Unit.ETHER);
-           /* TransactionReceipt transactionReceipt=bmtERC20.transfer(We3jUtils.toWeb3Address(account.getAddress()),fee.toBigInteger()).send();
+           /* TransactionReceipt transactionReceipt=erc20Service.transfer(We3jUtils.toWeb3Address(account.getAddress()),fee.toBigInteger()).send();
 
             Result<Long> heightResult=remoteBlockService.getBlockHeight();
             if(heightResult.getCode()== ApiStatus.SUCCESS.getCode()){
@@ -99,13 +95,13 @@ public class TransactionServiceImpl implements TransactionService {
                 BigDecimal ownerAmount = entry.getValue().stream()
                         .map(item->item.getAmount()).reduce(BigDecimal::add)
                         .orElse(BigDecimal.ZERO);
-                addressList.add(ownerAddress);
+                addressList.add(XenonCrypto.getAddress(ownerAddress));
 
                 BigDecimal blanceEther=  Convert.toWei(ownerAmount, Convert.Unit.ETHER);
                 rewardList.add(blanceEther.toBigInteger());
             }
             //调用合约发送奖励
-            TransactionReceipt transactionReceipt = bmtERC20.rewardMiner_multi(addressList, rewardList).send();
+            TransactionReceipt transactionReceipt = erc20Service.rewardMiner_multi(addressList, rewardList).send();
 
             // todo 更新miner账户余额
             accountService.updateEarning(poggRewardDto.getRewards());

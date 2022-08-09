@@ -1,5 +1,7 @@
 package com.aitos.xenon.common.crypto.ecdsa;
 
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.interfaces.ECPrivateKey;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
@@ -11,6 +13,7 @@ import java.math.BigInteger;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 
 public class Keccak256Secp256k1 {
     static {
@@ -48,8 +51,22 @@ public class Keccak256Secp256k1 {
         KeyPair keyPair = g.generateKeyPair();
 
         EcdsaKeyPair  ecdsaKeyPair=new EcdsaKeyPair();
-        ecdsaKeyPair.setPrivateKey(keyPair.getPrivate().getEncoded());
-        ecdsaKeyPair.setPublicKey(keyPair.getPublic().getEncoded());
+
+
+        BCECPrivateKey privateKey = (BCECPrivateKey) keyPair.getPrivate();
+        BCECPublicKey publicKey = (BCECPublicKey) keyPair.getPublic();
+
+        BigInteger privateKeyValue = privateKey.getD();
+
+        byte[] publicKeyBytes = publicKey.getQ().getEncoded(false);
+        BigInteger publicKeyValue =new BigInteger(1, Arrays.copyOfRange(publicKeyBytes, 1, publicKeyBytes.length));
+
+        /*System.out.println(privateKeyValue.toByteArray().length+"||"+publicKeyValue.toByteArray().length);
+        System.out.println(Hex.toHexString(privateKeyValue.toByteArray()));
+        System.out.println(Hex.toHexString(publicKeyValue.toByteArray()));*/
+
+        ecdsaKeyPair.setPrivateKey(privateKeyValue.toByteArray());
+        ecdsaKeyPair.setPublicKey(publicKeyValue.toByteArray());
         return ecdsaKeyPair;
     }
 
@@ -67,7 +84,25 @@ public class Keccak256Secp256k1 {
         return keyFactory.generatePublic(keySpec);
     }
 
+    public static byte[] getPublicKey(String privateKey) {
+        BigInteger privKey = new BigInteger(privateKey, 16);
+        BigInteger pubKey = Sign.publicKeyFromPrivate(privKey);
+        return pubKey.toByteArray();
+    }
+    public static String sign(String privateKey,byte[] data){
+        BigInteger privKey = new BigInteger(privateKey, 16);
+        BigInteger pubKey = Sign.publicKeyFromPrivate(privKey);
+        ECKeyPair keyPair = new ECKeyPair(privKey, pubKey);
+        System.out.println("Private key: " + privKey.toString(16));
+        System.out.println("Public key: " + pubKey.toString(16));
 
+        byte[] msgHash = Hash.sha3(data);
+        Sign.SignatureData signature = Sign.signMessage(msgHash, keyPair, false);
+
+        String sgin= Hex.toHexString(signature.getR())+ Hex.toHexString(signature.getS())+ Hex.toHexString(signature.getV());
+
+        return sgin;
+    }
     public static String sign(String privateKey,String data){
 
         BigInteger privKey = new BigInteger(privateKey, 16);
@@ -76,7 +111,7 @@ public class Keccak256Secp256k1 {
         System.out.println("Private key: " + privKey.toString(16));
         System.out.println("Public key: " + pubKey.toString(16));
 
-        byte[] msgHash = Hash.sha3(data.getBytes());
+        byte[] msgHash = Hash.sha3(Hex.decode(data));
         Sign.SignatureData signature = Sign.signMessage(msgHash, keyPair, false);
 
         String sgin= Hex.toHexString(signature.getR())+ Hex.toHexString(signature.getS())+ Hex.toHexString(signature.getV());
@@ -96,8 +131,26 @@ public class Keccak256Secp256k1 {
 
         ECDSASignature signature2=new ECDSASignature(r,s);
 
-        byte[] sha3Str = Hash.sha3(data.getBytes());
+        byte[] sha3Str = Hash.sha3(Hex.decode(data));
         boolean result=ECKeyPair.verify(sha3Str,signature2,pubKey);
         return result;
     }
+
+    public static boolean verify(String publicKey,byte[] data,String signData){
+        if(!publicKey.startsWith("04")){
+            publicKey="04"+publicKey;
+        }
+
+        byte[] pubKey = Hex.decode(publicKey);
+        BigInteger r = new BigInteger(signData.substring(0, 64),16);
+        BigInteger s = new BigInteger(signData.substring(64, 128),16);
+
+        ECDSASignature signature2=new ECDSASignature(r,s);
+
+        byte[] sha3Str = Hash.sha3(data);
+        boolean result=ECKeyPair.verify(sha3Str,signature2,pubKey);
+        return result;
+    }
+
+
 }

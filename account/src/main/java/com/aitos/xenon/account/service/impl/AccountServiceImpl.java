@@ -1,6 +1,6 @@
 package com.aitos.xenon.account.service.impl;
 
-import com.aitos.blockchain.web3j.BmtERC20;
+import com.aitos.blockchain.web3j.Erc20Service;
 import com.aitos.xenon.account.api.domain.dto.AccountSearchDto;
 import com.aitos.xenon.account.api.domain.dto.PoggRewardDetailDto;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
@@ -8,6 +8,8 @@ import com.aitos.xenon.account.api.domain.vo.BmtStatisticsVo;
 import com.aitos.xenon.account.domain.Account;
 import com.aitos.xenon.account.mapper.AccountMapper;
 import com.aitos.xenon.account.service.AccountService;
+import com.aitos.xenon.common.crypto.Algorithm;
+import com.aitos.xenon.common.crypto.XenonCrypto;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -26,7 +28,7 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private AccountMapper accountMapper;
     @Autowired
-    private BmtERC20 bmtERC20;
+    private Erc20Service erc20Service;
 
     @Override
     public void save(Account account) {
@@ -42,13 +44,13 @@ public class AccountServiceImpl implements AccountService {
     public Account findByAddress(String address) {
         try{
             Account account=accountMapper.findByAddress(address);
-            if(account==null){
+            if(account==null||account.getAccountType().equals(BusinessConstants.AccountType.MINER)){
                 return null;
             }else if(account.getAccountType()== BusinessConstants.AccountType.NETWORK){
-                BigInteger balance= bmtERC20._foundations_left().send();
+                BigInteger balance= erc20Service._foundations_initial_supply().send();
                 account.setBalance(balance.toString());
             }else{
-                BigInteger blance= bmtERC20.balanceOf(account.getAddress()).send();
+                BigInteger blance= erc20Service.balanceOf(account.getAddress()).send();
                 account.setBalance(blance.toString());
             }
             return account;
@@ -63,17 +65,30 @@ public class AccountServiceImpl implements AccountService {
         try{
             Page<AccountVo> page=new Page<AccountVo>(accountSearchDto.getOffset(),accountSearchDto.getLimit());
             IPage<AccountVo> pageResult=accountMapper.list(page,accountSearchDto);
-            List<String> addressList=pageResult.getRecords().stream().map(item->item.getAddress()).collect(Collectors.toList());
-            List<BigInteger> list= bmtERC20.balanceOf_multi(addressList).send();
-            int index=0;
+            List<String> addressList=pageResult.getRecords().stream()
+                    .filter(item-> XenonCrypto.convertorPublicKey(item.getAddress()).getAlgorithm().equals(Algorithm.ECDSA))
+                    .map(AccountVo::getAddress)
+                    .collect(Collectors.toList());
+            List<String> ecdsaAddressList=addressList.stream().map(publickey->XenonCrypto.getAddress(publickey)).collect(Collectors.toList());
+            List<BigInteger> list= erc20Service.balanceOf_multi(ecdsaAddressList).send();
             for(AccountVo accountVo:pageResult.getRecords()){
-                if(accountVo.getAccountType()== BusinessConstants.AccountType.NETWORK){
-                    BigInteger balance= bmtERC20._foundations_left().send();
-                    accountVo.setBalance(balance.toString());
+                Algorithm algorithm = XenonCrypto.convertorPublicKey(accountVo.getAddress()).getAlgorithm();
+                if(algorithm.equals(Algorithm.ECDSA)){
+                    if(accountVo.getAccountType()== BusinessConstants.AccountType.NETWORK){
+                        BigInteger balance= erc20Service._foundations_initial_supply().send();
+                        accountVo.setBalance(balance.toString());
+                    }else{
+                        for (int i = 0; i < addressList.size(); i++) {
+                            String publickey= addressList.get(i);
+                            if(publickey.equals(accountVo.getAddress())){
+                                accountVo.setBalance(list.get(i).toString());
+                                break;
+                            }
+                        }
+                    }
                 }else{
-                    accountVo.setBalance(list.get(index).toString());
+                    accountVo.setBalance("0");
                 }
-                index++;
             }
             return pageResult;
         }catch (Exception e){
@@ -95,7 +110,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public BigInteger bmtCirculation() {
         try {
-            BigInteger bmtCirculation = bmtERC20.alreadyReward().send();
+            BigInteger bmtCirculation = erc20Service.alreadyReward().send();
             return bmtCirculation;
         }catch (Exception e){
             log.error("bmtCirculation,error:{}",e);
@@ -107,9 +122,9 @@ public class AccountServiceImpl implements AccountService {
     public BmtStatisticsVo bmtStatistics() {
         BmtStatisticsVo bmtStatisticsVo=new BmtStatisticsVo();
         try {
-            BigInteger totalBMTMarket =bmtERC20._totalSupply().send();
+            BigInteger totalBMTMarket =erc20Service._foundations_initial_supply().send();
             bmtStatisticsVo.setTotalBMTMarket(totalBMTMarket.toString());
-            BigInteger bmtCirculation = bmtERC20.alreadyReward().send();
+            BigInteger bmtCirculation = erc20Service.alreadyReward().send();
             bmtStatisticsVo.setTokenSupply(bmtCirculation.toString());
         }catch (Exception e){
             log.error("bmtStatistics,error:{}",e);

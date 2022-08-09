@@ -1,7 +1,7 @@
 package com.aitos.xenon.account.common.config;
 
 
-import com.aitos.blockchain.web3j.BmtERC20;
+import com.aitos.blockchain.web3j.Erc20Service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,7 +41,7 @@ public class ChainConfig {
 
     @Bean
     @Scope("prototype")
-    public BmtERC20 bmtERC20() throws IOException {
+    public Erc20Service erc20Service() throws IOException {
 
         Web3j web3j = Web3j.build(new HttpService(web3Url));
         Credentials credentials = Credentials.create(web3PrivateKey);
@@ -60,7 +60,7 @@ public class ChainConfig {
             }
         };
 
-        BmtERC20 contract = BmtERC20.load(contractAddress, web3j, credentials, myGasProvider);
+        Erc20Service contract = Erc20Service.load(contractAddress, web3j, credentials, myGasProvider);
         return contract;
     }
 

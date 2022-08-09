@@ -1,8 +1,13 @@
 package com.aitos.xenon.account.service;
 
-import com.aitos.blockchain.web3j.BmtERC20;
+import com.aitos.blockchain.web3j.Erc20Service;
 import com.aitos.blockchain.web3j.We3jUtils;
-import com.alibaba.fastjson.JSON;
+import com.aitos.xenon.common.crypto.Algorithm;
+import com.aitos.xenon.common.crypto.Network;
+import com.aitos.xenon.common.crypto.XenonCrypto;
+import com.aitos.xenon.common.crypto.XenonKeyPair;
+import com.aitos.xenon.common.crypto.ed25519.Base58;
+import org.apache.commons.codec.binary.Hex;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,12 +16,14 @@ import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootTest
 public class ContractTest {
 
     @Autowired
-    private BmtERC20 bmtERC20;
+    private Erc20Service erc20Service;
 
     @Test
     void test_address() throws Exception {
@@ -41,9 +48,12 @@ public class ContractTest {
 
     @Test
     public void test_balanceOf() {
-
         try {
-            BigInteger balanceOf = bmtERC20.balanceOf("380BE9A0B62A99CFF726F1DCB3BF63C1E1B66219F965FA446A03154A525D3397").send();
+            XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair(Network.MAINNET, Algorithm.ECDSA);
+            System.out.println(Hex.encodeHexString(Base58.decode(xenonKeyPair.getOriginalPublicKey())));
+
+            String address=XenonCrypto.getAddress("17jjMMaZbPifsB7wq9pHxU8ztyf2DeNJqLspCXtkpFDAtvbzikg6EgPbvf1E4MQ6KkSVCsdC8NmSaDRJVbpjhR71V");
+            BigInteger balanceOf = erc20Service.balanceOf(address).send();
             System.out.println(balanceOf);
 
             System.out.println("balanceOf=" + balanceOf);
@@ -53,9 +63,27 @@ public class ContractTest {
     }
 
     @Test
+    public void test_rewardMiner_multi() {
+        try {
+            XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair(Network.MAINNET, Algorithm.ECDSA);
+            System.out.println(Hex.encodeHexString(Base58.decode(xenonKeyPair.getOriginalPublicKey())));
+
+            String address=XenonCrypto.getAddress("17jjMMaZbPifsB7wq9pHxU8ztyf2DeNJqLspCXtkpFDAtvbzikg6EgPbvf1E4MQ6KkSVCsdC8NmSaDRJVbpjhR71V");
+            List<String> list=new ArrayList<>();
+            list.add(address);
+            List<BigInteger> list2=new ArrayList<>();
+            list2.add(BigInteger.valueOf(100));
+            TransactionReceipt send = erc20Service.rewardMiner_multi(list, list2).send();
+            System.out.println(send);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
     public void test_transfer() throws Exception {
 
-        BigInteger bmtCirculation = bmtERC20.alreadyReward().send();
+        BigInteger bmtCirculation = erc20Service.alreadyReward().send();
         BigDecimal fee = Convert.fromWei(new BigDecimal(bmtCirculation), Convert.Unit.ETHER);
         System.out.println(fee);
 
