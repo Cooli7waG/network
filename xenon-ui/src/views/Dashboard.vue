@@ -81,12 +81,11 @@ export default {
         miners: 0,
         totalPowerLow: 0.0,
         totalChargeVol: 0.0
-      }
+      },
+      map:null,
+      max:5,
+      min:1
     })
-
-    let map=null
-    let max=5
-    let min=1
 
     const loadBlockchainstats=()=>{
       getBlockchainstats().then((result)=>{
@@ -112,7 +111,7 @@ export default {
 
     const addFeatures=(source ,nb)=>{
       var ssize = 20;		// seed size
-      var ext = map.getView().calculateExtent(map.getSize());
+      var ext = data.map.getView().calculateExtent(data.map.getSize());
       var dx = ext[2]-ext[0];
       var dy = ext[3]-ext[1];
       var dl = Math.min(dx,dy);
@@ -157,8 +156,8 @@ export default {
         case 'color':
         default: {
           var color;
-          if (f.get('features').length > max) color = [136, 0, 0, 1];
-          else if (f.get('features').length > min) color = [255, 165, 0, 1];
+          if (f.get('features').length > data.max) color = [136, 0, 0, 1];
+          else if (f.get('features').length > data.min) color = [255, 165, 0, 1];
           else color = [0, 136, 0, 1];
           return [ new Style({ fill: new Fill({  color: color }) }) ];
         }
@@ -177,10 +176,13 @@ export default {
         style: styleFn
       })
 
-      map.addLayer(vectorLayer);
+      data.map.addLayer(vectorLayer);
     }
 
     const initMap=()=>{
+      if(data.map!=null){
+        console.log("map has been initialized")
+      }
 
       var defaultStyle = new Style({
         //边框样式
@@ -199,7 +201,7 @@ export default {
           })
         })
       })
-      map=new Map({
+      data.map=new Map({
         layers: [
           new TileLayer({
             source: new OSM(),
@@ -219,7 +221,7 @@ export default {
       })
 
       var select  = new Select();
-      map.addInteraction(select);
+      data.map.addInteraction(select);
       select.on('select', function(e){
         if (e.selected.length){
           var f = e.selected[0].get('features');
@@ -239,7 +241,7 @@ export default {
       addFeatures(source,2000);
 
       var layerSource = new VectorLayer({ source: source, visible:true})
-      map.addLayer(layerSource);
+      data.map.addLayer(layerSource);
 
       createHexBin(source);
     }

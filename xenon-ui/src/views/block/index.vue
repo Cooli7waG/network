@@ -31,7 +31,12 @@
             <router-link :to="'/account/'+scope.row.address">{{scope.row.height}}</router-link>
           </template>
         </el-table-column>
-        <el-table-column prop="amountTransaction" :label="$t('block.table.amountTransaction')" width="200" align="right"/>
+        <el-table-column prop="amountTransaction" :label="$t('block.table.amountTransaction')" width="200" align="right">
+          <template #default="scope">
+            <router-link v-if="scope.row.amountTransaction>0" :to="{name:'Transaction',params:{height:scope.row.height}}">{{scope.row.amountTransaction}}</router-link>
+            <span v-else>{{scope.row.amountTransaction}}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="blockTime" :label="$t('block.table.blockTime')" width="180" />
         <el-table-column prop="createTime" :label="$t('block.table.createTime')">
           <template #default="scope">

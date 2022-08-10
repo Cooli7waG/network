@@ -22,11 +22,11 @@
             <if test="queryParams.height!=null">
                 height=#{queryParams.height}
             </if>
-            <if test="queryParams.fromAddress!=null and queryParams.fromAddress!=''">
-               and from_address=#{queryParams.fromAddress}
+            <if test="queryParams.hash!=null and queryParams.hash!=''">
+                and hash=#{queryParams.hash}
             </if>
-            <if test="queryParams.accountId!=null">
-               and from_address in (select address from device where account_id=#{queryParams.accountId})
+            <if test="queryParams.fromAddress!=null and queryParams.fromAddress!=''">
+                and from_address=#{queryParams.fromAddress}
             </if>
         </where>
         order by create_time desc

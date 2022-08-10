@@ -12,5 +12,5 @@ public class TransactionSearchDto extends QueryParams {
 
     private String fromAddress;
 
-    private Long accountId;
+    private String hash;
 }

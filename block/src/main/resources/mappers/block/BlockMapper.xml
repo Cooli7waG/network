@@ -16,13 +16,8 @@
     </select>
     <select id="list" resultType="com.aitos.xenon.block.api.domain.vo.BlockVo">
         select b.*,t.amountTransaction from block b left join
-            (select height,count(1) AS amountTransaction from transaction group by height) t
+            (select height,count(1) AS amountTransaction from transaction group by height order by height desc) t
             on b.height =t.height
-        <where>
-            <if test="queryParams.height!=null">
-                b.height=#{queryParams.height}
-            </if>
-        </where>
         order by b.create_time desc
     </select>
 

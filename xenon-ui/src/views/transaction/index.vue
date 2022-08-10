@@ -6,7 +6,17 @@
   <el-row :gutter="24">
     <el-col :span="20">
       <div class="mt-4">
-        <el-input v-model="data.query.keyword" :placeholder="$t('txs.query.searchPlaceHolder')">
+        <el-input
+            v-model="data.query.keyword" :placeholder="$t('txs.query.searchPlaceHolder')"
+            class="input-with-select"
+        >
+          <template #prepend>
+            <el-select v-model="data.query.select" placeholder="Select" style="width: 115px">
+              <el-option :label="$t('txs.query.searchType.1')" value="1" />
+              <el-option :label="$t('txs.query.searchType.2')" value="2" />
+              <el-option :label="$t('txs.query.searchType.3')" value="3" />
+            </el-select>
+          </template>
           <template #append>
             <el-button type="primary" @click="search">{{$t('txs.query.searchButton')}}</el-button>
           </template>
@@ -74,6 +84,7 @@ export default {
 
     const data = reactive({
       query:{
+        select:"1",
         keyword:'',
         page:{
           currentPage:1,
@@ -96,33 +107,22 @@ export default {
     }
 
     const search=()=>{
-      if(!data.query.keyword) {
-        data.query.page.keyword=''
-        data.query.page.currentPage=1
-        data.query.page.pageSize=10
-        loadTransactionList()
-      }else if(/^\d+$/.test(data.query.keyword)){
-        data.query.page.currentPage=1
-        data.query.page.pageSize=10
-        loadTransactionList(data.query.keyword)
-      }else{
-        router.push({
-          name:"TransactionInfo",
-          path: '/tx/'+data.query.keyword,
-          params:{
-            hash:data.query.keyword
-          }
-        })
-      }
+      data.query.page.currentPage=1
+      data.query.page.pageSize=10
+      loadTransactionList()
     }
 
-    const loadTransactionList=(height)=>{
+    const loadTransactionList=()=>{
       const params={
         offset:data.query.page.currentPage,
         limit:data.query.page.pageSize
       }
-      if(height){
-        params['height']=height
+      if(data.query.select=="1"){
+        params['hash']=data.query.keyword
+      }else if(data.query.select=="2"){
+        params['height']=data.query.keyword
+      }else if(data.query.select=="3"){
+        params['address']=data.query.keyword
       }
       transactionList(params).then((result)=>{
           data.query.page.total=result.data.total
@@ -136,6 +136,10 @@ export default {
       console.log("onMounted")
       if(route.query.keyword){
         data.query.keyword=route.query.keyword
+      }
+      if(route.params.height){
+        data.query.select="2"
+        data.query.keyword=route.params.height;
       }
       loadTransactionList()
     })

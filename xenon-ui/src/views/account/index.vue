@@ -39,7 +39,12 @@
         <el-table-column prop="balance" :label="$t('account.table.balance')" width="200" align="right"/>
         <el-table-column prop="earningMint" :label="$t('account.table.earningMint')" width="180" />
         <el-table-column prop="earningService" :label="$t('account.table.earningService')" width="180" />
-        <el-table-column prop="amountMiner" :label="$t('account.table.amountMiner')" width="180" />
+        <el-table-column prop="amountMiner" :label="$t('account.table.amountMiner')" width="180">
+          <template #default="scope">
+            <router-link v-if="scope.row.accountType==1&&scope.row.amountMiner>0" :to="{name:'Miners',params:{ownerAddress:scope.row.address}}">{{scope.row.amountMiner}}</router-link>
+            <span v-else>{{scope.row.amountMiner}}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="createTime" :label="$t('account.table.createTime')" width="180">
           <template #default="scope">
             {{formatDate(scope.row.createTime, "yyyy-MM-dd hh:mm:ss")}}

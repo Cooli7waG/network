@@ -61,7 +61,7 @@ import Constant from '@/utils/constant.js'
 import { formatDate } from '@/utils/data_format.js'
 import {deviceList} from '@/api/miners.js'
 import {onMounted, reactive} from "vue";
-import { useRouter } from 'vue-router'
+import { useRoute  } from 'vue-router'
 export default {
   props: {
     msg: String
@@ -87,7 +87,7 @@ export default {
       },
       tableList :[]
     })
-    const router = useRouter()
+    const route = useRoute()
 
     const pageSizeChange = (pageSize) => {
       data.query.page.pageSize=pageSize
@@ -99,19 +99,16 @@ export default {
     }
 
     const search=()=>{
-      router.push({
-        name:"MinersInfo",
-        path: '/miner/'+data.query.address,
-        params:{
-          address:data.query.address
-        }
-      })
+      data.query.page.currentPage=1
+      data.query.page.pageSize=10
+      loadDeviceList()
     }
 
     const loadDeviceList=()=>{
       const params={
         offset:data.query.page.currentPage,
-        limit:data.query.page.pageSize
+        limit:data.query.page.pageSize,
+        address:data.query.address
       }
       deviceList(params).then((result)=>{
           data.query.page.total=result.data.total
@@ -123,6 +120,7 @@ export default {
 
     onMounted(() => {
       console.log("onMounted")
+      data.query.address=route.params.ownerAddress;
       loadDeviceList()
     })
 

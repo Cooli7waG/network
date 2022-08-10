@@ -59,7 +59,12 @@ export default {
         },
         query:{
             searchButton:"Search",
-            searchPlaceHolder:"Please enter transaction hash or block height"
+            searchPlaceHolder:"Please enter transaction hash or block height",
+            searchType:{
+                1:"Tx Hash",
+                2:"Height",
+                3:"Address",
+            }
         },
         table:{
             hash:"Transaction Hash",
