@@ -1,51 +1,49 @@
 <template>
   <el-row :gutter="24">
     <el-col :span="12">
-      <el-card class="box-card" >
-        <div  class="text item">
-          <div class="lable">{{$t('dashboard.miners')}}</div>
+      <el-card class="box-card">
+        <div class="text item">
+          <div class="label">{{ $t('dashboard.miners') }}</div>
           <div class="content">{{ data.minerStatistics.miners }}</div>
         </div>
-        <div  class="text item">
-          <div class="lable">{{$t('dashboard.totalPowerLow')}}</div>
-          <div class="content">{{ data.minerStatistics.totalPowerLow }}</div>
+        <div class="text item">
+          <div class="label">{{ $t('dashboard.totalPowerLow') }}</div>
+          <div class="content">{{ formatPower(data.minerStatistics.totalPowerLow) }}</div>
         </div>
-        <div  class="text item">
-          <div class="lable">{{$t('dashboard.totalChargeVol')}}</div>
-          <div class="content">{{ data.minerStatistics.totalChargeVol }}</div>
+        <div class="text item">
+          <div class="label">{{ $t('dashboard.totalChargeVol') }}</div>
+          <div class="content">{{ formatElectricity(data.minerStatistics.totalChargeVol) }}</div>
         </div>
 
       </el-card>
     </el-col>
     <el-col :span="12">
       <el-card class="box-card">
-        <div  class="text item">
-          <div class="lable">{{$t('dashboard.uSDBmtMarketPrice')}}</div>
+        <div class="text item">
+          <div class="label">{{ $t('dashboard.uSDBmtMarketPrice') }}</div>
           <div class="content">{{ data.blockchainstats.usdbmtMarketPrice }}</div>
         </div>
-
-        <div  class="text item">
-          <div class="lable">{{$t('dashboard.totalBMTMarket')}}</div>
+        <div class="text item">
+          <div class="label">{{ $t('dashboard.totalBMTMarket') }}</div>
           <div class="content">{{ data.blockchainstats.totalBMTMarket }}</div>
         </div>
-        <div  class="text item">
-          <div class="lable">{{$t('dashboard.tokenSupply')}}</div>
+        <div class="text item">
+          <div class="label">{{ $t('dashboard.tokenSupply') }}</div>
           <div class="content">{{ data.blockchainstats.tokenSupply }}</div>
         </div>
       </el-card>
     </el-col>
   </el-row>
   <el-row>
-    <el-col>
-      <div id="map" class="map"></div>
-    </el-col>
+    <div id="map" class="map"></div>
   </el-row>
 </template>
 
 <script>
-import {getBlockchainstats,getMinerStatistics} from '@/api/statistics.js'
+import {getBlockchainstats, getMinerStatistics} from '@/api/statistics.js'
 import {onMounted, reactive} from "vue";
 import {toEther} from '@/utils/utils.js'
+import {formatPower, formatElectricity} from '@/utils/data_format.js'
 
 import "ol/ol.css"
 import Map from "ol/Map"
@@ -69,61 +67,67 @@ export default {
   props: {
     msg: String
   },
-  setup(){
+  computed: {
+    formatPower() {
+      return formatPower
+    },
+    formatElectricity() {
+      return formatElectricity
+    },
+  },
+  setup() {
 
     const data = reactive({
-      blockchainstats:{
-        uSDBmtMarketPrice: 0,
+      blockchainstats: {
+        usdbmtMarketPrice: 0,
         totalBMTMarket: 0,
         tokenSupply: 0
       },
-      minerStatistics:{
+      minerStatistics: {
         miners: 0,
         totalPowerLow: 0.0,
         totalChargeVol: 0.0
       },
-      map:null,
-      max:5,
-      min:1
+      map: null,
+      max: 5,
+      min: 1,
     })
 
-    const loadBlockchainstats=()=>{
-      getBlockchainstats().then((result)=>{
-        console.log(result)
-        data.blockchainstats=result.data;
-        data.blockchainstats.tokenSupply=toEther(data.blockchainstats.tokenSupply,8)
-        data.blockchainstats.totalBMTMarket=toEther(data.blockchainstats.totalBMTMarket,8)
-      }).catch((err) =>{
+    const loadBlockchainstats = () => {
+      getBlockchainstats().then((result) => {
+        data.blockchainstats = result.data;
+        data.blockchainstats.tokenSupply = toEther(data.blockchainstats.tokenSupply, 8)
+        data.blockchainstats.totalBMTMarket = toEther(data.blockchainstats.totalBMTMarket, 8)
+      }).catch((err) => {
         console.log(err);
       });
     }
 
-    const loadMinerStatistics=()=>{
-      getMinerStatistics().then((result)=>{
+    const loadMinerStatistics = () => {
+      getMinerStatistics().then((result) => {
         console.log(result)
-        data.minerStatistics=result.data;
-        data.minerStatistics.totalChargeVol=(data.minerStatistics.totalChargeVol/1000/1000).toFixed(3)
-      }).catch((err) =>{
+        data.minerStatistics = result.data;
+        data.minerStatistics.totalChargeVol = (data.minerStatistics.totalChargeVol / 1000 / 1000).toFixed(3)
+      }).catch((err) => {
         console.log(err);
       });
     }
 
-
-    const addFeatures=(source ,nb)=>{
+    const addFeatures = (source, nb) => {
       var ssize = 20;		// seed size
       var ext = data.map.getView().calculateExtent(data.map.getSize());
-      var dx = ext[2]-ext[0];
-      var dy = ext[3]-ext[1];
-      var dl = Math.min(dx,dy);
-      var features=[];
-      for (var i=0; i<nb/ssize; ++i){
-        var seed = [ext[0]+dx*Math.random(), ext[1]+dy*Math.random()]
-        for (var j=0; j<ssize; j++){
+      var dx = ext[2] - ext[0];
+      var dy = ext[3] - ext[1];
+      var dl = Math.min(dx, dy);
+      var features = [];
+      for (var i = 0; i < nb / ssize; ++i) {
+        var seed = [ext[0] + dx * Math.random(), ext[1] + dy * Math.random()]
+        for (var j = 0; j < ssize; j++) {
           var f = new Feature(new Point([
-            seed[0] + dl/10*Math.random(),
-            seed[1] + dl/10*Math.random()
+            seed[0] + dl / 10 * Math.random(),
+            seed[1] + dl / 10 * Math.random()
           ]));
-          f.set('id',i*ssize+j);
+          f.set('id', i * ssize + j);
           features.push(f);
         }
       }
@@ -131,58 +135,56 @@ export default {
       source.addFeatures(features);
     }
 
-
-    const styleFn = function(f,res){
-      switch ("color"){
-        /*case 'point':{
-          var radius = Math.round(100000/res +0.5) * Math.min(1,f.get('features').length/max);
-          if (radius < minRadius) radius = minRadius;
-          return	[ new ol.style.Style({
-            image: new ol.style.RegularShape({
-              points: 6,
-              radius: radius,
-              fill: new ol.style.Fill({ color: [0,0,255] }),
-              rotateWithView: true
-            }),
-            geometry: new ol.geom.Point(f.get('center'))
-          })
-            //, new ol.style.Style({ fill: new ol.style.Fill({color: [0,0,255,.1] }) })
-          ];
-        }
-        case 'gradient': {
-          var opacity = Math.min(1,f.get('features').length/max);
-          return [ new ol.style.Style({ fill: new ol.style.Fill({ color: [0,0,255,opacity] }) }) ];
-        }*/
+    const styleFn = function (f, res) {
+      switch ("color") {
+          /*case 'point':{
+            var radius = Math.round(100000/res +0.5) * Math.min(1,f.get('features').length/max);
+            if (radius < minRadius) radius = minRadius;
+            return	[ new ol.style.Style({
+              image: new ol.style.RegularShape({
+                points: 6,
+                radius: radius,
+                fill: new ol.style.Fill({ color: [0,0,255] }),
+                rotateWithView: true
+              }),
+              geometry: new ol.geom.Point(f.get('center'))
+            })
+              //, new ol.style.Style({ fill: new ol.style.Fill({color: [0,0,255,.1] }) })
+            ];
+          }
+          case 'gradient': {
+            var opacity = Math.min(1,f.get('features').length/max);
+            return [ new ol.style.Style({ fill: new ol.style.Fill({ color: [0,0,255,opacity] }) }) ];
+          }*/
         case 'color':
         default: {
           var color;
           if (f.get('features').length > data.max) color = [136, 0, 0, 1];
           else if (f.get('features').length > data.min) color = [255, 165, 0, 1];
           else color = [0, 136, 0, 1];
-          return [ new Style({ fill: new Fill({  color: color }) }) ];
+          return [new Style({fill: new Fill({color: color})})];
         }
       }
     };
 
-    const createHexBin=(source)=>{
+    const createHexBin = (source) => {
       const hexbin = new HexBinource({
         source: source,		// source of the bin
         size: 100000			// hexagon size (in map unit)
       });
 
-      const vectorLayer  =new VectorLayer({
+      const vectorLayer = new VectorLayer({
         source: hexbin,
-        opacity:0.5,
+        opacity: 0.5,
         style: styleFn
       })
 
       data.map.addLayer(vectorLayer);
     }
 
-    const initMap=()=>{
-      if(data.map!=null){
-        console.log("map has been initialized")
-      }
+    const initMap = () => {
+      //
+
 
       var defaultStyle = new Style({
         //边框样式
@@ -201,7 +203,7 @@ export default {
           })
         })
       })
-      data.map=new Map({
+      data.map = new Map({
         layers: [
           new TileLayer({
             source: new OSM(),
@@ -220,50 +222,47 @@ export default {
         })
       })
 
-      var select  = new Select();
+      var select = new Select();
       data.map.addInteraction(select);
-      select.on('select', function(e){
-        if (e.selected.length){
+      select.on('select', function (e) {
+        if (e.selected.length) {
           var f = e.selected[0].get('features');
           if (f) {
             console.log(e.selected[0].get('features').length)
-          }
-          else {
+          } else {
             console.log(0)
           }
-        }
-        else {
+        } else {
           console.log(0)
         }
       });
 
       var source = new VectorSource();
-      addFeatures(source,2000);
+      addFeatures(source, 2000);
 
-      var layerSource = new VectorLayer({ source: source, visible:true})
+      var layerSource = new VectorLayer({source: source, visible: true})
       data.map.addLayer(layerSource);
 
       createHexBin(source);
     }
 
     onMounted(() => {
-      console.log("onMounted")
       loadBlockchainstats()
       loadMinerStatistics()
-
       initMap();
     })
     return {
-      data
+      data,
     }
   }
 }
 </script>
 <style lang="scss" scoped>
 .box-card {
-  .item{
+  .item {
     margin-bottom: 20px;
-    .lable{
+
+    .label {
       font-weight: bold;
       margin-bottom: 6px;
     }

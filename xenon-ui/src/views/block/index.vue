@@ -24,11 +24,12 @@
           :total="data.query.page.total"
           @size-change="pageSizeChange"
           @current-change="pageCurrentChange"
+          style="margin-top: 5px"
       />
-      <el-table :data="data.tableList" stripe border   style="width: 100%">
+      <el-table :data="data.tableList" stripe border   style="width: 100%;margin-top: 5px">
         <el-table-column prop="address" :label="$t('block.table.height')" width="450">
           <template #default="scope">
-            <router-link :to="'/account/'+scope.row.address">{{scope.row.height}}</router-link>
+            <router-link :to="{name:'Transaction',params:{height:scope.row.height}}">{{scope.row.height}}</router-link>
           </template>
         </el-table-column>
         <el-table-column prop="amountTransaction" :label="$t('block.table.amountTransaction')" width="200" align="right">

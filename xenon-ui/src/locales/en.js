@@ -48,9 +48,9 @@ export default {
         totalPowerLow: 'The total power of the whole network',
         totalChargeVol: 'The total power generation of the whole network',
 
-        uSDBmtMarketPrice: 'BMT market price in USD',
-        totalBMTMarket: 'Total BMT Market',
-        tokenSupply: 'Total BMT Circulation'
+        uSDBmtMarketPrice: 'AKRE market price in USD',
+        totalBMTMarket: 'Total AKRE Market',
+        tokenSupply: 'Total AKRE Circulation'
     },
     txs: {
         path:{
@@ -70,7 +70,7 @@ export default {
             hash:"Transaction Hash",
             height:"Block Height",
             txType:"Transaction Type",
-            txTime:"Transaction Hour"
+            txTime:"Timestamp"
         },
         msg:{
 
@@ -87,7 +87,7 @@ export default {
             status:"Status",
             height:"Block Height",
             txType:"Transaction Type",
-            txTime:"Transaction Hour",
+            txTime:"Timestamp",
             txData:"Transaction Data"
         },
         msg:{
@@ -107,11 +107,16 @@ export default {
             address:"Address",
             ownerAddress:"Owner Address",
             minerType:"Miner Type",
-            earningMint:"Total Mining Revenue",
+            earningMint:"Reward",
+            earningService:"Income",
+            power:"Power(kWp)",
+            totalEnergyGeneration:"Energy(kWh)",
+            createTime:"Create Time",
+            /*earningMint:"Total Mining Revenue",
             earningService:"Total Service Revenue",
             power:"Average power generation (kWp)",
             totalEnergyGeneration:"Total Power Generation (kWh)",
-            createTime:"Create Time",
+            createTime:"Create Time",*/
         },
         msg:{
 

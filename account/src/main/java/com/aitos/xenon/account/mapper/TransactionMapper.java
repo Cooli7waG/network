@@ -4,8 +4,10 @@ import com.aitos.xenon.account.domain.Transaction;
 import com.aitos.xenon.core.model.QueryParams;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+@Mapper
 public interface TransactionMapper {
     void save(Transaction transaction);
 

@@ -5,27 +5,32 @@
     <el-breadcrumb-item >{{$t('txinfo.path.info')}}</el-breadcrumb-item>
   </el-breadcrumb>
   <div v-if="data.transaction">
-    <el-row :gutter="20">
+    <el-row class="info-box" :gutter="20">
       <el-col :span="4">{{$t('txinfo.info.hash')}}:</el-col>
       <el-col :span="16">{{data.transaction.hash}}</el-col>
     </el-row>
-    <el-row :gutter="20">
+    <el-row :gutter="20" class="info-box">
       <el-col :span="4">{{$t('txinfo.info.status')}}:</el-col>
-      <el-col :span="16">{{data.transaction.status}}</el-col>
+      <el-col :span="16">
+        <el-tag type="success" v-if="data.transaction.status==1">Success</el-tag>
+        <el-tag type="danger" v-else>Failed</el-tag>
+      </el-col>
     </el-row>
-    <el-row :gutter="20">
+    <el-row :gutter="20" class="info-box">
       <el-col :span="4">{{$t('txinfo.info.height')}}:</el-col>
-      <el-col :span="16">{{data.transaction.height}}</el-col>
+      <el-col :span="16">
+        <router-link :to="{name:'Transaction',params:{height:data.transaction.height}}">{{data.transaction.height}}</router-link>
+      </el-col>
     </el-row>
-    <el-row :gutter="20">
+    <el-row :gutter="20" class="info-box">
       <el-col :span="4">{{$t('txinfo.info.txType')}}:</el-col>
       <el-col :span="16">{{data.transaction.txType?Constant.TXType[data.transaction.txType]:''}}</el-col>
     </el-row>
-    <el-row :gutter="20">
+    <el-row :gutter="20" class="info-box">
       <el-col :span="4">{{$t('txinfo.info.txTime')}}:</el-col>
       <el-col :span="16">{{formatDate(data.transaction.createTime, "yyyy-MM-dd hh:mm:ss")}}</el-col>
     </el-row>
-    <el-row :gutter="20">
+    <el-row :gutter="20" class="info-box">
       <el-col :span="4">{{$t('txinfo.info.txData')}}:</el-col>
       <el-col :span="16">{{data.transaction.data}}</el-col>
     </el-row>
@@ -96,6 +101,9 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.info-box {
+  padding: 5px 0px;
+}
 .box-card {
   .item{
     margin-bottom: 20px;
@@ -104,6 +112,5 @@ export default {
       margin-bottom: 6px;
     }
   }
-
 }
 </style>

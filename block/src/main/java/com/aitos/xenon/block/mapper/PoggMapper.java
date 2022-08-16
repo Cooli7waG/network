@@ -1,12 +1,9 @@
 package com.aitos.xenon.block.mapper;
 
 import com.aitos.xenon.block.domain.PoggCommit;
-import com.aitos.xenon.block.domain.PoggChallengeRecord;
-import com.aitos.xenon.block.domain.PoggChallengeRecordCount;
-import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
-
+@Mapper
 public interface PoggMapper {
 
     void saveCommit(PoggCommit pogg);

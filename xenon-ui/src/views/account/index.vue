@@ -24,11 +24,12 @@
           :total="data.query.page.total"
           @size-change="pageSizeChange"
           @current-change="pageCurrentChange"
+          style="margin-top: 5px"
       />
-      <el-table :data="data.tableList" stripe border   style="width: 100%">
-        <el-table-column prop="address" :label="$t('account.table.address')" width="450">
+      <el-table :data="data.tableList" stripe border   style="width: 100%;margin-top: 5px">
+        <el-table-column prop="address" :label="$t('account.table.address')" width="210px">
           <template #default="scope">
-            <router-link :to="'/account/'+scope.row.address">{{scope.row.address}}</router-link>
+            <router-link :to="'/account/'+scope.row.address">{{formatString(scope.row.address,20)}}</router-link>
           </template>
         </el-table-column>
         <el-table-column prop="accountType" :label="$t('account.table.accountType')" width="180" >
@@ -36,10 +37,10 @@
             {{Constant.AccountType[scope.row.accountType]}}
           </template>
         </el-table-column>
-        <el-table-column prop="balance" :label="$t('account.table.balance')" width="200" align="right"/>
-        <el-table-column prop="earningMint" :label="$t('account.table.earningMint')" width="180" />
-        <el-table-column prop="earningService" :label="$t('account.table.earningService')" width="180" />
-        <el-table-column prop="amountMiner" :label="$t('account.table.amountMiner')" width="180">
+        <el-table-column prop="balance" :label="$t('account.table.balance')" align="right"/>
+        <el-table-column prop="earningMint" :label="$t('account.table.earningMint')" />
+        <el-table-column prop="earningService" :label="$t('account.table.earningService')" />
+        <el-table-column prop="amountMiner" :label="$t('account.table.amountMiner')">
           <template #default="scope">
             <router-link v-if="scope.row.accountType==1&&scope.row.amountMiner>0" :to="{name:'Miners',params:{ownerAddress:scope.row.address}}">{{scope.row.amountMiner}}</router-link>
             <span v-else>{{scope.row.amountMiner}}</span>
@@ -57,7 +58,7 @@
 </template>
 
 <script>
-import { formatDate } from '@/utils/data_format.js'
+import { formatDate,formatString } from '@/utils/data_format.js'
 import {list} from '@/api/account.js'
 import {onMounted, reactive} from "vue";
 import { useRouter } from 'vue-router'
@@ -70,6 +71,9 @@ export default {
   computed: {
     formatDate() {
       return formatDate
+    },
+    formatString() {
+      return formatString
     },
     Constant() {
       return Constant

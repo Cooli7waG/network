@@ -1,7 +1,7 @@
 <template>
   <el-breadcrumb style="margin-bottom: 20px;">
-    <el-breadcrumb-item :to="{ path: '/' }">{{$t('txs.path.home')}}</el-breadcrumb-item>
-    <el-breadcrumb-item >{{$t('txs.path.txs')}}</el-breadcrumb-item>
+    <el-breadcrumb-item :to="{ path: '/' }">{{ $t('txs.path.home') }}</el-breadcrumb-item>
+    <el-breadcrumb-item>{{ $t('txs.path.txs') }}</el-breadcrumb-item>
   </el-breadcrumb>
   <el-row :gutter="24">
     <el-col :span="20">
@@ -12,13 +12,13 @@
         >
           <template #prepend>
             <el-select v-model="data.query.select" placeholder="Select" style="width: 115px">
-              <el-option :label="$t('txs.query.searchType.1')" value="1" />
-              <el-option :label="$t('txs.query.searchType.2')" value="2" />
-              <el-option :label="$t('txs.query.searchType.3')" value="3" />
+              <el-option :label="$t('txs.query.searchType.1')" value="1"/>
+              <el-option :label="$t('txs.query.searchType.2')" value="2"/>
+              <el-option :label="$t('txs.query.searchType.3')" value="3"/>
             </el-select>
           </template>
           <template #append>
-            <el-button type="primary" @click="search">{{$t('txs.query.searchButton')}}</el-button>
+            <el-button type="primary" @click="search">{{ $t('txs.query.searchButton') }}</el-button>
           </template>
         </el-input>
       </div>
@@ -34,26 +34,27 @@
           :total="data.query.page.total"
           @size-change="pageSizeChange"
           @current-change="pageCurrentChange"
+          style="margin-top: 5px"
       />
-      <el-table :data="data.tableList" stripe border   style="width: 100%">
+      <el-table :data="data.tableList" stripe border style="width: 100%;margin-top: 5px">
         <el-table-column prop="hash" :label="$t('txs.table.hash')" width="450">
           <template #default="scope">
-            <router-link :to="'/tx/'+scope.row.hash">{{scope.row.hash}}</router-link>
+            <router-link :to="'/tx/'+scope.row.hash">{{ formatString(scope.row.hash, 20) }}</router-link>
           </template>
         </el-table-column>
-        <el-table-column prop="height" :label="$t('txs.table.height')" width="180" >
+        <el-table-column prop="height" :label="$t('txs.table.height')" width="180">
           <template #default="scope">
-            <el-link @click="()=>{data.query.keyword=scope.row.height;search();}">{{scope.row.height}}</el-link>
+            <el-link @click="()=>{data.query.keyword=scope.row.height;search();}">{{ scope.row.height }}</el-link>
           </template>
         </el-table-column>
-        <el-table-column prop="txType" :label="$t('txs.table.txType')" width="180" >
+        <el-table-column prop="txType" :label="$t('txs.table.txType')" width="180">
           <template #default="scope">
-            {{scope.row.txType?Constant.TXType[scope.row.txType]:''}}
+            {{ scope.row.txType ? Constant.TXType[scope.row.txType] : '' }}
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" :label="$t('txs.table.txTime')" >
+        <el-table-column prop="createTime" :label="$t('txs.table.txTime')">
           <template #default="scope">
-            {{formatDate(scope.row.createTime, "yyyy-MM-dd hh:mm:ss")}}
+            {{ formatDate(scope.row.createTime, "yyyy-MM-dd hh:mm:ss") }}
           </template>
         </el-table-column>
       </el-table>
@@ -64,10 +65,11 @@
 
 <script>
 import Constant from '@/utils/constant.js'
-import { formatDate } from '@/utils/data_format.js'
+import {formatDate, formatString} from '@/utils/data_format.js'
 import {transactionList} from '@/api/transaction.js'
 import {onMounted, reactive} from "vue";
 import {useRoute, useRouter} from 'vue-router'
+
 export default {
   props: {
     msg: String
@@ -76,70 +78,73 @@ export default {
     formatDate() {
       return formatDate
     },
+    formatString() {
+      return formatString
+    },
     Constant() {
       return Constant
     }
   },
-  setup(){
+  setup() {
 
     const data = reactive({
-      query:{
-        select:"1",
-        keyword:'',
-        page:{
-          currentPage:1,
-          pageSize:10,
-          total:0
+      query: {
+        select: "1",
+        keyword: '',
+        page: {
+          currentPage: 1,
+          pageSize: 10,
+          total: 0
         }
       },
-      tableList :[]
+      tableList: []
     })
     const router = useRouter()
-    const route= useRoute()
+    const route = useRoute()
 
     const pageSizeChange = (pageSize) => {
-      data.query.page.pageSize=pageSize
+      data.query.page.pageSize = pageSize
       loadTransactionList()
     }
     const pageCurrentChange = (currentPage) => {
-      data.query.page.currentPage=currentPage
+      data.query.page.currentPage = currentPage
       loadTransactionList()
     }
 
-    const search=()=>{
-      data.query.page.currentPage=1
-      data.query.page.pageSize=10
+    const search = () => {
+      data.query.page.currentPage = 1
+      data.query.page.pageSize = 10
       loadTransactionList()
     }
 
-    const loadTransactionList=()=>{
-      const params={
-        offset:data.query.page.currentPage,
-        limit:data.query.page.pageSize
+    const loadTransactionList = () => {
+      const params = {
+        offset: data.query.page.currentPage,
+        limit: data.query.page.pageSize
       }
-      if(data.query.select=="1"){
-        params['hash']=data.query.keyword
-      }else if(data.query.select=="2"){
-        params['height']=data.query.keyword
-      }else if(data.query.select=="3"){
-        params['address']=data.query.keyword
+      if (data.query.select == "1") {
+        params['hash'] = data.query.keyword
+      } else if (data.query.select == "2") {
+        params['height'] = data.query.keyword
+      } else if (data.query.select == "3") {
+        params['address'] = data.query.keyword
       }
-      transactionList(params).then((result)=>{
-          data.query.page.total=result.data.total
-          data.tableList=result.data.items
-      }).catch((err) =>{
+      transactionList(params).then((result) => {
+        data.query.page.total = result.data.total
+        data.tableList = result.data.items
+      }).catch((err) => {
         console.log(err);
       });
     }
 
     onMounted(() => {
       console.log("onMounted")
-      if(route.query.keyword){
-        data.query.keyword=route.query.keyword
+      if (route.query.keyword) {
+        data.query.keyword = route.query.keyword
       }
-      if(route.params.height){
-        data.query.select="2"
-        data.query.keyword=route.params.height;
+      if (route.params.height) {
+        data.query.select = "2"
+        data.query.keyword = route.params.height;
       }
       loadTransactionList()
     })
@@ -156,16 +161,18 @@ export default {
 </script>
 <style lang="scss" scoped>
 .box-card {
-  .item{
+  .item {
     margin-bottom: 20px;
-    .lable{
+
+    .lable {
       font-weight: bold;
       margin-bottom: 6px;
     }
   }
 
 }
-.el-pagination{
+
+.el-pagination {
   justify-content: flex-end;
 }
 </style>

@@ -25,7 +25,22 @@ export function register(data){
 
 export function onboard(data){
     return request({
-        url: '/device/device/onboard',
+        url: '/block/pogg/onboard',
+        method: 'post',
+        data:data
+    })
+}
+
+export function getReport(data){
+    return request({
+        url: '/block/pogg/getReport',
+        method: 'post',
+        data:data
+    })
+}
+export function getReward(data){
+    return request({
+        url: '/block/pogg/getReward',
         method: 'post',
         data:data
     })

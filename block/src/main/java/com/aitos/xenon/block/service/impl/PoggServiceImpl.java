@@ -4,6 +4,9 @@ import com.aitos.xenon.account.api.RemoteTransactionService;
 import com.aitos.xenon.account.api.domain.dto.PoggRewardDetailDto;
 import com.aitos.xenon.account.api.domain.dto.PoggRewardDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionDto;
+import com.aitos.xenon.block.api.domain.PoggReport;
+import com.aitos.xenon.block.api.domain.PoggRewardMiner;
+import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
 import com.aitos.xenon.block.domain.*;
 import com.aitos.xenon.block.mapper.PoggMapper;
 import com.aitos.xenon.block.mapper.PoggRewardMapper;
@@ -23,6 +26,8 @@ import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
 import com.aitos.xenon.device.api.RemoteDeviceService;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,6 +100,7 @@ public class PoggServiceImpl implements PoggService {
         transactionDto.setData(txData);
         transactionDto.setHash(txHash);
         transactionDto.setTxType(BusinessConstants.TXType.TX_COMMIT_POGG);
+        //TODO
         Result result=remoteTransactionService.transaction(transactionDto);
         if(result.getCode()!= ApiStatus.SUCCESS.getCode()){
             throw new ServiceException(result.getMsg());
@@ -150,7 +156,10 @@ public class PoggServiceImpl implements PoggService {
                     poggRewardDetail.setAddress(item.getAddress());
                     poggRewardDetail.setOwnerAddress(item.getOwnerAddress());
                     poggRewardDetail.setAmount(awardNumber);
-                    return  poggRewardDetail;
+            //PoggRewardMiner poggRewardMiner = BeanConvertor.toBean(poggRewardDetail, PoggRewardMiner.class);
+            //poggRewardMapper.savePoggRewardMiner(poggRewardMiner);
+            //TDOD
+            return  poggRewardDetail;
                 }).collect(Collectors.toList());
 
         //封装数据，并存入到数据库中
@@ -226,7 +235,6 @@ public class PoggServiceImpl implements PoggService {
         return 0;
     }
 
-
     /**
      * 计算总的奖励权重
      */
@@ -236,6 +244,7 @@ public class PoggServiceImpl implements PoggService {
                 .orElse(BigDecimal.ZERO);
         return totalRewardWeight;
     }
+
     /**
      * 计算奖励分配
      * @param minerRecordTotal
@@ -261,7 +270,6 @@ public class PoggServiceImpl implements PoggService {
         return awardNumber;
     }
 
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void giveOutRewards() {
@@ -282,5 +290,19 @@ public class PoggServiceImpl implements PoggService {
             }
             poggRewardMapper.updateStatus(item.getId(),status,msg, LocalDateTime.now());
         });
+    }
+
+    @Override
+    public IPage<PoggReport> getReportByMinerAddress(PoggReportDto queryParams) {
+        Page<PoggReport> page=new Page<PoggReport>(queryParams.getOffset(),queryParams.getLimit());
+        IPage<PoggReport> pageResult=poggRewardMapper.getReportByMinerAddress(page,queryParams);
+        return pageResult;
+    }
+
+    @Override
+    public IPage<PoggRewardMiner> getRewardByMinerAddress(PoggReportDto queryParams) {
+        Page<PoggRewardMiner> page=new Page<PoggRewardMiner>(queryParams.getOffset(),queryParams.getLimit());
+        IPage<PoggRewardMiner> pageResult=poggRewardMapper.getRewardByMinerAddress(page,queryParams);
+        return pageResult;
     }
 }

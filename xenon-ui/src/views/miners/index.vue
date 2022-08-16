@@ -24,11 +24,12 @@
           :total="data.query.page.total"
           @size-change="pageSizeChange"
           @current-change="pageCurrentChange"
+          style="margin-top: 5px"
       />
-      <el-table :data="data.tableList" stripe border   style="width: 100%">
-        <el-table-column prop="address" :label="$t('miners.table.address')" width="450">
+      <el-table :data="data.tableList" stripe border   style="width: 100%;margin-top: 5px">
+        <el-table-column prop="address" :label="$t('miners.table.address')" width="210px">
           <template #default="scope">
-            <router-link :to="'/miner/'+scope.row.address">{{scope.row.address}}</router-link>
+            <router-link :to="'/miner/'+scope.row.address">{{formatString(scope.row.address,20)}}</router-link>
           </template>
         </el-table-column>
         <el-table-column prop="minerType" :label="$t('miners.table.minerType')" width="180" >
@@ -36,8 +37,12 @@
             {{scope.row.minerType?Constant.MinerType[scope.row.minerType]:''}}
           </template>
         </el-table-column>
-        <el-table-column prop="ownerAddress" :label="$t('miners.table.ownerAddress')" width="180" />
-        <el-table-column prop="earningMint" :label="$t('miners.table.earningMint')" width="180" />
+        <el-table-column prop="ownerAddress" :label="$t('miners.table.ownerAddress')" width="210px">
+          <template #default="scope">
+            <router-link :to="'/account/'+scope.row.ownerAddress">{{formatString(scope.row.ownerAddress,20)}}</router-link>
+          </template>
+        </el-table-column>
+        <el-table-column prop="earningMint" :label="$t('miners.table.earningMint')"/>
         <el-table-column prop="earningService" :label="$t('miners.table.earningService')"  />
         <el-table-column prop="power" :label="$t('miners.table.power')"  />
         <el-table-column prop="totalEnergyGeneration" :label="$t('miners.table.totalEnergyGeneration')">
@@ -58,7 +63,7 @@
 
 <script>
 import Constant from '@/utils/constant.js'
-import { formatDate } from '@/utils/data_format.js'
+import { formatDate,formatString } from '@/utils/data_format.js'
 import {deviceList} from '@/api/miners.js'
 import {onMounted, reactive} from "vue";
 import { useRoute  } from 'vue-router'
@@ -69,6 +74,9 @@ export default {
   computed: {
     formatDate() {
       return formatDate
+    },
+    formatString() {
+      return formatString
     },
     Constant() {
       return Constant

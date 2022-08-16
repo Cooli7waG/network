@@ -1,5 +1,9 @@
 package com.aitos.xenon.device.controller;
 
+import com.aitos.xenon.block.api.RemotePoggService;
+import com.aitos.xenon.block.api.domain.PoggReport;
+import com.aitos.xenon.block.api.domain.PoggRewardMiner;
+import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
 import com.aitos.xenon.common.crypto.XenonCrypto;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.model.Page;
@@ -34,6 +38,9 @@ public class DeviceController {
 
     @Value("${foundation.publicKey}")
     private String foundationPublicKey;
+
+    @Autowired
+    private RemotePoggService remotePoggService;
 
     @PostMapping("/register")
     public Result register(@RequestBody DeviceRegisterDto deviceRegister){
@@ -134,5 +141,18 @@ public class DeviceController {
         Device device=BeanConvertor.toBean(deviceDto,Device.class);
         deviceService.update(device);
         return Result.ok();
+    }
+
+    @PostMapping("/getReward")
+    public Result<Page<PoggRewardMiner>> getReward(@RequestBody PoggReportDto queryParams){
+
+        return remotePoggService.getReward(queryParams);
+    }
+
+    @PostMapping("/getReport")
+    public Result<Page<PoggReport>> getReport(@RequestBody PoggReportDto queryParams){
+        log.info("getReport PoggReportDto:{}",JSON.toJSONString(queryParams));
+        Result<Page<PoggReport>> report = remotePoggService.getReport(queryParams);
+        return report;
     }
 }

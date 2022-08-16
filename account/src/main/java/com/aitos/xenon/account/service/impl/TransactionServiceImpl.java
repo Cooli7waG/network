@@ -48,7 +48,18 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(rollbackFor = Exception.class)
     public void transaction(Transaction transaction){
         transaction.setStatus(1);
+        //TODO 提取数据分别保存
+        log.info("---------------------------------------------------------------------------");
+        log.info("transaction type:{}",transaction.getTxType());
+        log.info("save transaction:{}",JSON.toJSONString(transaction));
+        log.info("---------------------------------------------------------------------------");
+        abstractTransaction(transaction);
+        //
         transactionMapper.save(transaction);
+    }
+
+    private void abstractTransaction(Transaction transaction){
+
     }
 
     @Override

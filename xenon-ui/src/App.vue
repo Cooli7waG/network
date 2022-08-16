@@ -38,6 +38,7 @@ body {
   color: var(--text-color);
   background-color: var(--bg-color);
   direction: ltr;
+  font-family: Helvetica,Arial,sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

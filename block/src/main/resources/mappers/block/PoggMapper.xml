@@ -21,4 +21,9 @@
     <update id="updateCommit">
         update <include refid="tableName"/> set status=#{status},update_time=#{updateTime} where id=#{id}
     </update>
+
+    <insert id="savePoggRewardMiner" parameterType="com.aitos.xenon.block.api.domain.PoggRewardMiner">
+        insert into  pogg_reward_miner(address,amount,owner_address,create_time)
+        value (#{address},#{amount},#{owner_address},now())
+    </insert>
 </mapper>

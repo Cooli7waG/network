@@ -1,12 +1,16 @@
 package com.aitos.xenon.block.controller;
 
+import com.aitos.xenon.block.api.domain.PoggReport;
+import com.aitos.xenon.block.api.domain.PoggRewardMiner;
 import com.aitos.xenon.block.api.domain.dto.PoggGreenDataDto;
 import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
+import com.aitos.xenon.block.api.domain.vo.BlockVo;
 import com.aitos.xenon.block.domain.PoggCommit;
 import com.aitos.xenon.block.service.PoggReportService;
 import com.aitos.xenon.block.service.PoggService;
 import com.aitos.xenon.common.crypto.XenonCrypto;
 import com.aitos.xenon.core.constant.ApiStatus;
+import com.aitos.xenon.core.model.Page;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.ValidatorUtils;
 import com.aitos.xenon.device.api.RemoteDeviceService;
@@ -14,6 +18,8 @@ import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
@@ -22,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/pogg")
 public class PoggController {
@@ -83,16 +90,30 @@ public class PoggController {
 
         PoggCommit currentPoggCommit=poggService.findCurrentCommit();
         poggReportDto.setEpoch(currentPoggCommit.getEpoch());
-
+        //TODO
         String txHash=poggReportService.reportSave(poggReportDto);
         return Result.ok(txHash);
     }
-
 
     @PostMapping("/poggHitPerBlocks")
     public Result<HashMap<String,String>> poggHitPerBlocks(){
         HashMap<String,String> hashMap=new HashMap<>(1);
         hashMap.put("challengeHit",challengeHit+"");
         return Result.ok(hashMap);
+    }
+
+    @PostMapping("/getReport")
+    public Result<Page<PoggReport>> getReportByMinerAddress(@RequestBody PoggReportDto queryParams){
+        log.info("getReport PoggReportDto:{}",JSON.toJSONString(queryParams));
+        IPage<PoggReport> listPage= poggService.getReportByMinerAddress(queryParams);
+        Page<PoggReport> poggReportPage=new Page<PoggReport>(listPage.getTotal(),listPage.getRecords());
+        return Result.ok(poggReportPage);
+    }
+
+    @PostMapping("/getReward")
+    public Result<Page<PoggRewardMiner>> getRewardByMinerAddress(@RequestBody PoggReportDto queryParams){
+        IPage<PoggRewardMiner> listPage= poggService.getRewardByMinerAddress(queryParams);
+        Page<PoggRewardMiner> poggRewardMinerPage=new Page<PoggRewardMiner>(listPage.getTotal(),listPage.getRecords());
+        return Result.ok(poggRewardMinerPage);
     }
 }

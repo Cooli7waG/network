@@ -6,6 +6,10 @@ import com.aitos.xenon.account.api.domain.dto.AccountRegisterDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionDto;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
 import com.aitos.xenon.block.api.RemoteBlockService;
+import com.aitos.xenon.block.api.RemotePoggService;
+import com.aitos.xenon.block.api.domain.PoggReport;
+import com.aitos.xenon.block.api.domain.PoggRewardMiner;
+import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.exceptions.ServiceException;
@@ -177,5 +181,4 @@ public class DeviceServiceImpl implements DeviceService {
     public void terminate(DeviceTerminateMinerDto deviceTerminateMinerDto) {
         deviceMapper.terminate(deviceTerminateMinerDto);
     }
-
 }

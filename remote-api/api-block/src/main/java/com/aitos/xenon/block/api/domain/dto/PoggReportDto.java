@@ -1,5 +1,6 @@
 package com.aitos.xenon.block.api.domain.dto;
 
+import com.aitos.xenon.core.model.QueryParams;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
@@ -7,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
-public class PoggReportDto {
+public class PoggReportDto extends QueryParams {
     @NotNull(message = "请填写版本号")
     private Integer version;
 

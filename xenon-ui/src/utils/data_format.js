@@ -34,3 +34,39 @@ export function formatDate(value, format) {
     }
     return format;
 }
+
+export function formatString(value, index) {
+    if(value==null || value==undefined){
+        return value;
+    }
+    if(index==null || index == undefined || index<1){
+        index = 20;
+    }
+    if(value.length>index) {
+        return value.substring(0,index)+"..."
+    }else {
+        return value;
+    }
+}
+
+export function formatPower(value) {
+    if(value==null || value==undefined){
+        return "0 W";
+    }
+    if(value>10000) {
+        return (value/1000)+" kW";
+    }else {
+        return value+" W";
+    }
+}
+
+export function formatElectricity(value) {
+    if(value==null || value==undefined){
+        return "0 Wh";
+    }
+    if(value>10000) {
+        return (value/1000)+" kWh";
+    }else {
+        return value+" Wh";
+    }
+}
