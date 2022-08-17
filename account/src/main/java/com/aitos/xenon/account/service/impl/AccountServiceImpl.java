@@ -51,7 +51,8 @@ public class AccountServiceImpl implements AccountService {
                 account.setBalance(balance.toString());
             } else {
                 //TODO 地址需要解码
-                BigInteger blance = erc20Service.balanceOf(account.getAddress()).send();
+                String publicKey = XenonCrypto.convertorPublicKey(account.getAddress()).getPublicKey();
+                BigInteger blance = erc20Service.balanceOf(XenonCrypto.getAddress(publicKey)).send();
                 account.setBalance(blance.toString());
             }
             return account;

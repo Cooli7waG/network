@@ -142,7 +142,7 @@
 </template>
 
 <script>
-import "@/assets/css/iconfont.css"
+import "@/assets/css/iconfont_bak.css"
 import Constant from '@/utils/constant.js'
 import {queryByMiner,getReport,getReward} from '@/api/miners.js'
 import {onMounted, reactive} from "vue";

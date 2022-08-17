@@ -1,5 +1,5 @@
 @font-face {
-  font-family: "iconfont"; /* Project id 3593592 */
+  font-family: "iconfont";
   src: url('/src/assets/font/iconfont.ttf?t=1660703406802') format('truetype');
 }
 
@@ -9,22 +9,6 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-.icon-meiyuan8:before {
-  content: "\e73a";
-}
-
-.icon-dengdai:before {
-  content: "\e677";
-}
-
-.icon-chenggong:before {
-  content: "\e8c3";
-}
-
-.icon-shibai:before {
-  content: "\e8c5";
 }
 
 .icon-chongzhi360:before {

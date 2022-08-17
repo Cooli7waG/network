@@ -6,6 +6,7 @@ import router from './router'
 import store from './store/index.js'
 import '@/utils/nprogress'
 import i18n from './locales'
+//import JsonViewer from "vue3-json-viewer"
 
 
 const app = createApp(App)
@@ -14,4 +15,5 @@ app.use(ElementPlus)
 app.use(router)
 app.use(store)
 app.use(i18n)
+//app.use(JsonViewer)
 app.mount('#app')

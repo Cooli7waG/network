@@ -14,23 +14,30 @@
           <div class="label">{{ $t('dashboard.totalChargeVol') }}</div>
           <div class="content">{{ formatElectricity(data.minerStatistics.totalChargeVol) }}</div>
         </div>
-
       </el-card>
     </el-col>
     <el-col :span="12">
       <el-card class="box-card">
         <div class="text item">
           <div class="label">{{ $t('dashboard.uSDBmtMarketPrice') }}</div>
-          <div class="content">{{ data.blockchainstats.usdbmtMarketPrice }}</div>
+          <div class="content">${{ Number(data.blockchainstats.usdbmtMarketPrice).toFixed(2) }}</div>
         </div>
         <div class="text item">
           <div class="label">{{ $t('dashboard.totalBMTMarket') }}</div>
-          <div class="content">{{ data.blockchainstats.totalBMTMarket }}</div>
+          <div class="content">${{ data.blockchainstats.totalBMTMarket }}</div>
         </div>
         <div class="text item">
           <div class="label">{{ $t('dashboard.tokenSupply') }}</div>
+          <div class="content">{{ data.blockchainstats.tokenSupply }}/{{ data.blockchainstats.totalBMTMarket }}</div>
+        </div>
+        <!--<div class="text item">
+          <div class="label">{{ $t('dashboard.tokenCirculatingSupply') }}</div>
           <div class="content">{{ data.blockchainstats.tokenSupply }}</div>
         </div>
+        <div class="text item">
+          <div class="label">{{ $t('dashboard.tokenMaxSupply') }}</div>
+          <div class="content">{{ data.blockchainstats.totalBMTMarket }}</div>
+        </div>-->
       </el-card>
     </el-col>
   </el-row>
@@ -183,9 +190,6 @@ export default {
     }
 
     const initMap = () => {
-      //
-
-
       var defaultStyle = new Style({
         //边框样式
         stroke: new Stroke({

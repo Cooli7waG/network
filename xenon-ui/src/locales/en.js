@@ -44,13 +44,15 @@ export default {
         txs:"Transactions",
     },
     dashboard: {
-        miners: 'The number of mining machines in the whole network',
-        totalPowerLow: 'The total power of the whole network',
-        totalChargeVol: 'The total power generation of the whole network',
+        miners: 'Solar Miners',
+        totalPowerLow: 'Total Green Power',
+        totalChargeVol: 'Total Green Energy Generation',
 
-        uSDBmtMarketPrice: 'AKRE market price in USD',
-        totalBMTMarket: 'Total AKRE Market',
-        tokenSupply: 'Total AKRE Circulation'
+        uSDBmtMarketPrice: 'AKRE Market Price',
+        totalBMTMarket: 'AKRE Market Cap',
+        tokenSupply: 'Circulating Supply/Max Supply',
+        tokenCirculatingSupply: 'Circulating Supply',
+        tokenMaxSupply: 'Max Supply'
     },
     txs: {
         path:{
