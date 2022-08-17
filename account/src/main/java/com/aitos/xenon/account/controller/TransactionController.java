@@ -2,8 +2,11 @@ package com.aitos.xenon.account.controller;
 
 import com.aitos.xenon.account.api.domain.dto.*;
 import com.aitos.xenon.account.api.domain.vo.TransactionVo;
+import com.aitos.xenon.account.domain.PoggReportMiner;
+import com.aitos.xenon.account.domain.PoggRewardMiner;
 import com.aitos.xenon.account.domain.Transaction;
 import com.aitos.xenon.account.service.TransactionService;
+import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
 import com.aitos.xenon.common.crypto.XenonCrypto;
 import com.aitos.xenon.common.crypto.ed25519.Base58;
 import com.aitos.xenon.common.crypto.ed25519.Ed25519;
@@ -13,13 +16,14 @@ import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/transaction")
 public class TransactionController {
@@ -70,5 +74,20 @@ public class TransactionController {
         List<TransactionVo>  listVo=BeanConvertor.toList(listPage.getRecords(),TransactionVo.class);
         Page<TransactionVo> page=new Page<>(listPage.getTotal(),listVo);
         return Result.ok(page);
+    }
+
+    @PostMapping("/getReport")
+    public Result<Page<PoggReportMiner>> getReportByMinerAddress(@RequestBody PoggReportDto queryParams){
+        log.info("getReport PoggReportDto:{}",JSON.toJSONString(queryParams));
+        IPage<PoggReportMiner> listPage= transactionService.getReportByMinerAddress(queryParams);
+        Page<PoggReportMiner> poggReportPage=new Page<PoggReportMiner>(listPage.getTotal(),listPage.getRecords());
+        return Result.ok(poggReportPage);
+    }
+
+    @PostMapping("/getReward")
+    public Result<Page<PoggRewardMiner>> getRewardByMinerAddress(@RequestBody PoggReportDto queryParams){
+        IPage<PoggRewardMiner> listPage= transactionService.getRewardByMinerAddress(queryParams);
+        Page<PoggRewardMiner> poggRewardMinerPage=new Page<PoggRewardMiner>(listPage.getTotal(),listPage.getRecords());
+        return Result.ok(poggRewardMinerPage);
     }
 }

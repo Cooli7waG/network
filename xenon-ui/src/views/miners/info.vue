@@ -23,35 +23,23 @@
       <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.maker') }}:</el-col>
       <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ data.device.maker }}</el-col>
     </el-row>
-    <!--<el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{$t('minerinfo.info.locationType')}}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{data.device.locationType}}</el-col>
-    </el-row>-->
     <el-row :gutter="20">
       <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.latlog') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ data.device.latitude + "," + data.device.longitude }}
+      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
+        {{ data.device.latitude + "," + data.device.longitude }}
+        <i class="iconfont icon-weizhi" style="color: deepskyblue;cursor: pointer" @click="gotoMap(data.device.latitude,data.device.longitude)"/>
       </el-col>
     </el-row>
-    <!--<el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{$t('minerinfo.info.h3index')}}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{data.device.h3index}}</el-col>
-    </el-row>-->
-    <!--<el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{$t('minerinfo.info.terminate')}}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{data.device.terminate}}</el-col>
-    </el-row>-->
     <el-row :gutter="20">
       <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.createTime') }}:</el-col>
       <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
         {{ formatDate(data.device.createTime, "yyyy-MM-dd hh:mm:ss") }}
       </el-col>
     </el-row>
-
     <el-row :gutter="20">
       <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.earningMint') }}:</el-col>
       <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ data.device.earningMint }}</el-col>
     </el-row>
-
     <el-row :gutter="20">
       <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.earningService') }}:</el-col>
       <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ data.device.earningService }}</el-col>
@@ -74,6 +62,7 @@
         <el-pagination
             v-model:currentPage="data.page.offset"
             v-model:page-size="data.page.limit"
+            :hide-on-single-page="data.page.hidePage"
             :page-sizes="[10, 25, 50, 100]"
             layout="total, sizes, prev, pager, next, jumper"
             :total="data.page.total"
@@ -82,23 +71,22 @@
             style="margin-top: 5px"
         />
         <el-table v-loading="data.reportLoading" :data="data.reportData" border style="width: 100%;margin-top: 5px">
-          <el-table-column
-              prop="address"
-              label="Address">
+          <el-table-column prop="hash" label="Transaction Hash" width="220" :show-overflow-tooltip=true>
+            <template #default="scope">
+              <router-link :to="'/tx/'+scope.row.hash">{{scope.row.hash}}</router-link>
+            </template>
           </el-table-column>
-          <el-table-column
-              prop="epoch"
-              label="Epoch"
-              width="180">
+          <el-table-column prop="height" label="Block Height">
           </el-table-column>
-          <el-table-column
-              prop="power"
-              label="Power"
-              width="180">
+          <el-table-column prop="power" label="Power" width="180">
+            <template #default="scope">
+              {{formatPower((scope.row.power/1000).toFixed(3))}}
+            </template>
           </el-table-column>
-          <el-table-column
-              prop="total"
-              label="Total">
+          <el-table-column prop="total" label="Total">
+            <template #default="scope">
+              {{formatElectricity((scope.row.total/1000).toFixed(3))}}
+            </template>
           </el-table-column>
           <el-table-column prop="timestamp" label="Timestamp">
             <template #default="scope">{{formatDate(new Date(scope.row.timestamp*1000), "yyyy-MM-dd hh:mm:ss")}}</template>
@@ -109,6 +97,7 @@
         <el-pagination
             v-model:currentPage="data.page.offset"
             v-model:page-size="data.page.limit"
+            :hide-on-single-page="data.page.hidePage"
             :page-sizes="[10, 25, 50, 100]"
             layout="total, sizes, prev, pager, next, jumper"
             :total="data.page.total"
@@ -117,18 +106,21 @@
             style="margin-top: 5px"
         />
         <el-table v-loading="data.rewardLoading" :data="data.rewardData" border style="width: 100%;margin-top: 5px">
-          <el-table-column
-              prop="address"
-              label="Address">
+          <el-table-column prop="address" label="Miner Address" width="220" :show-overflow-tooltip=true>
           </el-table-column>
-          <el-table-column
-              prop="amount"
-              label="Amount"
-              width="180">
+          <el-table-column prop="hash" label="Transaction Hash" width="220" :show-overflow-tooltip=true>
           </el-table-column>
-          <el-table-column
-              prop="ownerAddress"
-              label="Owner Address">
+          <el-table-column prop="height" label="Block Height">
+          </el-table-column>
+          <el-table-column prop="amount" label="Amount" width="180">
+            <template #default="scope">
+              {{formatNumber((scope.row.amount).toFixed(2))}}
+            </template>
+          </el-table-column>
+          <el-table-column prop="rewardPercent" label="Reward Percent">
+            <template #default="scope">
+              {{ Number(scope.row.rewardPercent).toFixed(2)}}%
+            </template>
           </el-table-column>
           <el-table-column prop="createTime" label="Timestamp">
             <template #default="scope">{{formatDate(scope.row.createTime, "yyyy-MM-dd hh:mm:ss")}}</template>
@@ -150,22 +142,35 @@
 </template>
 
 <script>
+import "@/assets/css/iconfont.css"
 import Constant from '@/utils/constant.js'
 import {queryByMiner,getReport,getReward} from '@/api/miners.js'
 import {onMounted, reactive} from "vue";
 import {useRoute} from 'vue-router'
-import {formatDate} from "@/utils/data_format";
+import {formatDate,formatPower,formatNumber,formatElectricity} from "@/utils/data_format";
 
 export default {
   components: {},
-
   props: {
     msg: String
   },
   created() {
-    this.handleGetReport()
+    this.handleGetList();
   },
   methods: {
+    gotoMap(latitude,longitude){
+      console.log("latitude:"+latitude+",longitude:"+longitude)
+    },
+    handleGetList(){
+      let url = window.location.href;
+      if(url.endsWith("#reward")){
+        this.data.activeName = "reward"
+        this.handleGetReward();
+      }else {
+        this.data.activeName = "report"
+        this.handleGetReport();
+      }
+    },
     pageSizeChange(pageSize) {
       this.data.page.limit = pageSize
       if(this.data.page.tag == 1){
@@ -192,11 +197,29 @@ export default {
         this.data.page.tag = 1;
         this.data.reportLoading = true;
         this.handleGetReport();
+        let url = window.location.href;
+        if(!url.endsWith("#report")){
+          if(url.endsWith("#reward")){
+            url = url.replace("#reward","#report")
+          }else {
+            url = url+"#report";
+          }
+        }
+        history.pushState('','',url)
       }
       if (tab.props.name == 'reward') {
         this.data.page.tag = 2;
         this.data.rewardLoading = true;
         this.handleGetReward();
+        let url = window.location.href;
+        if(!url.endsWith("#reward")){
+          if(url.endsWith("#report")){
+            url = url.replace("#report","#reward")
+          }else {
+            url = url+"#reward";
+          }
+        }
+        history.pushState('','',url)
       }
     },
     handleGetReport(){
@@ -220,6 +243,15 @@ export default {
     formatDate() {
       return formatDate
     },
+    formatElectricity() {
+      return formatElectricity
+    },
+    formatPower() {
+      return formatPower
+    },
+    formatNumber() {
+      return formatNumber
+    },
     Constant() {
       return Constant
     }
@@ -231,6 +263,7 @@ export default {
         minerAddress: ''
       },
       page:{
+        hidePage:true,
         address:null,
         offset:1,
         limit:25,

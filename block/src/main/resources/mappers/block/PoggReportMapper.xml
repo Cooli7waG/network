@@ -7,40 +7,49 @@
     <sql id="tableName">pogg_report</sql>
 
     <insert id="batchSave">
-        insert into <include refid="tableName"/> (address,epoch,power,total,timestamp,create_time)
-        value <foreach collection="greenDataList" item="item"  separator=",">
+        insert into
+        <include refid="tableName"/>
+        (address,epoch,power,total,timestamp,create_time)
+        value
+        <foreach collection="greenDataList" item="item" separator=",">
             (#{address},#{epoch},#{item.power},#{item.total},#{item.timestamp},#{item.createTime})
         </foreach>
     </insert>
 
 
-
-
     <insert id="saveSubtotal">
-        INSERT INTO pogg_report_subtotal (
-        address,
-        owner_address,
-        miner_type,
-        epoch,
-        record_num,
-        create_time,
-        update_time
-        )
-        VALUES
-        (#{address},#{ownerAddress},#{minerType}, #{epoch}, #{recordNum}, NOW(), NOW())
+        INSERT INTO pogg_report_subtotal (address,
+                                          owner_address,
+                                          miner_type,
+                                          epoch,
+                                          record_num,
+                                          create_time,
+                                          update_time)
+        VALUES (#{address}, #{ownerAddress}, #{minerType}, #{epoch}, #{recordNum}, NOW(), NOW())
     </insert>
     <update id="updateSubtotal">
-        update pogg_report_subtotal set update_time = NOW(), record_num = #{recordNum} where id=#{id}
+        update pogg_report_subtotal
+        set update_time = NOW(),
+            record_num  = #{recordNum}
+        where id = #{id}
     </update>
 
     <select id="findSubtotalByEpoch" resultType="com.aitos.xenon.block.domain.PoggReportSubtotal">
-        SELECT * FROM `pogg_report_subtotal` where address=#{address} and epoch=#{epoch}
+        SELECT *
+        FROM `pogg_report_subtotal`
+        where address = #{address}
+          and epoch = #{epoch}
     </select>
 
-    <select id="findSubtotalStatisticsList"
-            resultType="com.aitos.xenon.block.domain.PoggReportSubtotalStatistics">
-        SELECT address,owner_address,miner_type,sum(record_num) as total FROM `pogg_report_subtotal`
-        where epoch &gt;= #{startEpoch} and epoch &lt;= #{endEpoch} and address in(select address from pogg_report_subtotal where epoch=1 and record_num &gt; 0 )
-        group by address,owner_address,miner_type
+    <select id="findSubtotalStatisticsList" resultType="com.aitos.xenon.block.domain.PoggReportSubtotalStatistics">
+        SELECT address, owner_address, miner_type, sum(record_num) as total
+        FROM `pogg_report_subtotal`
+        where epoch &gt;= #{startEpoch}
+          and epoch &lt;= #{endEpoch}
+          and address
+            in (select address
+                from pogg_report_subtotal
+                where epoch &gt;= #{startEpoch} and epoch &lt;= #{endEpoch} and record_num &gt; 0)
+        group by address, owner_address, miner_type
     </select>
 </mapper>

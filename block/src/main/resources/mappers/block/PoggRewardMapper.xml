@@ -18,21 +18,4 @@
     <select id="findListUnIssued" resultType="com.aitos.xenon.block.domain.PoggReward">
         select * from <include refid="tableName"/> where status=0
     </select>
-
-    <select id="findAll" resultType="com.aitos.xenon.block.domain.PoggReward">
-        select * from <include refid="tableName"/>
-    </select>
-
-    <insert id="savePoggRewardMiner" parameterType="com.aitos.xenon.block.api.domain.PoggRewardMiner">
-        insert into  pogg_reward_miner(address,amount,owner_address,create_time)
-            value (#{address},#{amount},#{ownerAddress},now())
-    </insert>
-
-    <select id="getReportByMinerAddress" resultType="com.aitos.xenon.block.api.domain.PoggReport">
-        select * from pogg_report where address = #{queryParams.address} order by create_time desc
-    </select>
-
-    <select id="getRewardByMinerAddress" resultType="com.aitos.xenon.block.api.domain.PoggRewardMiner">
-        select * from pogg_reward_miner where address = #{queryParams.address} order by create_time desc
-    </select>
 </mapper>

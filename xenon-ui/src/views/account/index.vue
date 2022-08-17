@@ -27,9 +27,10 @@
           style="margin-top: 5px"
       />
       <el-table :data="data.tableList" stripe border   style="width: 100%;margin-top: 5px">
-        <el-table-column prop="address" :label="$t('account.table.address')" width="210px">
+        <el-table-column prop="address" :label="$t('account.table.address')" width="210px" :show-overflow-tooltip=true>
           <template #default="scope">
-            <router-link :to="'/account/'+scope.row.address">{{formatString(scope.row.address,20)}}</router-link>
+            <router-link v-if="scope.row.accountType==2" :to="'/miner/'+scope.row.address">{{scope.row.address}}</router-link>
+            <router-link v-else :to="'/account/'+scope.row.address">{{scope.row.address}}</router-link>
           </template>
         </el-table-column>
         <el-table-column prop="accountType" :label="$t('account.table.accountType')" width="180" >

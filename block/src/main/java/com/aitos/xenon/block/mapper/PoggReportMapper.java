@@ -3,14 +3,16 @@ package com.aitos.xenon.block.mapper;
 import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
 import com.aitos.xenon.block.domain.PoggReportSubtotal;
 import com.aitos.xenon.block.domain.PoggReportSubtotalStatistics;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@Mapper
 public interface PoggReportMapper {
     /**
      * 批量保存report记录
-     * @param list
+     * @param poggReportDto
      */
     void batchSave(PoggReportDto poggReportDto);
 

@@ -42,57 +42,58 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account findByAddress(String address) {
-        try{
-            Account account=accountMapper.findByAddress(address);
-            if(account==null||account.getAccountType().equals(BusinessConstants.AccountType.MINER)){
+        try {
+            Account account = accountMapper.findByAddress(address);
+            if (account == null || account.getAccountType().equals(BusinessConstants.AccountType.MINER)) {
                 return null;
-            }else if(account.getAccountType()== BusinessConstants.AccountType.NETWORK){
-                BigInteger balance= erc20Service._foundations_initial_supply().send();
+            } else if (account.getAccountType() == BusinessConstants.AccountType.NETWORK) {
+                BigInteger balance = erc20Service._foundations_initial_supply().send();
                 account.setBalance(balance.toString());
-            }else{
-                BigInteger blance= erc20Service.balanceOf(account.getAddress()).send();
+            } else {
+                //TODO 地址需要解码
+                BigInteger blance = erc20Service.balanceOf(account.getAddress()).send();
                 account.setBalance(blance.toString());
             }
             return account;
-        }catch (Exception e){
-            log.error("error:{}",e);
+        } catch (Exception e) {
+            log.error("error:{}", e);
         }
         return null;
     }
 
     @Override
     public IPage<AccountVo> list(AccountSearchDto accountSearchDto) {
-        try{
-            Page<AccountVo> page=new Page<AccountVo>(accountSearchDto.getOffset(),accountSearchDto.getLimit());
-            IPage<AccountVo> pageResult=accountMapper.list(page,accountSearchDto);
-            List<String> addressList=pageResult.getRecords().stream()
-                    .filter(item-> XenonCrypto.convertorPublicKey(item.getAddress()).getAlgorithm().equals(Algorithm.ECDSA))
+        try {
+            Page<AccountVo> page = new Page<AccountVo>(accountSearchDto.getOffset(), accountSearchDto.getLimit());
+            IPage<AccountVo> pageResult = accountMapper.list(page, accountSearchDto);
+            List<String> addressList = pageResult.getRecords().stream()
+                    .filter(item -> XenonCrypto.convertorPublicKey(item.getAddress()).getAlgorithm().equals(Algorithm.ECDSA))
                     .map(AccountVo::getAddress)
                     .collect(Collectors.toList());
-            List<String> ecdsaAddressList=addressList.stream().map(publickey->XenonCrypto.getAddress(publickey)).collect(Collectors.toList());
-            List<BigInteger> list= erc20Service.balanceOf_multi(ecdsaAddressList).send();
-            for(AccountVo accountVo:pageResult.getRecords()){
+            List<String> ecdsaAddressList = addressList.stream().map(publickey -> XenonCrypto.getAddress(publickey)).collect(Collectors.toList());
+            List<BigInteger> list = erc20Service.balanceOf_multi(ecdsaAddressList).send();
+            for (AccountVo accountVo : pageResult.getRecords()) {
                 Algorithm algorithm = XenonCrypto.convertorPublicKey(accountVo.getAddress()).getAlgorithm();
-                if(algorithm.equals(Algorithm.ECDSA)){
-                    if(accountVo.getAccountType()== BusinessConstants.AccountType.NETWORK){
-                        BigInteger balance= erc20Service._foundations_initial_supply().send();
+                if (algorithm.equals(Algorithm.ECDSA)) {
+                    if (accountVo.getAccountType() == BusinessConstants.AccountType.NETWORK) {
+                        BigInteger balance = erc20Service._foundations_initial_supply().send();
                         accountVo.setBalance(balance.toString());
-                    }else{
+                    } else {
                         for (int i = 0; i < addressList.size(); i++) {
-                            String publickey= addressList.get(i);
-                            if(publickey.equals(accountVo.getAddress())){
+                            String publickey = addressList.get(i);
+                            if (publickey.equals(accountVo.getAddress())) {
                                 accountVo.setBalance(list.get(i).toString());
                                 break;
                             }
                         }
                     }
-                }else{
+                } else {
                     accountVo.setBalance("0");
                 }
             }
             return pageResult;
-        }catch (Exception e){
-            log.error("error:{}",e);
+        } catch (Exception e) {
+            log.error("error:{}", e);
         }
         return null;
     }
@@ -112,22 +113,22 @@ public class AccountServiceImpl implements AccountService {
         try {
             BigInteger bmtCirculation = erc20Service.alreadyReward().send();
             return bmtCirculation;
-        }catch (Exception e){
-            log.error("bmtCirculation,error:{}",e);
+        } catch (Exception e) {
+            log.error("bmtCirculation,error:{}", e);
         }
         return new BigInteger("0");
     }
 
     @Override
     public BmtStatisticsVo bmtStatistics() {
-        BmtStatisticsVo bmtStatisticsVo=new BmtStatisticsVo();
+        BmtStatisticsVo bmtStatisticsVo = new BmtStatisticsVo();
         try {
-            BigInteger totalBMTMarket =erc20Service._foundations_initial_supply().send();
+            BigInteger totalBMTMarket = erc20Service._foundations_initial_supply().send();
             bmtStatisticsVo.setTotalBMTMarket(totalBMTMarket.toString());
             BigInteger bmtCirculation = erc20Service.alreadyReward().send();
             bmtStatisticsVo.setTokenSupply(bmtCirculation.toString());
-        }catch (Exception e){
-            log.error("bmtStatistics,error:{}",e);
+        } catch (Exception e) {
+            log.error("bmtStatistics,error:{}", e);
         }
         return bmtStatisticsVo;
     }

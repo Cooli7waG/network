@@ -70,3 +70,16 @@ export function formatElectricity(value) {
         return value+" Wh";
     }
 }
+
+export function formatNumber(value) {
+    if(value==null || value==undefined){
+        return 0;
+    }
+    if(value.toString().concat(".")){
+        let str = value.toString();
+        let strArr = str.split(".");
+        return Number(strArr[0]).toLocaleString()+"."+strArr[1];
+    }else {
+        return value.toLocaleString()
+    }
+}

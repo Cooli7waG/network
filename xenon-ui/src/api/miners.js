@@ -33,14 +33,14 @@ export function onboard(data){
 
 export function getReport(data){
     return request({
-        url: '/block/pogg/getReport',
+        url: '/account/transaction/getReport',
         method: 'post',
         data:data
     })
 }
 export function getReward(data){
     return request({
-        url: '/block/pogg/getReward',
+        url: '/account/transaction/getReward',
         method: 'post',
         data:data
     })

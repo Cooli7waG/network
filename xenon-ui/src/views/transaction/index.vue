@@ -37,9 +37,9 @@
           style="margin-top: 5px"
       />
       <el-table :data="data.tableList" stripe border style="width: 100%;margin-top: 5px">
-        <el-table-column prop="hash" :label="$t('txs.table.hash')" width="450">
+        <el-table-column prop="hash" :label="$t('txs.table.hash')" width="220" :show-overflow-tooltip=true>
           <template #default="scope">
-            <router-link :to="'/tx/'+scope.row.hash">{{ formatString(scope.row.hash, 20) }}</router-link>
+            <router-link :to="'/tx/'+scope.row.hash">{{scope.row.hash }}</router-link>
           </template>
         </el-table-column>
         <el-table-column prop="height" :label="$t('txs.table.height')" width="180">

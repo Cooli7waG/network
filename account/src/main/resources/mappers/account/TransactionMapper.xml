@@ -32,4 +32,25 @@
         order by create_time desc
     </select>
 
+    <insert id="saveReport" useGeneratedKeys="true" keyProperty="id" parameterType="com.aitos.xenon.account.domain.PoggReportMiner">
+        insert into pogg_report_miner(address,power,total,hash,height,timestamp,create_time)
+        value (#{address},#{power},#{total},#{hash},#{height},#{timestamp},NOW())
+    </insert>
+
+    <insert id="saveReward" useGeneratedKeys="true" keyProperty="id" parameterType="com.aitos.xenon.account.domain.PoggRewardMiner">
+        insert into pogg_reward_miner(address,amount,owner_address,hash,height,reward_percent,create_time)
+            value (#{address},#{amount},#{ownerAddress},#{hash},#{height},#{rewardPercent},NOW())
+    </insert>
+
+    <select id="getReportByMinerAddress" resultType="com.aitos.xenon.account.domain.PoggReportMiner">
+        select * from pogg_report_miner where address = #{queryParams.address} order by create_time desc
+    </select>
+
+    <select id="getRewardByMinerAddress" resultType="com.aitos.xenon.account.domain.PoggRewardMiner">
+        select * from pogg_reward_miner where address = #{queryParams.address} order by create_time desc
+    </select>
+
+    <select id="getAll" resultType="com.aitos.xenon.account.domain.Transaction">
+        SELECT * FROM transaction WHERE tx_type in(8,9)ORDER BY id;
+    </select>
 </mapper>
