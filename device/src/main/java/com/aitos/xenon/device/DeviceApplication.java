@@ -8,7 +8,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @SpringBootApplication
 @EnableFeignClients(basePackages ={
         "com.aitos.xenon.account.api",
+        "com.aitos.xenon.fundation.api",
         "com.aitos.xenon.block.api",
+        "com.aitos.xenon.device.api",
 })
 @MapperScan("com.aitos.xenon.device.mapper")
 public class DeviceApplication {

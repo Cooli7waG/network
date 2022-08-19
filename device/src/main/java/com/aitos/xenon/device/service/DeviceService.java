@@ -1,9 +1,6 @@
 package com.aitos.xenon.device.service;
 
-import com.aitos.xenon.device.api.domain.dto.DeviceBindDto;
-import com.aitos.xenon.device.api.domain.dto.DeviceRegisterDto;
-import com.aitos.xenon.device.api.domain.dto.DeviceSearchDto;
-import com.aitos.xenon.device.api.domain.dto.DeviceTerminateMinerDto;
+import com.aitos.xenon.device.api.domain.dto.*;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.domain.DeviceDetial;
@@ -28,4 +25,11 @@ public interface DeviceService {
     DeviceVo queryByMiner(String minerAddress);
 
     void terminate(DeviceTerminateMinerDto deviceTerminateMinerDto);
+
+    /**
+     * 解析公钥并生成其他数据
+     * @param applyGameMiner
+     * @return
+     */
+    String applyGameMiner(ApplyGameMiner applyGameMiner);
 }

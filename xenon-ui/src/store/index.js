@@ -6,6 +6,7 @@ export default createStore({
         accountId:0,
         balance:0,
         accountType:1,
+        mateMaskAddress:undefined
     },
     mutations: {
         login(state,account) {
@@ -19,6 +20,16 @@ export default createStore({
             state.accountId=0
             state.balance=0
             state.accountType=1
+        },
+        loginMateMask(mateMaskAddress){
+            this.state.mateMaskAddress = mateMaskAddress;
+        },
+        getMateMask(){
+            return this.state.mateMaskAddress
+        },
+        logoutMateMask(){
+            this.state.mateMaskAddress = undefined;
         }
     }
 })
+

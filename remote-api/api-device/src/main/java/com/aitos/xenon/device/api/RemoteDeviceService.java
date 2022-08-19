@@ -1,8 +1,8 @@
 package com.aitos.xenon.device.api;
 
-
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.device.api.domain.dto.DeviceDto;
+import com.aitos.xenon.device.api.domain.dto.DeviceRegisterDto;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -18,4 +18,7 @@ public interface RemoteDeviceService {
 
     @PutMapping("/device/update")
     Result update(@RequestBody DeviceDto deviceDto);
+
+    @PostMapping("/device/register")
+    Result register(@RequestBody DeviceRegisterDto deviceRegister);
 }

@@ -3,6 +3,7 @@ export default {
         msg:{
             timeout:"System interface request timeout",
             networkError:"Backend interface connection exception",
+            metaMaskNotFound:"Please install metamask wallet first",
         },
         button:{
             back:"Back"
@@ -42,6 +43,7 @@ export default {
         accounts:"Accounts",
         blocks:"Blocks",
         txs:"Transactions",
+        login:"Login with MetaMask",
     },
     dashboard: {
         miners: 'Solar Miners',

@@ -1,6 +1,7 @@
 package com.aitos.xenon.core.exceptions;
 
 import com.aitos.xenon.core.constant.ApiStatus;
+import com.aitos.xenon.core.exceptions.device.RecoverPublicKeyException;
 import com.aitos.xenon.core.model.Result;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
@@ -24,11 +25,9 @@ import java.util.Set;
 
 /**
  * 全局异常处理器
- *
  */
 @RestControllerAdvice
-public class GlobalExceptionHandler
-{
+public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
@@ -36,8 +35,7 @@ public class GlobalExceptionHandler
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public Result handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException e,
-                                                      HttpServletRequest request)
-    {
+                                                      HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',不支持'{}'请求", requestURI, e.getMethod());
         return Result.failed(ApiStatus.HTTP_REQUEST_METHOD_NOT_SUPPORTED);
@@ -47,8 +45,7 @@ public class GlobalExceptionHandler
      * 拦截未知的运行时异常
      */
     @ExceptionHandler(RuntimeException.class)
-    public Result handleRuntimeException(RuntimeException e, HttpServletRequest request)
-    {
+    public Result handleRuntimeException(RuntimeException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',发生未知异常.", requestURI, e);
         return Result.failed(ApiStatus.ERROR);
@@ -58,8 +55,7 @@ public class GlobalExceptionHandler
      * 自定义验证异常
      */
     @ExceptionHandler(BindException.class)
-    public Result handleBindException(BindException e)
-    {
+    public Result handleBindException(BindException e) {
         log.error(e.getMessage(), e);
         String message = e.getAllErrors().get(0).getDefaultMessage();
         return Result.failed(ApiStatus.PARAMETER_FORMATE_ERROR);
@@ -69,17 +65,16 @@ public class GlobalExceptionHandler
      * 参数类型
      */
     @ExceptionHandler(InvalidFormatException.class)
-    public Result handleBindException(InvalidFormatException e)
-    {
+    public Result handleBindException(InvalidFormatException e) {
         log.error(e.getMessage(), e);
         return Result.failed(ApiStatus.PARAMETER_FORMATE_ERROR);
     }
+
     /**
      * 参数类型
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public Result handleBindException(HttpMessageNotReadableException e)
-    {
+    public Result handleBindException(HttpMessageNotReadableException e) {
         log.error(e.getMessage(), e);
         return Result.failed(ApiStatus.PARAMETER_FORMATE_ERROR);
     }
@@ -88,11 +83,10 @@ public class GlobalExceptionHandler
      * 自定义验证异常
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Result handleMethodArgumentNotValidException(MethodArgumentNotValidException e)
-    {
+    public Result handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error(e.getMessage(), e);
         String message = e.getBindingResult().getFieldError().getDefaultMessage();
-        return Result.failed(ApiStatus.PARAMETER_FORMATE_ERROR,message);
+        return Result.failed(ApiStatus.PARAMETER_FORMATE_ERROR, message);
     }
 
 
@@ -100,9 +94,8 @@ public class GlobalExceptionHandler
      * 服务异常
      */
     @ExceptionHandler(ServiceException.class)
-    public Result handleServiceException(ServiceException e)
-    {
-        log.error("handleServiceException:{}",e);
+    public Result handleServiceException(ServiceException e) {
+        log.error("handleServiceException:{}", e);
         return Result.failed(ApiStatus.ERROR);
     }
 
@@ -119,7 +112,7 @@ public class GlobalExceptionHandler
             ConstraintViolation<?> cvl = iterator.next();
             msgList.add(cvl.getMessageTemplate());
         }
-        return Result.failed(ApiStatus.PARAMETER_FORMATE_ERROR,String.join(",",msgList));
+        return Result.failed(ApiStatus.PARAMETER_FORMATE_ERROR, String.join(",", msgList));
     }
 
     /**
@@ -127,15 +120,24 @@ public class GlobalExceptionHandler
      */
     @ExceptionHandler(value = ParamValidateInvalidException.class)
     public Result paramValidateInvalidExceptionHandler(ParamValidateInvalidException ex) {
-        return Result.failed(ApiStatus.PARAMETER_FORMATE_ERROR,ex.getMessage());
+        return Result.failed(ApiStatus.PARAMETER_FORMATE_ERROR, ex.getMessage());
     }
 
     /**
      * 系统异常
      */
     @ExceptionHandler(Exception.class)
-    public Result handleException(Exception e, HttpServletRequest request)
-    {
+    public Result handleException(Exception e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}',发生系统异常.", requestURI, e);
+        return Result.failed(e.getMessage());
+    }
+
+    /**
+     * 系统异常
+     */
+    @ExceptionHandler(RecoverPublicKeyException.class)
+    public Result handleException(RecoverPublicKeyException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',发生系统异常.", requestURI, e);
         return Result.failed(e.getMessage());

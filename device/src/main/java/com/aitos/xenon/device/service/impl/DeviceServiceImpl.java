@@ -6,18 +6,25 @@ import com.aitos.xenon.account.api.domain.dto.AccountRegisterDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionDto;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
 import com.aitos.xenon.block.api.RemoteBlockService;
+import com.aitos.xenon.common.crypto.*;
+import com.aitos.xenon.common.crypto.ed25519.Base58;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.exceptions.ServiceException;
 import com.aitos.xenon.core.exceptions.account.OwnerAccountNotExistException;
 import com.aitos.xenon.core.exceptions.device.DeviceExistedException;
+import com.aitos.xenon.core.exceptions.device.MinerApplyException;
+import com.aitos.xenon.core.exceptions.device.RecoverPublicKeyException;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
+import com.aitos.xenon.device.api.RemoteDeviceService;
 import com.aitos.xenon.device.api.domain.dto.*;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.mapper.DeviceMapper;
 import com.aitos.xenon.device.service.DeviceService;
+import com.aitos.xenon.fundation.api.RemoteFundationService;
+import com.aitos.xenon.fundation.api.domain.dto.RegisterDto;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -28,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -46,6 +54,10 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Autowired
     private RemoteBlockService remoteBlockService;
+    @Autowired
+    private RemoteFundationService remoteFundationService;
+    @Autowired
+    private RemoteDeviceService remoteDeviceService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -177,5 +189,52 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public void terminate(DeviceTerminateMinerDto deviceTerminateMinerDto) {
         deviceMapper.terminate(deviceTerminateMinerDto);
+    }
+
+    /**
+     * 解析公钥并生成需要的其他数据
+     * @param applyGameMiner
+     * @return
+     */
+    @Override
+    public String applyGameMiner(ApplyGameMiner applyGameMiner) {
+        String str =applyGameMiner.getName()+"("+applyGameMiner.getEmail()+") Request Game Miner";
+        String srcPublicKey =null;
+        try{
+            //恢复owner公钥
+            srcPublicKey = RecoverPublicKeyUtils.recoverPublicKeyHexString(applyGameMiner.getPersonalSign(), str.getBytes(StandardCharsets.UTF_8));
+            String ownerAddress = Base58.encode(srcPublicKey.getBytes(StandardCharsets.UTF_8));
+            // 生成miner信息并发送到基金会签名
+            XenonKeyPair eCDSAXenonKeyPair = XenonCrypto.gerateKeyPair(Network.TESTNET,Algorithm.ECDSA);
+            String minerAddress = eCDSAXenonKeyPair.getPublicKey();
+            DeviceRegisterDto deviceRegisterDto = new DeviceRegisterDto();
+            deviceRegisterDto.setAddress(minerAddress);
+            deviceRegisterDto.setMaker(BusinessConstants.MakerInfo.GAME_MINER);
+            deviceRegisterDto.setVersion(1);
+            deviceRegisterDto.setMinerType(BusinessConstants.DeviceMinerType.GAME_MINER);
+            deviceRegisterDto.setTxData(applyGameMiner.getPersonalSign());
+            //
+
+
+            Result<String> register = remoteFundationService.register(JSON.toJSONString(deviceRegisterDto));
+            log.info("register result:{}",register.getData());
+            deviceRegisterDto.setFoundationSignature(register.getData());
+            //调用 miner register
+
+
+
+
+
+            //Result deviceRegister = remoteDeviceService.register(deviceRegisterDto);
+            //if(deviceRegister.getCode() != ApiStatus.SUCCESS.getCode()){
+            //    throw new MinerApplyException("miner apply failed");
+            //}
+            //调用Miner AirDrop
+
+            //
+            return null;
+        }catch (Exception e){
+            throw new RecoverPublicKeyException("Failed to get user address");
+        }
     }
 }

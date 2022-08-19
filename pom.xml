@@ -16,6 +16,7 @@
         <module>device</module>
         <module>remote-api</module>
         <module>block</module>
+        <module>fundation</module>
     </modules>
 
     <properties>
@@ -146,6 +147,11 @@
             <dependency>
                 <groupId>com.aitos</groupId>
                 <artifactId>api-block</artifactId>
+                <version>${xenon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aitos</groupId>
+                <artifactId>api-fundation</artifactId>
                 <version>${xenon.version}</version>
             </dependency>
         </dependencies>

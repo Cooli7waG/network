@@ -66,7 +66,7 @@ public class AirDropRecordController {
 
         //检查空投状态
         AirDropRecord airDropRecordTemp=airDropRecordService.findNotClaimedByMinerAddress(airDropDto.getMinerAddress());
-        if(airDropRecordTemp!=null&&airDropRecordTemp.getStatus()== BusinessConstants.DeviceAirdropStatus.NOT_CLAIM){
+        if(airDropRecordTemp!=null && airDropRecordTemp.getStatus()== BusinessConstants.DeviceAirdropStatus.NOT_CLAIM){
             return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_EXISTED);
         }
         /*Result<Long> blockHeightResult = blockService.getBlockHeight();

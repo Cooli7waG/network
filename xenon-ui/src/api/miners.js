@@ -38,9 +38,18 @@ export function getReport(data){
         data:data
     })
 }
+
 export function getReward(data){
     return request({
         url: '/account/transaction/getReward',
+        method: 'post',
+        data:data
+    })
+}
+
+export function applyGameMiner(data){
+    return request({
+        url: '/device/device/apply',
         method: 'post',
         data:data
     })

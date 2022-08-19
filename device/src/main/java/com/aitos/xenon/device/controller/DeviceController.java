@@ -34,13 +34,13 @@ public class DeviceController {
     @Value("${foundation.publicKey}")
     private String foundationPublicKey;
 
-    @Autowired
-    private RemotePoggService remotePoggService;
-
     @PostMapping("/register")
     public Result register(@RequestBody DeviceRegisterDto deviceRegister){
-
-        Boolean verify= XenonCrypto.verify(foundationPublicKey,deviceRegister.getAddress(),deviceRegister.getFoundationSignature());
+        //Boolean verify= XenonCrypto.verify(foundationPublicKey,deviceRegister.getAddress(),deviceRegister.getFoundationSignature());
+        JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(deviceRegister));
+        jsonObject.remove("foundationSignature");
+        String jsonData=jsonObject.toJSONString();
+        Boolean verify= XenonCrypto.verify(foundationPublicKey,jsonData,deviceRegister.getFoundationSignature());
         if(!verify){
             return Result.failed(ApiStatus.VALIDATE_SIGN_FAILED);
         }
@@ -54,7 +54,6 @@ public class DeviceController {
         deviceService.save(deviceRegister);
         return Result.ok();
     }
-
 
     @PostMapping("/onboard")
     public Result onboard(@RequestBody String params){
@@ -136,5 +135,12 @@ public class DeviceController {
         Device device=BeanConvertor.toBean(deviceDto,Device.class);
         deviceService.update(device);
         return Result.ok();
+    }
+
+    @PostMapping("/apply")
+    public Result applyGameMiner(@RequestBody ApplyGameMiner applyGameMiner){
+        log.info("applyGameMiner:{}",JSON.toJSONString(applyGameMiner));
+        String result = deviceService.applyGameMiner(applyGameMiner);
+        return Result.ok(result);
     }
 }

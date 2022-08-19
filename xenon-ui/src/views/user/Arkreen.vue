@@ -1,0 +1,137 @@
+<template>
+  <el-container style="height: auto">
+    <div class="contentDiv">
+      <div class="titleDiv">Arkreen Website</div>
+      <div class="btnDiv">{{ userAddress }}</div>
+      <div class="btnDiv">
+        <el-button type="primary" @click="handleApplyGameMiner" :disabled="userAddress==null">Apply Game Miner</el-button>
+      </div>
+      <div class="btnDiv">
+        <el-button type="success" @click="gotoMinerList" :disabled="userAddress==null">View My Miners</el-button>
+      </div>
+    </div>
+  </el-container>
+  <div v-show="centerDialogVisible" class="el-dialog__wrapper" style="z-index: 9999;background-color: rgba(0,0,0,0.5)">
+    <div role="dialog" aria-modal="true" aria-label="提示" class="el-dialog el-dialog--center" style="margin-top: 15vh; width: 30%;">
+      <div class="el-dialog__header">
+        <span class="el-dialog__title">Apply Game Miner</span>
+      </div>
+      <div class="el-dialog__body">
+        <el-form :model="minerForm" :rules="rules" size="medium" :label-position="labelPosition" ref="minerForm" label-width="100px">
+          <el-form-item prop="name">
+            <el-input v-model="minerForm.name" placeholder="Please enter the username"></el-input>
+          </el-form-item>
+          <el-form-item prop="email">
+            <el-input v-model="minerForm.email" placeholder="Please enter the email"></el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div class="el-dialog__footer">
+        <span class="dialog-footer">
+          <button type="button" class="el-button el-button--default" @click="centerDialogVisible = false">
+            <span>Cancel</span>
+          </button>
+          <button type="button" class="el-button el-button--primary" @click="submitForm('minerForm')">
+            <span>Apply</span>
+          </button>
+        </span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Buffer from "vue-buffer";
+import {applyGameMiner} from "@/api/miners";
+export default {
+  name: 'Arkreen',
+  data() {
+    return {
+      labelPosition:'top',
+      centerDialogVisible: false,
+      userAddress: null,
+      minerForm: {
+        name: 'test',
+        email: 'test@qq.com',
+        personalSign:undefined
+      },
+      rules: {
+        name: [
+          { required: true, message: 'Please enter the user name', trigger: 'blur' }
+        ],
+        email: [
+          { required: true, trigger: "blur", message: "Please enter your email" },
+          { type: 'email', message: 'Please enter the correct email address', trigger: ['blur', 'change'] }
+        ]
+      },
+    };
+  },
+  created() {
+    this.getUserAddress();
+  },
+  methods: {
+    submitForm(formName) {
+      this.$refs[formName].validate(async (valid) => {
+        if (valid) {
+          let message = this.minerForm.name + "(" + this.minerForm.email + ") Request Game Miner";
+          console.log("message:"+message)
+          const msg = `0x${Buffer.from(message, 'utf8').toString('hex')}`;
+          const sign = await ethereum.request({
+            method: 'personal_sign',
+            params: [msg, this.userAddress, 'Example password'],
+          });
+          console.log("personalSign result:" + sign)
+          this.minerForm.personalSign = sign;
+          applyGameMiner(this.minerForm).then(rsp =>{
+            console.log("applyGameMiner result:"+JSON.stringify(rsp))
+          })
+        } else {
+          return false;
+        }
+      });
+    },
+    handleApplyGameMiner() {
+      this.centerDialogVisible = true
+    },
+    gotoMinerList() {
+      this.$router.push("/account/" + this.userAddress)
+    },
+    async getUserAddress() {
+      if (window.ethereum) {
+        const newAccounts = await ethereum.request({
+          method: 'eth_requestAccounts',
+        });
+        this.userAddress = newAccounts[0];
+        console.log("user address:"+this.userAddress)
+      } else {
+        this.$message.error(this.$t('common.msg.metaMaskNotFound'));
+      }
+    }
+  },
+}
+</script>
+<style lang="scss" scoped>
+.contentDiv {
+  margin: 0 auto;
+  background-color: #e7eaf3;
+  height: 250px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.btnDiv {
+  height: 50px;
+  text-align: center;
+  line-height: 50px;
+}
+
+.titleDiv {
+  width: 500px;
+  background-color: #545c64;
+  height: 50px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  text-align: center;
+  line-height: 50px;
+}
+</style>

@@ -144,4 +144,8 @@ public interface BusinessConstants
          */
         int ISSUED_FAILED=2;
     }
+
+    interface MakerInfo {
+        String GAME_MINER = "aitos";
+    }
 }

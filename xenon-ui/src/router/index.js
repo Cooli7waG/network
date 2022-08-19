@@ -4,6 +4,7 @@ import Transaction from "@/views/transaction/index.vue";
 import TransactionInfo from "@/views/transaction/info.vue";
 import Miners from "@/views/miners/index.vue";
 import MinersInfo from "@/views/miners/info.vue";
+import Arkreen from "@/views/user/Arkreen.vue";
 
 import Console from "@/views/console/index.vue";
 
@@ -47,6 +48,11 @@ const routes = [
         path: "/blocks",
         name: "Blocks",
         component: () => import('@/views/block/index.vue'),
+    },
+    {
+        path: "/user",
+        name: "Arkreen",
+        component: Arkreen,
     },
     {
         path: "/console/",
