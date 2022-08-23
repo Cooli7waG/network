@@ -2,6 +2,7 @@ package com.aitos.xenon.device.controller;
 
 import com.aitos.xenon.block.api.RemoteBlockService;
 import com.aitos.xenon.common.crypto.XenonCrypto;
+import com.aitos.xenon.common.crypto.ed25519.Base58;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.model.Page;
@@ -25,6 +26,8 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
+
 @RestController
 @RequestMapping("/airdroprecord")
 @Slf4j
@@ -44,13 +47,14 @@ public class AirDropRecordController {
 
     @PostMapping("/airdrop")
     public Result airDrop(@RequestBody String body){
-        log.info("claim.body:{}",body);
+        log.info("airdrop.body:{}",body);
 
         JSONObject jsonObject=JSONObject.parseObject(body, Feature.OrderedField);
         String signature=jsonObject.getString("signature");
         jsonObject.remove("signature");
         String jsonData=jsonObject.toJSONString();
-
+        log.info("AirDropRecordController.airDrop jsonData:{}",jsonData);
+        log.info("AirDropRecordController.airDrop signature:{}",signature);
         AirDropDto airDropDto=JSON.parseObject(body,AirDropDto.class);
         Boolean verify= XenonCrypto.verify(foundationPublicKey,jsonData.getBytes(),signature);
         if(!verify){

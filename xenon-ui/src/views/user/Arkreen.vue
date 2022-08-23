@@ -1,5 +1,5 @@
 <template>
-  <el-container style="height: auto">
+  <el-container v-loading="loading" style="height: auto">
     <div class="contentDiv">
       <div class="titleDiv">Arkreen Website</div>
       <div class="btnDiv">{{ userAddress }}</div>
@@ -11,7 +11,7 @@
       </div>
     </div>
   </el-container>
-  <div v-show="centerDialogVisible" class="el-dialog__wrapper" style="z-index: 9999;background-color: rgba(0,0,0,0.5)">
+  <div v-loading="loading" v-show="centerDialogVisible" class="el-dialog__wrapper" style="z-index: 9999;background-color: rgba(0,0,0,0.5)">
     <div role="dialog" aria-modal="true" aria-label="提示" class="el-dialog el-dialog--center" style="margin-top: 15vh; width: 30%;">
       <div class="el-dialog__header">
         <span class="el-dialog__title">Apply Game Miner</span>
@@ -47,6 +47,7 @@ export default {
   name: 'Arkreen',
   data() {
     return {
+      loading : false,
       labelPosition:'top',
       centerDialogVisible: false,
       userAddress: null,
@@ -71,6 +72,7 @@ export default {
   },
   methods: {
     submitForm(formName) {
+      this.loading = true;
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
           let message = this.minerForm.name + "(" + this.minerForm.email + ") Request Game Miner";
@@ -78,14 +80,23 @@ export default {
           const msg = `0x${Buffer.from(message, 'utf8').toString('hex')}`;
           const sign = await ethereum.request({
             method: 'personal_sign',
-            params: [msg, this.userAddress, 'Example password'],
+            params: [msg, this.userAddress, ''],
           });
           console.log("personalSign result:" + sign)
           this.minerForm.personalSign = sign;
           applyGameMiner(this.minerForm).then(rsp =>{
             console.log("applyGameMiner result:"+JSON.stringify(rsp))
+            if(rsp.code == 0){
+              this.centerDialogVisible = false
+              this.loading = false;
+              this.$message.success("apply successful, please wait for the mail patiently");
+            }else {
+              this.loading = false;
+              this.$message.error(rsp.msg);
+            }
           })
         } else {
+          this.loading = true;
           return false;
         }
       });

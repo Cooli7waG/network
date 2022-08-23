@@ -54,3 +54,11 @@ export function applyGameMiner(data){
         data:data
     })
 }
+
+export function claimGameMiner(data){
+    return request({
+        url: '/device/device/claim',
+        method: 'post',
+        data:data
+    })
+}

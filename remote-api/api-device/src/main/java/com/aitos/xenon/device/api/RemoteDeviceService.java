@@ -21,4 +21,10 @@ public interface RemoteDeviceService {
 
     @PostMapping("/device/register")
     Result register(@RequestBody DeviceRegisterDto deviceRegister);
+
+    @PostMapping("/airdroprecord/airdrop")
+    Result airdrop(@RequestBody String body);
+
+    @PostMapping("/airdroprecord/claim")
+    Result claim(@RequestBody String body);
 }

@@ -1,5 +1,6 @@
 package com.aitos.xenon.common.crypto.ecdsa;
 
+import com.aitos.xenon.common.crypto.HexUtils;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.asn1.x9.X9IntegerConverter;
 import org.bouncycastle.crypto.ec.CustomNamedCurves;

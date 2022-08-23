@@ -5,6 +5,7 @@ import TransactionInfo from "@/views/transaction/info.vue";
 import Miners from "@/views/miners/index.vue";
 import MinersInfo from "@/views/miners/info.vue";
 import Arkreen from "@/views/user/Arkreen.vue";
+import ClaimGameMiner from "@/views/user/claim.vue";
 
 import Console from "@/views/console/index.vue";
 
@@ -53,6 +54,11 @@ const routes = [
         path: "/user",
         name: "Arkreen",
         component: Arkreen,
+    },
+    {
+        path: "/claim/:address",
+        name: "Claim Game Miner",
+        component: ClaimGameMiner,
     },
     {
         path: "/console/",

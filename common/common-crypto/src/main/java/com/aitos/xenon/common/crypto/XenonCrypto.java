@@ -174,7 +174,8 @@ public class XenonCrypto {
         }else if(algorithm.equals(Algorithm.ECDSA)){
             byte[] originalPublicKeyBytes=Base58.decode(xenonKeyPair.getOriginalPublicKey());
             String originalPublicKey=Hex.toHexString(originalPublicKeyBytes);
-            Boolean verify = Keccak256Secp256k1.verify(originalPublicKey,data,signature);
+            //TODO
+            Boolean verify = Keccak256Secp256k1.verify(originalPublicKey,data,HexUtils.bytesToHexString(signatureBytes));
             return verify;
         }
         return false;

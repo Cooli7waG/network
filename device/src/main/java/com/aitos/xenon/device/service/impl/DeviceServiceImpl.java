@@ -26,6 +26,8 @@ import com.aitos.xenon.device.service.DeviceService;
 import com.aitos.xenon.fundation.api.RemoteFundationService;
 import com.aitos.xenon.fundation.api.domain.dto.RegisterDto;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
@@ -33,10 +35,12 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Base64Utils;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -203,6 +207,7 @@ public class DeviceServiceImpl implements DeviceService {
         try{
             //恢复owner公钥
             srcPublicKey = RecoverPublicKeyUtils.recoverPublicKeyHexString(applyGameMiner.getPersonalSign(), str.getBytes(StandardCharsets.UTF_8));
+            srcPublicKey = "0001"+srcPublicKey;
             String ownerAddress = Base58.encode(srcPublicKey.getBytes(StandardCharsets.UTF_8));
             // 生成miner信息并发送到基金会签名
             XenonKeyPair eCDSAXenonKeyPair = XenonCrypto.gerateKeyPair(Network.TESTNET,Algorithm.ECDSA);
@@ -213,28 +218,70 @@ public class DeviceServiceImpl implements DeviceService {
             deviceRegisterDto.setVersion(1);
             deviceRegisterDto.setMinerType(BusinessConstants.DeviceMinerType.GAME_MINER);
             deviceRegisterDto.setTxData(applyGameMiner.getPersonalSign());
-            //
-
-
-            Result<String> register = remoteFundationService.register(JSON.toJSONString(deviceRegisterDto));
-            log.info("register result:{}",register.getData());
+            //TODO 适配device register 只签名一个字段
+            Result<String> register = remoteFundationService.register(deviceRegisterDto.getAddress());
+            log.info("remoteFundationService.register result:{}",register.getData());
             deviceRegisterDto.setFoundationSignature(register.getData());
             //调用 miner register
+            Result deviceRegister = remoteDeviceService.register(deviceRegisterDto);
+            if(deviceRegister.getCode() != ApiStatus.SUCCESS.getCode()){
+                log.info("remoteDeviceService.register error:{}",JSON.toJSONString(deviceRegister));
+                throw new MinerApplyException("miner apply failed");
+            }
+            //TODO 调用Miner AirDrop，部分数值暂时写死
+            AirDropDto airDropDto = new AirDropDto();
+            airDropDto.setMinerAddress(minerAddress);
+            airDropDto.setOwnerAddress(ownerAddress);
+            airDropDto.setVersion(1);
+            // 30天
+            Result<Long> blockHeight = remoteBlockService.getBlockHeight();
+            airDropDto.setExpiration(blockHeight.getData()+(30*24*60));
+            //TODO 来源？
+            DeviceLocationDto deviceLocationDto = new DeviceLocationDto();
+            airDropDto.setLocation(deviceLocationDto);
+            //TODO 这里填写啥？
+            DeviceInfoDto deviceInfoDto = new DeviceInfoDto();
+            deviceInfoDto.setAddress(minerAddress);
+            deviceInfoDto.setCapabilities("0");
+            deviceInfoDto.setPower(0L);
+            deviceInfoDto.setVersion(1);
+            deviceInfoDto.setEnergy(1);
 
+            airDropDto.setMinerInfo(deviceInfoDto);
+            String airJson = JSON.toJSONString(airDropDto);
+            Result<String> airdropResult = remoteFundationService.airdrop(airJson);
+            log.info("remoteFundationService.airdrop result:{}",airdropResult.getData());
+            String airdropSign = airdropResult.getData();
+            JSONObject jsonObject=JSONObject.parseObject(airJson, Feature.OrderedField);
 
-
-
-
-            //Result deviceRegister = remoteDeviceService.register(deviceRegisterDto);
-            //if(deviceRegister.getCode() != ApiStatus.SUCCESS.getCode()){
-            //    throw new MinerApplyException("miner apply failed");
-            //}
-            //调用Miner AirDrop
-
+            jsonObject.put("signature",airdropSign);
+            Result airdrop = remoteDeviceService.airdrop(jsonObject.toJSONString());
+            if(airdrop.getCode() != ApiStatus.SUCCESS.getCode()){
+                log.info("remoteDeviceService.airdrop error:{}",JSON.toJSONString(deviceRegister));
+                throw new MinerApplyException("miner airdrop failed");
+            }
+            //TODO 发送邮件等通知owner
+            HashMap<String,String> hashMap = new HashMap();
+            hashMap.put("minerAddress",minerAddress);
+            hashMap.put("ownerAddress",ownerAddress);
+            log.info("领取地址：http://localhost:8080/claim/"+ Base64Utils.encodeToString(JSON.toJSONString(hashMap).getBytes(StandardCharsets.UTF_8)));
             //
-            return null;
+            return ApiStatus.SUCCESS.getMsg();
         }catch (Exception e){
+            log.error("Apply Game Miner Error:{}",e.getMessage());
             throw new RecoverPublicKeyException("Failed to get user address");
         }
+    }
+
+    /**
+     * 申领gaming miner
+     * @param claimGameMiner
+     * @return
+     */
+    @Override
+    public String claimGameMiner(String claimGameMiner) {
+        Result claim = remoteDeviceService.claim(claimGameMiner);
+        log.info("DeviceServiceImpl.claimGameMiner:{}",JSON.toJSONString(claim));
+        return null;
     }
 }

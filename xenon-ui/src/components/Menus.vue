@@ -19,7 +19,7 @@
     <el-col :span="4" class="login">
       <div style="float: right;line-height: 50px;margin-right: 10px">
         <el-button v-if="userAddress==undefined" type="text" style="color: #FFFFFF" @click="loginApp">{{ $t('menus.login') }}</el-button>
-        <el-button v-else type="text" style="color: #FFFFFF" >{{ formatString(userAddress) }}</el-button>
+        <el-button v-else type="text" style="color: #FFFFFF" @click="loginApp">{{ formatString(userAddress) }}</el-button>
       </div>
     </el-col>
   </el-row>
@@ -37,16 +37,28 @@ export default {
       userAddress:undefined
     }
   },
+  created() {
+    this.getInfo();
+  },
   methods:{
+    getInfo(){
+      let MateMaskAddress = window.localStorage.getItem('MateMaskAddress')
+      console.log("window localStorage MateMaskAddress:"+MateMaskAddress)
+      this.userAddress = MateMaskAddress;
+    },
     formatString(str){
       return formatString(str,5);
     },
     async loginApp() {
+      if(this.userAddress != undefined){
+        this.$router.push("/user");
+      }
       if (window.ethereum) {
         const newAccounts = await ethereum.request({
           method: 'eth_requestAccounts',
         });
         this.userAddress = newAccounts[0];
+        window.localStorage.setItem('MateMaskAddress',this.userAddress);
         this.$router.push("/user");
       } else {
         this.$message.error(this.$t('common.msg.metaMaskNotFound'));

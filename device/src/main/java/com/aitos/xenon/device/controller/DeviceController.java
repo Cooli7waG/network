@@ -36,11 +36,16 @@ public class DeviceController {
 
     @PostMapping("/register")
     public Result register(@RequestBody DeviceRegisterDto deviceRegister){
-        //Boolean verify= XenonCrypto.verify(foundationPublicKey,deviceRegister.getAddress(),deviceRegister.getFoundationSignature());
-        JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(deviceRegister));
-        jsonObject.remove("foundationSignature");
-        String jsonData=jsonObject.toJSONString();
-        Boolean verify= XenonCrypto.verify(foundationPublicKey,jsonData,deviceRegister.getFoundationSignature());
+        //TODO 此处不能只验证一个字段
+        log.info("DeviceController.register address:{}",deviceRegister.getAddress());
+        log.info("DeviceController.register FoundationSignature:{}",deviceRegister.getFoundationSignature());
+        log.info("DeviceController.register foundationPublicKey:{}",foundationPublicKey);
+        Boolean verify= XenonCrypto.verify(foundationPublicKey,deviceRegister.getAddress(),deviceRegister.getFoundationSignature());
+        //JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(deviceRegister));
+        //jsonObject.remove("foundationSignature");
+        //String jsonData=jsonObject.toJSONString();
+        //log.info("device register:{}",jsonData);
+        //Boolean verify= XenonCrypto.verify(foundationPublicKey,jsonData.getBytes(StandardCharsets.UTF_8),deviceRegister.getFoundationSignature().getBytes(StandardCharsets.UTF_8));
         if(!verify){
             return Result.failed(ApiStatus.VALIDATE_SIGN_FAILED);
         }
@@ -141,6 +146,13 @@ public class DeviceController {
     public Result applyGameMiner(@RequestBody ApplyGameMiner applyGameMiner){
         log.info("applyGameMiner:{}",JSON.toJSONString(applyGameMiner));
         String result = deviceService.applyGameMiner(applyGameMiner);
+        return Result.ok(result);
+    }
+
+    @PostMapping("/claim")
+    public Result claimGameMiner(@RequestBody String claimGameMiner){
+        log.info("DeviceController.claimGameMiner:{}",claimGameMiner);
+        String result = deviceService.claimGameMiner(claimGameMiner);
         return Result.ok(result);
     }
 }

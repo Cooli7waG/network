@@ -32,4 +32,11 @@ public interface DeviceService {
      * @return
      */
     String applyGameMiner(ApplyGameMiner applyGameMiner);
+
+    /**
+     * 申领gaming miner
+     * @param claimGameMiner
+     * @return
+     */
+    String claimGameMiner(String claimGameMiner);
 }
