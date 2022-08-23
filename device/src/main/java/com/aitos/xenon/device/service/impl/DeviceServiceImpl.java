@@ -207,8 +207,13 @@ public class DeviceServiceImpl implements DeviceService {
         try{
             //恢复owner公钥
             srcPublicKey = RecoverPublicKeyUtils.recoverPublicKeyHexString(applyGameMiner.getPersonalSign(), str.getBytes(StandardCharsets.UTF_8));
-            srcPublicKey = "0001"+srcPublicKey;
-            String ownerAddress = Base58.encode(srcPublicKey.getBytes(StandardCharsets.UTF_8));
+            log.info("RecoverPublicKeyUtils.recoverPublicKeyHexString:{}",srcPublicKey);
+            byte[] bytes = srcPublicKey.getBytes(StandardCharsets.UTF_8);
+            byte[] xenonBytes = new byte[bytes.length+2];
+            System.arraycopy(bytes,0,xenonBytes,2,bytes.length);
+            xenonBytes[0] = 0x00;
+            xenonBytes[1] = 0x01;
+            String ownerAddress = Base58.encode(xenonBytes);
             // 生成miner信息并发送到基金会签名
             XenonKeyPair eCDSAXenonKeyPair = XenonCrypto.gerateKeyPair(Network.TESTNET,Algorithm.ECDSA);
             String minerAddress = eCDSAXenonKeyPair.getPublicKey();

@@ -1,6 +1,7 @@
 package com.aitos.xenon.device.controller;
 
 import com.aitos.xenon.block.api.RemoteBlockService;
+import com.aitos.xenon.common.crypto.HexUtils;
 import com.aitos.xenon.common.crypto.XenonCrypto;
 import com.aitos.xenon.common.crypto.ed25519.Base58;
 import com.aitos.xenon.core.constant.ApiStatus;
@@ -89,12 +90,14 @@ public class AirDropRecordController {
         log.info("claim.body:{}",body);
 
         JSONObject jsonObject=JSONObject.parseObject(body, Feature.OrderedField);
-        String signature=jsonObject.getString("signature");
+        String signature = jsonObject.getString("signature");
+
+        //String signature=Base58.encode(HexUtils.hexStringToByteArray(str.substring(2,str.length()-2)));
         jsonObject.remove("signature");
         String jsonData=jsonObject.toJSONString();
 
         ClaimDto claimDto=JSON.parseObject(body,ClaimDto.class);
-        Boolean verify= XenonCrypto.verify(claimDto.getOwnerAddress(),jsonData.getBytes(),signature);
+        Boolean verify= XenonCrypto.verifyClaim(claimDto.getOwnerAddress(),jsonData.getBytes(),signature);
         if(!verify){
             return Result.failed(ApiStatus.VALIDATE_SIGN_FAILED);
         }
