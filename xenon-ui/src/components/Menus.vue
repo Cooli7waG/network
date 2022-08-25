@@ -2,7 +2,7 @@
   <el-row style="background-color: #545c64">
     <el-col :span="20">
       <el-menu
-          :default-active="$route.path"
+          :default-active="autoActive()"
           class="el-menu-demo"
           mode="horizontal"
           background-color="#545c64"
@@ -40,6 +40,11 @@
 
 <script>
 import {formatString} from "@/utils/data_format";
+import {
+  getMetaMaskLoginUserAddress,
+  loginWithMetaMask,
+  removeMetaMaskUserAddress,
+} from "@/api/metamask_utils";
 
 export default {
   name: 'Menus',
@@ -48,7 +53,7 @@ export default {
   },
   data() {
     return {
-      isShow: true,
+      isShow: false,
       userAddress: undefined
     }
   },
@@ -56,6 +61,19 @@ export default {
     this.getInfo();
   },
   methods: {
+    autoActive(){
+      let path = this.$route.path;
+      if(path.startsWith("/miner/")){
+        return "/miners"
+      }
+      if(path.startsWith("/account/")){
+        return "/accounts"
+      }
+      if(path.startsWith("/tx/")){
+        return "/txs"
+      }
+      return path;
+    },
     gotoMyMiner() {
       this.$router.push("/account/" + this.userAddress)
     },
@@ -68,7 +86,7 @@ export default {
         cancelButtonText: 'Cancel',
         type: 'warning'
       }).then(() => {
-        window.localStorage.removeItem('MateMaskAddress')
+        removeMetaMaskUserAddress()
         this.userAddress = undefined;
         this.$router.push("/");
       }).catch(() => {
@@ -76,26 +94,32 @@ export default {
       });
     },
     getInfo() {
-      let MateMaskAddress = window.localStorage.getItem('MateMaskAddress')
-      console.log("window localStorage MateMaskAddress:" + MateMaskAddress)
+      let MateMaskAddress = getMetaMaskLoginUserAddress()
       this.userAddress = MateMaskAddress;
     },
     formatString(str) {
-      return formatString(str, 5);
+      return formatString(str, 15);
     },
     async loginApp() {
       if (this.userAddress != undefined) {
         this.$router.push("/user");
       }
-      if (window.ethereum) {
-        const newAccounts = await ethereum.request({
-          method: 'eth_requestAccounts',
-        });
-        this.userAddress = newAccounts[0];
-        window.localStorage.setItem('MateMaskAddress', this.userAddress);
-        this.$router.push("/user");
-      } else {
-        this.$message.error(this.$t('common.msg.metaMaskNotFound'));
+      try {
+        if (window.ethereum) {
+          this.userAddress = await loginWithMetaMask();
+          let path = this.$route.path;
+          if(path == "/user"){
+            this.$router.go(0);
+          }else if(path.startsWith("/claim/")){
+            this.$router.go(0);
+          }else {
+            this.$router.push("/user");
+          }
+        } else {
+          this.$message.error(this.$t('common.msg.metaMaskNotFound'));
+        }
+      }catch (err){
+        this.$message.error(this.$t('common.msg.LoginWithMetaMaskFailed'));
       }
     }
   }
@@ -108,7 +132,7 @@ export default {
 }
 .down-menu{
   list-style: none;
-  padding: 0px 0px;
+  padding: 5px 0px;
 }
 a {
   text-decoration: none;
