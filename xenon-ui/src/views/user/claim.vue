@@ -1,6 +1,6 @@
 <template>
   <el-container style="height: auto">
-    <div class="contentDiv">
+    <div class="contentDiv" v-loading="loading">
       <div class="titleDiv">Arkreen Website</div>
       <div class="btnDiv" style="padding: 10px;">You Game Miner Address:</div>
       <div class="btnDiv" style="padding: 10px;">{{ minerForm.minerAddress }}</div>
@@ -20,6 +20,7 @@ export default {
   name: 'Arkreen',
   data() {
     return {
+      loading:false,
       labelPosition:'top',
       centerDialogVisible: false,
       userAddress:undefined,
@@ -46,6 +47,7 @@ export default {
       this.minerForm.ownerAddress = obj.ownerAddress;
     },
     async submitForm() {
+      this.loading = true;
       if (window.ethereum) {
         const newAccounts = await ethereum.request({
           method: 'eth_requestAccounts',
@@ -53,6 +55,7 @@ export default {
         this.userAddress = newAccounts[0];
       } else {
         this.$message.error(this.$t('common.msg.metaMaskNotFound'));
+        this.loading = false;
         return;
       }
       //let message = this.minerForm.minerAddress + "(" + this.minerForm.userAddress + ") Request Game Miner";
@@ -73,6 +76,7 @@ export default {
         console.log("claimGameMiner result:" + JSON.stringify(rsp))
         this.minerForm.signature = undefined;
       })
+      this.loading = false;
     },
     handleClaimGameMiner() {
       this.$confirm('Click "OK" to confirm the receipt', 'Tips', {
@@ -86,6 +90,7 @@ export default {
       });
     },
     async getUserAddress() {
+      this.loading = true;
       if (window.ethereum) {
         const newAccounts = await ethereum.request({
           method: 'eth_requestAccounts',
@@ -96,6 +101,7 @@ export default {
       } else {
         this.$message.error(this.$t('common.msg.metaMaskNotFound'));
       }
+      this.loading = false;
     }
   },
 }

@@ -17,9 +17,22 @@
       </el-menu>
     </el-col>
     <el-col :span="4" class="login">
-      <div style="float: right;line-height: 50px;margin-right: 10px" v-show="isShow">
-        <el-button v-if="userAddress==undefined" type="text" style="color: #FFFFFF" @click="loginApp">{{ $t('menus.login') }}</el-button>
-        <el-button v-else type="text" style="color: #FFFFFF" @click="loginApp">{{ formatString(userAddress) }}</el-button>
+      <div style="float: right;margin-right: 10px" v-show="isShow">
+        <div v-if="userAddress==undefined" style="line-height: 50px">
+          <el-button type="text" style="color: #FFFFFF" @click="loginApp">{{ $t('menus.login') }}</el-button>
+        </div>
+        <ul v-else class="box">
+          <li class="user">
+            <a style="cursor: pointer;">
+              <span @click="loginApp">{{ formatString(userAddress) }}</span>
+            </a>
+            <ul class="down-menu">
+              <li @click="gotoBrowser()">Browser</li>
+              <li @click="gotoMyMiner()">My Miners</li>
+              <li @click="Logout()">Logout</li>
+            </ul>
+          </li>
+        </ul>
       </div>
     </el-col>
   </el-row>
@@ -27,34 +40,51 @@
 
 <script>
 import {formatString} from "@/utils/data_format";
+
 export default {
   name: 'Menus',
   props: {
     msg: String
   },
-  data(){
+  data() {
     return {
-      isShow:true,
-      userAddress:undefined
+      isShow: true,
+      userAddress: undefined
     }
   },
   created() {
     this.getInfo();
   },
-  methods:{
-    changeTitle() {
-
+  methods: {
+    gotoMyMiner() {
+      this.$router.push("/account/" + this.userAddress)
     },
-    getInfo(){
+    gotoBrowser() {
+      this.$router.push("/")
+    },
+    Logout() {
+      this.$confirm('Are you sure want to logout?', 'Tips', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        window.localStorage.removeItem('MateMaskAddress')
+        this.userAddress = undefined;
+        this.$router.push("/");
+      }).catch(() => {
+
+      });
+    },
+    getInfo() {
       let MateMaskAddress = window.localStorage.getItem('MateMaskAddress')
-      console.log("window localStorage MateMaskAddress:"+MateMaskAddress)
+      console.log("window localStorage MateMaskAddress:" + MateMaskAddress)
       this.userAddress = MateMaskAddress;
     },
-    formatString(str){
-      return formatString(str,5);
+    formatString(str) {
+      return formatString(str, 5);
     },
     async loginApp() {
-      if(this.userAddress != undefined){
+      if (this.userAddress != undefined) {
         this.$router.push("/user");
       }
       if (window.ethereum) {
@@ -62,7 +92,7 @@ export default {
           method: 'eth_requestAccounts',
         });
         this.userAddress = newAccounts[0];
-        window.localStorage.setItem('MateMaskAddress',this.userAddress);
+        window.localStorage.setItem('MateMaskAddress', this.userAddress);
         this.$router.push("/user");
       } else {
         this.$message.error(this.$t('common.msg.metaMaskNotFound'));
@@ -72,7 +102,61 @@ export default {
 }
 </script>
 <style scoped>
-.login{
+.box{
+  list-style: none;
+  width: 150px;
+}
+.down-menu{
+  list-style: none;
+  padding: 0px 0px;
+}
+a {
+  text-decoration: none;
+  color: #fff;
+}
+
+ul.box > li.user {
+  width: 150px;
+  height: 20px;
+}
+
+ul.box > li.user > a {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+ul.box > li.user:hover .down-menu {
+  display: block;
+}
+
+ul.box > li > .down-menu {
+  background: #fff;
+  width: 150px;
+  display: none;
+  border: 1px solid silver;
+  border-radius: 3px;
+}
+
+ul.box > li > .down-menu > li {
+  padding: 3px 0px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 40px;
+  line-height: 40px;
+  border-bottom: 1px solid #fff;
+  cursor: pointer;
+  padding: 0px 20px;
+}
+
+ul.box > li > .down-menu > li:hover {
+  background-color: silver;
+}
+
+.login {
   background-color: #545c64;
   border-bottom: solid 1px var(--el-menu-border-color);
 }

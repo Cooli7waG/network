@@ -1,7 +1,7 @@
 <template>
   <el-row :gutter="24">
     <el-col :span="12">
-      <el-card class="box-card">
+      <el-card class="box-card" >
         <div class="text item">
           <div class="label">{{ $t('dashboard.miners') }}</div>
           <div class="content">{{ data.minerStatistics.miners }}</div>
