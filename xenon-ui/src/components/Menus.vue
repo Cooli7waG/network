@@ -17,7 +17,7 @@
       </el-menu>
     </el-col>
     <el-col :span="4" class="login">
-      <div style="float: right;line-height: 50px;margin-right: 10px">
+      <div style="float: right;line-height: 50px;margin-right: 10px" v-show="isShow">
         <el-button v-if="userAddress==undefined" type="text" style="color: #FFFFFF" @click="loginApp">{{ $t('menus.login') }}</el-button>
         <el-button v-else type="text" style="color: #FFFFFF" @click="loginApp">{{ formatString(userAddress) }}</el-button>
       </div>
@@ -34,6 +34,7 @@ export default {
   },
   data(){
     return {
+      isShow:true,
       userAddress:undefined
     }
   },
@@ -41,6 +42,9 @@ export default {
     this.getInfo();
   },
   methods:{
+    changeTitle() {
+
+    },
     getInfo(){
       let MateMaskAddress = window.localStorage.getItem('MateMaskAddress')
       console.log("window localStorage MateMaskAddress:"+MateMaskAddress)

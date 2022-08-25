@@ -14,17 +14,19 @@ import com.aitos.xenon.core.exceptions.ServiceException;
 import com.aitos.xenon.core.exceptions.account.OwnerAccountNotExistException;
 import com.aitos.xenon.core.exceptions.device.DeviceExistedException;
 import com.aitos.xenon.core.exceptions.device.MinerApplyException;
+import com.aitos.xenon.core.exceptions.device.MinerClaimVerifyException;
 import com.aitos.xenon.core.exceptions.device.RecoverPublicKeyException;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
 import com.aitos.xenon.device.api.RemoteDeviceService;
+import com.aitos.xenon.device.api.RemoteGameMinerService;
 import com.aitos.xenon.device.api.domain.dto.*;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
+import com.aitos.xenon.device.api.domain.vo.GameMiner;
 import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.mapper.DeviceMapper;
 import com.aitos.xenon.device.service.DeviceService;
 import com.aitos.xenon.fundation.api.RemoteFundationService;
-import com.aitos.xenon.fundation.api.domain.dto.RegisterDto;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
@@ -62,6 +64,8 @@ public class DeviceServiceImpl implements DeviceService {
     private RemoteFundationService remoteFundationService;
     @Autowired
     private RemoteDeviceService remoteDeviceService;
+    @Autowired
+    private RemoteGameMinerService remoteGameMinerService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -214,9 +218,16 @@ public class DeviceServiceImpl implements DeviceService {
             xenonBytes[0] = 0x00;
             xenonBytes[1] = 0x01;
             String ownerAddress = Base58.encode(xenonBytes);
-            // 生成miner信息并发送到基金会签名
-            XenonKeyPair eCDSAXenonKeyPair = XenonCrypto.gerateKeyPair(Network.TESTNET,Algorithm.ECDSA);
-            String minerAddress = eCDSAXenonKeyPair.getPublicKey();
+            log.info("applyGameMiner Recover ownerAddress:{}",ownerAddress);
+            // 调用game miner服务生成miner地址进行预注册
+            Result<String> gameMinerResult = remoteGameMinerService.register();
+            if(gameMinerResult==null || gameMinerResult.getCode() != ApiStatus.SUCCESS.getCode()){
+                log.info("remoteGameMinerService.register error:{}",JSON.toJSONString(gameMinerResult));
+                throw new MinerApplyException("miner apply failed");
+            }
+            log.info("remoteGameMinerService.register result:{}",JSON.toJSONString(gameMinerResult));
+            // 发送miner信息到基金会签名
+            String minerAddress = gameMinerResult.getData();
             DeviceRegisterDto deviceRegisterDto = new DeviceRegisterDto();
             deviceRegisterDto.setAddress(minerAddress);
             deviceRegisterDto.setMaker(BusinessConstants.MakerInfo.GAME_MINER);
@@ -258,9 +269,12 @@ public class DeviceServiceImpl implements DeviceService {
             log.info("remoteFundationService.airdrop result:{}",airdropResult.getData());
             String airdropSign = airdropResult.getData();
             JSONObject jsonObject=JSONObject.parseObject(airJson, Feature.OrderedField);
-
+            //
             jsonObject.put("signature",airdropSign);
-            Result airdrop = remoteDeviceService.airdrop(jsonObject.toJSONString());
+            String deviceAirdropStr = jsonObject.toJSONString();
+            log.info("remoteFundationService.airdrop str:{}",airJson);
+            log.info("remoteDeviceService.airdrop str:{}",deviceAirdropStr);
+            Result airdrop = remoteDeviceService.airdrop(deviceAirdropStr);
             if(airdrop.getCode() != ApiStatus.SUCCESS.getCode()){
                 log.info("remoteDeviceService.airdrop error:{}",JSON.toJSONString(deviceRegister));
                 throw new MinerApplyException("miner airdrop failed");
@@ -285,8 +299,20 @@ public class DeviceServiceImpl implements DeviceService {
      */
     @Override
     public String claimGameMiner(String claimGameMiner) {
+        //
         Result claim = remoteDeviceService.claim(claimGameMiner);
-        log.info("DeviceServiceImpl.claimGameMiner:{}",JSON.toJSONString(claim));
+        log.info("remoteDeviceService.claim:{}",JSON.toJSONString(claim));
+        if(claim.getCode() != ApiStatus.SUCCESS.getCode()){
+            throw new MinerClaimVerifyException("claim miner airdrop verify failed");
+        }
+        ClaimDto claimDto=JSON.parseObject(claimGameMiner,ClaimDto.class);
+        GameMiner gameMiner = new GameMiner();
+        gameMiner.setAddress(claimDto.getMinerAddress());
+        Result start = remoteGameMinerService.start(gameMiner);
+        log.info("remoteGameMinerService.start:{}",JSON.toJSONString(start));
+        if(start.getCode() != ApiStatus.SUCCESS.getCode()){
+            return "success";
+        }
         return null;
     }
 }

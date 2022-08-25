@@ -46,9 +46,20 @@ export default {
       this.minerForm.ownerAddress = obj.ownerAddress;
     },
     async submitForm() {
+      if (window.ethereum) {
+        const newAccounts = await ethereum.request({
+          method: 'eth_requestAccounts',
+        });
+        this.userAddress = newAccounts[0];
+      } else {
+        this.$message.error(this.$t('common.msg.metaMaskNotFound'));
+        return;
+      }
       //let message = this.minerForm.minerAddress + "(" + this.minerForm.userAddress + ") Request Game Miner";
-      let message = JSON.stringify(this.minerForm);
+      //let message = JSON.stringify(this.minerForm);
+      let message = '{"version":1,"ownerAddress":"'+this.minerForm.ownerAddress+'","minerAddress":"'+this.minerForm.minerAddress+'"}'
       console.log("message:" + message)
+      console.log("this.userAddress:" + this.userAddress)
       const msg = `0x${Buffer.from(message, 'utf8').toString('hex')}`;
       const sign = await ethereum.request({
         method: 'personal_sign',
@@ -57,8 +68,10 @@ export default {
       //
       console.log("personalSign result:" + sign)
       this.minerForm.signature = sign;
-      claimGameMiner(JSON.stringify(this.minerForm)).then(rsp => {
+      message = '{"version":1,"ownerAddress":"'+this.minerForm.ownerAddress+'","minerAddress":"'+this.minerForm.minerAddress+'","signature":"'+this.minerForm.signature+'"}'
+      claimGameMiner(message).then(rsp => {
         console.log("claimGameMiner result:" + JSON.stringify(rsp))
+        this.minerForm.signature = undefined;
       })
     },
     handleClaimGameMiner() {

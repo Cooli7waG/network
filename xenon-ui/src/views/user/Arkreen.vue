@@ -9,6 +9,9 @@
       <div class="btnDiv">
         <el-button type="success" @click="gotoMinerList" :disabled="userAddress==null">View My Miners</el-button>
       </div>
+      <div class="btnDiv">
+        <el-button type="success" @click="Logout" :disabled="userAddress==null">Logout</el-button>
+      </div>
     </div>
   </el-container>
   <div v-loading="loading" v-show="centerDialogVisible" class="el-dialog__wrapper" style="z-index: 9999;background-color: rgba(0,0,0,0.5)">
@@ -71,6 +74,10 @@ export default {
     this.getUserAddress();
   },
   methods: {
+    Logout(){
+      window.localStorage.removeItem('MateMaskAddress')
+      this.$router.push("/");
+    },
     submitForm(formName) {
       this.loading = true;
       this.$refs[formName].validate(async (valid) => {

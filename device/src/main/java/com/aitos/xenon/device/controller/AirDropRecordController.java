@@ -2,6 +2,7 @@ package com.aitos.xenon.device.controller;
 
 import com.aitos.xenon.block.api.RemoteBlockService;
 import com.aitos.xenon.common.crypto.HexUtils;
+import com.aitos.xenon.common.crypto.RecoverPublicKeyUtils;
 import com.aitos.xenon.common.crypto.XenonCrypto;
 import com.aitos.xenon.common.crypto.ed25519.Base58;
 import com.aitos.xenon.core.constant.ApiStatus;
@@ -86,7 +87,7 @@ public class AirDropRecordController {
 
 
     @PostMapping("/claim")
-    public Result claim(@RequestBody String body){
+    public Result claim(@RequestBody String body) throws Exception {
         log.info("claim.body:{}",body);
 
         JSONObject jsonObject=JSONObject.parseObject(body, Feature.OrderedField);
@@ -95,8 +96,19 @@ public class AirDropRecordController {
         //String signature=Base58.encode(HexUtils.hexStringToByteArray(str.substring(2,str.length()-2)));
         jsonObject.remove("signature");
         String jsonData=jsonObject.toJSONString();
-
+        //
+        String srcPublicKey = RecoverPublicKeyUtils.recoverPublicKeyHexString(signature, jsonData.getBytes(StandardCharsets.UTF_8));
+        log.info("RecoverPublicKeyUtils.recoverPublicKeyHexString:{}",srcPublicKey);
+        byte[] bytes = srcPublicKey.getBytes(StandardCharsets.UTF_8);
+        byte[] xenonBytes = new byte[bytes.length+2];
+        System.arraycopy(bytes,0,xenonBytes,2,bytes.length);
+        xenonBytes[0] = 0x00;
+        xenonBytes[1] = 0x01;
+        String ownerAddress = Base58.encode(xenonBytes);
+        log.info("Recover owner address:{}",ownerAddress);
+        //
         ClaimDto claimDto=JSON.parseObject(body,ClaimDto.class);
+        log.info("ClaimDto owner address:{}",claimDto.getOwnerAddress());
         Boolean verify= XenonCrypto.verifyClaim(claimDto.getOwnerAddress(),jsonData.getBytes(),signature);
         if(!verify){
             return Result.failed(ApiStatus.VALIDATE_SIGN_FAILED);

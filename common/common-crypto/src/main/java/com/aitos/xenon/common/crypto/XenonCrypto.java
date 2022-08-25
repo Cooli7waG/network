@@ -185,20 +185,18 @@ public class XenonCrypto {
         XenonKeyPair xenonKeyPair=convertorPublicKey(publicKey);
         Network network=xenonKeyPair.getNetwork();
         Algorithm algorithm=xenonKeyPair.getAlgorithm();
-        log.info("xenonKeyPair:{}",xenonKeyPair.getOriginalPublicKey());
-        System.out.println("----------------------verify.signature:"+signature);
         if(algorithm.equals(Algorithm.ED25519)){
             byte[] signatureBytes=Base58.decode(signature);
             byte[] originalPublicKeyBytes=Base58.decode(xenonKeyPair.getOriginalPublicKey());
             Boolean verify = Ed25519.verify(originalPublicKeyBytes,data,signatureBytes);
             return verify;
         }else if(algorithm.equals(Algorithm.ECDSA)){
+            log.info("verifyClaim.signature:{}",signature);
+            log.info("xenonKeyPair.getOriginalPublicKey:{}",xenonKeyPair.getOriginalPublicKey());
             byte[] originalPublicKeyBytes=Base58.decode(xenonKeyPair.getOriginalPublicKey());
             //String originalPublicKey=Hex.toHexString(originalPublicKeyBytes);
             String originalPublicKey= new String(originalPublicKeyBytes);
-            System.out.println("-------------------------------------------------------");
-            System.out.println("originalPublicKey："+originalPublicKey);
-            System.out.println("-------------------------------------------------------");
+            log.info("new String originalPublicKey:{}",originalPublicKey);
             //TODO
             signature = signature.substring(2);
             Boolean verify = Keccak256Secp256k1.verify(originalPublicKey,data,signature);

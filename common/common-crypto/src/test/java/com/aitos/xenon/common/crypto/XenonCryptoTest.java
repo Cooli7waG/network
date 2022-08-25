@@ -85,8 +85,9 @@ public class XenonCryptoTest {
         String privateKey="12KKhkurmNiJnKHngrbX7RXFxPfQGtGu9wgftYKn2Kd64YY";
         String data="17jjMMaZbPifsB7wq9pHxU8ztyf2DeNJqLspCXtkpFDAtvbzikg6EgPbvf1E4MQ6KkSVCsdC8NmSaDRJVbpjhR71V";
         String sign="B8fuMMnQgQTFCtpvMU6UqhXwMKXtTXmBNWXMA6kUa2zzpaCvMiHYXxVZFVTCzRg5Czq5Pp2NBKyYbr3GzMb7Asxk2";
-
-        boolean result = XenonCrypto.verify(XenonCrypto.getPublickKey(privateKey),data, sign);
+        String publickKey = XenonCrypto.getPublickKey(privateKey);
+        System.out.println("publickKey"+publickKey);
+        boolean result = XenonCrypto.verify(publickKey,data, sign);
         System.out.println(result);
     }
 
@@ -95,7 +96,7 @@ public class XenonCryptoTest {
         XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair(Network.MAINNET,Algorithm.ED25519);
 
         String sign = XenonCrypto.sign(xenonKeyPair.getPrivateKey(),"test_data");
-
+        System.out.println("xenonKeyPair.getPublicKey:"+xenonKeyPair.getPublicKey());
         boolean result = XenonCrypto.verify(xenonKeyPair.getPublicKey(),"test_data", sign);
         System.out.println(result);
     }

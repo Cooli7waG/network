@@ -146,6 +146,6 @@ public interface BusinessConstants
     }
 
     interface MakerInfo {
-        String GAME_MINER = "aitos";
+        String GAME_MINER = "Arkreen";
     }
 }
