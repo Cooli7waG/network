@@ -39,4 +39,11 @@ public interface DeviceService {
      * @return
      */
     String claimGameMiner(String claimGameMiner);
+
+    /**
+     * 根据owner地址查询miner列表
+     * @param deviceSearchDto
+     * @return
+     */
+    IPage<DeviceVo> getMinersByOwnerAddress(DeviceSearchDto deviceSearchDto);
 }

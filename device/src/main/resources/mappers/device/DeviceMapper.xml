@@ -25,6 +25,17 @@
           </where>
          order by create_time desc
     </select>
+
+    <select id="getMinersByOwnerAddress" resultType="com.aitos.xenon.device.api.domain.vo.DeviceVo">
+        select d.*,a.earning_mint,a.earning_service from <include refid="tableName"/> d left join account a on d.address=a.address
+          <where>
+              <if test="queryParams.address!=null and queryParams.address!=''">
+                  d.owner_address=#{queryParams.address}
+              </if>
+          </where>
+         order by create_time desc
+    </select>
+
     <select id="findByOwnerAddress" resultType="com.aitos.xenon.device.domain.Device">
         select * from <include refid="tableName"/>
         where owner_address=#{ownerAddress}

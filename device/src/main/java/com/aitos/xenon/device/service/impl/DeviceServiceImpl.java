@@ -315,4 +315,16 @@ public class DeviceServiceImpl implements DeviceService {
         }
         return null;
     }
+
+    /**
+     * 根据owner地址查询miner列表
+     * @param queryParams
+     * @return
+     */
+    @Override
+    public IPage<DeviceVo> getMinersByOwnerAddress(DeviceSearchDto queryParams) {
+        Page<DeviceVo> page=new Page<DeviceVo>(queryParams.getOffset(),queryParams.getLimit());
+        IPage<DeviceVo> pageResult=deviceMapper.getMinersByOwnerAddress(page,queryParams);
+        return pageResult;
+    }
 }
