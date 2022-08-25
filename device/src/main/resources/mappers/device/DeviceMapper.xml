@@ -63,6 +63,9 @@
                 <if test="totalEnergyGeneration!=null">
                     total_energy_generation=#{totalEnergyGeneration},
                 </if>
+                <if test="power!=null">
+                    power=#{power},
+                </if>
                 update_time=#{updateTime}
             </set>
             where address=#{address}

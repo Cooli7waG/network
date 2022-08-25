@@ -47,6 +47,7 @@ public class PoggReportServiceImpl implements PoggReportService {
         deviceDto.setAddress(poggReportDto.getAddress());
         PoggGreenDataDto poggGreenDataDto = poggReportDto.getGreenDataList().get(poggReportDto.getGreenDataList().size() - 1);
         deviceDto.setTotalEnergyGeneration(poggGreenDataDto.getTotal());
+        deviceDto.setPower(poggGreenDataDto.getPower());
         Result updateResult = deviceService.update(deviceDto);
         if (updateResult.getCode() != ApiStatus.SUCCESS.getCode()) {
             throw new ServiceException(updateResult.getMsg());
