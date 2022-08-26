@@ -157,7 +157,7 @@
             <dependency>
                 <groupId>com.aitos</groupId>
                 <artifactId>aitos-common-crypto</artifactId>
-                <version>0.0.5</version>
+                <version>0.0.8</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
