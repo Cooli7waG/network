@@ -1,5 +1,6 @@
 package com.aitos.xenon.account.api.domain.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -22,16 +23,16 @@ public class PoggRewardDto {
      */
     private List<PoggRewardDetailDto> rewards;
 
-    @JsonIgnore
+    @JSONField(serialize = false)
     private String rewardsJson;
 
     /**
      * 0.表示未发放，1表已发放，2表示发放失败
      */
-    @JsonIgnore
+    @JSONField(serialize = false)
     private Integer status;
 
-    @JsonIgnore
+    @JSONField(serialize = false)
     private String msg;
 
     private Long height;

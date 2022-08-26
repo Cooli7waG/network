@@ -38,7 +38,7 @@ public interface BusinessConstants
 
     interface AccountType{
         /**
-         * owner账户
+         * WALLET账户
          */
         int WALLET =1;
         /**

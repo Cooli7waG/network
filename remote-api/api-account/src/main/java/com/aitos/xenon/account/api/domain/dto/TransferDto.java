@@ -1,11 +1,9 @@
 package com.aitos.xenon.account.api.domain.dto;
 
-import com.aitos.xenon.core.model.BaseModel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.crypto.digests.SHA256Digest;
-
+import org.apache.commons.codec.digest.DigestUtils;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -28,7 +26,7 @@ public class TransferDto  {
     private String txData;
 
     public String getTxHash(){
-        return txData!=null?DigestUtils.sha256Hex(txData):null;
+        return txData!=null? DigestUtils.sha256Hex(txData):null;
     }
 
 }

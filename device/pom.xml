@@ -75,10 +75,10 @@
             <artifactId>api-block</artifactId>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>com.aitos</groupId>
             <artifactId>common-crypto</artifactId>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

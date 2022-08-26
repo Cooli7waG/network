@@ -1,17 +1,13 @@
 package com.aitos.xenon.device.controller;
 
+import com.aitos.common.crypto.coder.DataCoder;
+import com.aitos.common.crypto.ecdsa.Ecdsa;
 import com.aitos.xenon.block.api.RemoteBlockService;
-import com.aitos.xenon.common.crypto.HexUtils;
-import com.aitos.xenon.common.crypto.RecoverPublicKeyUtils;
-import com.aitos.xenon.common.crypto.XenonCrypto;
-import com.aitos.xenon.common.crypto.ed25519.Base58;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
-import com.aitos.xenon.core.model.Page;
 import com.aitos.xenon.core.model.Result;
-import com.aitos.xenon.core.utils.BeanConvertor;
-import com.aitos.xenon.device.api.domain.dto.*;
-import com.aitos.xenon.device.api.domain.vo.DeviceVo;
+import com.aitos.xenon.device.api.domain.dto.AirDropDto;
+import com.aitos.xenon.device.api.domain.dto.ClaimDto;
 import com.aitos.xenon.device.domain.AirDropRecord;
 import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.service.AirDropRecordService;
@@ -19,14 +15,16 @@ import com.aitos.xenon.device.service.DeviceService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
+import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.charset.StandardCharsets;
 
@@ -58,7 +56,7 @@ public class AirDropRecordController {
         log.info("AirDropRecordController.airDrop jsonData:{}",jsonData);
         log.info("AirDropRecordController.airDrop signature:{}",signature);
         AirDropDto airDropDto=JSON.parseObject(body,AirDropDto.class);
-        Boolean verify= XenonCrypto.verify(foundationPublicKey,jsonData.getBytes(),signature);
+        Boolean verify= Ecdsa.verifyByAddress(foundationPublicKey,jsonData.getBytes(),signature,DataCoder.BASE58);
         if(!verify){
             return Result.failed(ApiStatus.VALIDATE_SIGN_FAILED);
         }
@@ -97,19 +95,19 @@ public class AirDropRecordController {
         jsonObject.remove("signature");
         String jsonData=jsonObject.toJSONString();
         //
-        String srcPublicKey = RecoverPublicKeyUtils.recoverPublicKeyHexString(signature, jsonData.getBytes(StandardCharsets.UTF_8));
+        byte[] srcPublicKey = Ecdsa.getPublicKey(jsonData.getBytes(),signature);
         log.info("RecoverPublicKeyUtils.recoverPublicKeyHexString:{}",srcPublicKey);
-        byte[] bytes = srcPublicKey.getBytes(StandardCharsets.UTF_8);
+       /* byte[] bytes = srcPublicKey.getBytes(StandardCharsets.UTF_8);
         byte[] xenonBytes = new byte[bytes.length+2];
         System.arraycopy(bytes,0,xenonBytes,2,bytes.length);
         xenonBytes[0] = 0x00;
         xenonBytes[1] = 0x01;
-        String ownerAddress = Base58.encode(xenonBytes);
-        log.info("Recover owner address:{}",ownerAddress);
+        String ownerAddress = Hex.toHexString(xenonBytes);
+        log.info("Recover owner address:{}",ownerAddress);*/
         //
         ClaimDto claimDto=JSON.parseObject(body,ClaimDto.class);
         log.info("ClaimDto owner address:{}",claimDto.getOwnerAddress());
-        Boolean verify= XenonCrypto.verifyClaim(claimDto.getOwnerAddress(),jsonData.getBytes(),signature);
+        Boolean verify= Ecdsa.verifyByAddress(claimDto.getOwnerAddress(),jsonData,signature, DataCoder.BASE58);
         if(!verify){
             return Result.failed(ApiStatus.VALIDATE_SIGN_FAILED);
         }

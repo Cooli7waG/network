@@ -1,5 +1,7 @@
 package com.aitos.xenon.block.service.impl;
 
+import com.aitos.common.crypto.ecdsa.Ecdsa;
+import com.aitos.common.crypto.ecdsa.EcdsaKeyPair;
 import com.aitos.xenon.account.api.RemoteTransactionService;
 import com.aitos.xenon.account.api.domain.dto.PoggRewardDetailDto;
 import com.aitos.xenon.account.api.domain.dto.PoggRewardDto;
@@ -11,11 +13,6 @@ import com.aitos.xenon.block.service.BlockService;
 import com.aitos.xenon.block.service.PoggReportService;
 import com.aitos.xenon.block.service.PoggService;
 import com.aitos.xenon.block.service.SystemConfigService;
-import com.aitos.xenon.common.crypto.Algorithm;
-import com.aitos.xenon.common.crypto.Network;
-import com.aitos.xenon.common.crypto.XenonCrypto;
-import com.aitos.xenon.common.crypto.XenonKeyPair;
-import com.aitos.xenon.common.crypto.ed25519.Base58;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.exceptions.ServiceException;
@@ -24,6 +21,7 @@ import com.aitos.xenon.core.utils.BeanConvertor;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,9 +68,9 @@ public class PoggServiceImpl implements PoggService {
 
         PoggCommit poggCommit = new PoggCommit();
 
-        XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair(Network.MAINNET, Algorithm.ED25519);
-        poggCommit.setPrivateKey(xenonKeyPair.getOriginalPrivateKey());
-        poggCommit.setPublicKey(xenonKeyPair.getOriginalPublicKey());
+        EcdsaKeyPair ecdsaKeyPair = Ecdsa.genKeyPair();
+        poggCommit.setPrivateKey(ecdsaKeyPair.getPrivateKeyHex());
+        poggCommit.setPublicKey(ecdsaKeyPair.getAddressHex());
         poggCommit.setHeight(block.getHeight());
         poggCommit.setEpoch(epoch + 1);
         poggCommit.setStatus(BusinessConstants.POGGCommitStatus.NOT_OVER);
@@ -186,8 +184,8 @@ public class PoggServiceImpl implements PoggService {
         //奖励资格获得1次奖励
         int perRewardEligibilityBlocks = systemConfig.getPerRewardBlocks();
 
-        byte[] commitPrivateKeyBytes = Base58.decode(commitPrivatekey);
-        byte[] minerAddressByte = Base58.decode(minerAddress);
+        byte[] commitPrivateKeyBytes = Hex.decode(commitPrivatekey);
+        byte[] minerAddressByte = Hex.decode(minerAddress);
         byte[] ecdhBytes = new byte[commitPrivateKeyBytes.length + minerAddressByte.length];
         System.arraycopy(commitPrivateKeyBytes, 0, ecdhBytes, 0, commitPrivateKeyBytes.length);
         System.arraycopy(minerAddressByte, 0, ecdhBytes, commitPrivateKeyBytes.length - 1, minerAddressByte.length);

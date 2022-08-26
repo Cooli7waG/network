@@ -1,6 +1,5 @@
 package com.aitos.xenon.common.crypto;
 
-import com.aitos.xenon.common.crypto.ed25519.Base58;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.interfaces.ECPrivateKey;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
@@ -14,7 +13,6 @@ import org.junit.Test;
 import javax.crypto.KeyAgreement;
 import java.math.BigInteger;
 import java.security.*;
-import java.security.spec.ECGenParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -22,49 +20,35 @@ public class XenonCryptoTest {
 
     @Test
     public void test_gerateKeyPair(){
-        XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair(Network.MAINNET,Algorithm.ED25519);
+        XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair();
         System.out.println(xenonKeyPair);
-
-        XenonKeyPair eCDSAxenonKeyPair = XenonCrypto.gerateKeyPair(Network.MAINNET,Algorithm.ECDSA);
-        System.out.println(eCDSAxenonKeyPair);
-
-        System.out.println(Hex.toHexString(Base58.decode(eCDSAxenonKeyPair.getOriginalPublicKey())));
     }
     @Test
     public void test_getAddress(){
-        String address = XenonCrypto.getAddress("13eooedRFCrcn423n2kg8FRgSRNf8Z62gAU6U3yfU1kMe7t1ntL");
+        String address = XenonCrypto.getAddress("5ec4be5fdb4a8da8d2511f816430e5ebf6cc4d73ebdb81704d0127ae6c82782bf15f1eb86fc00c1102e33fe4ca1668801c5e4af20506575275eb899bb21f2e9c");
         System.out.println(address);
     }
     @Test
     public void test_getPublickKey(){
-        XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair(Network.MAINNET,Algorithm.ED25519);
-
-        String publickKey = XenonCrypto.getPublickKey(xenonKeyPair.getPrivateKey());
-        System.out.println(publickKey);
-    }
-    @Test
-    public void test_getPublickKey2(){
-        XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair(Network.MAINNET,Algorithm.ED25519);
-
-        String publickKey = XenonCrypto.getPublickKey(Base58.encode(Hex.decode("0000F3B5DF432D1A33578DE7A57DE25C992E97C096E7F66DE5E5CAA2E591AA0C29B0")));
+        String publickKey = XenonCrypto.getPublickKey("00808173ee96055fc3af64320a7ae20d611372f7240c057d1c4d89f466135efac5");
         System.out.println(publickKey);
     }
 
     @Test
     public void test_sign(){
-        String privateKey="11J4DRPHHzuFCoj2EjbsNyNEQatcjkRCjj5YUoWEJGMTuQ";
+        String privateKey="00808173ee96055fc3af64320a7ae20d611372f7240c057d1c4d89f466135efac5";
         String dataJson="{\"version\":1,\"minerAddress\":\"1162eqbyXo8p4JPxbLVt94e8zL8TVgyqyeF9Ytg7PhC55o\",\"ownerAddress\":\"11D1gq3XVrkp2UEgJ25afSdEZuoncyz9JngBfKZjfjQxRW\",\"payerAddress\":\"11D1gq3XVrkp2UEgJ25afSdEZuoncyz9JngBfKZjfjQxRW\",\"location\":{\"version\":1,\"locationType\":0,\"latitude\":0,\"longitude\":0},\"minerInfo\":{\"version\":1,\"startHeight\":1,\"location\":\"{\\\"version\\\":1,\\\"locationType\\\":0,\\\"latitude\\\":0,\\\"longitude\\\":0}\",\"energy\":0,\"capabilities\":1,\"totalChargeVol\":0,\"totalUsageVol\":0},\"stakingFee\":0}";
 
         String sign = XenonCrypto.sign(privateKey,dataJson.getBytes());
         System.out.println(sign);
 
-        String privateKey2="11B1xh3SVEnAhG8dijFGjY99V9JeJsehf6Lrst7ZyRjCXU";
+        String privateKey2="00808173ee96055fc3af64320a7ae20d611372f7240c057d1c4d89f466135efac5";
         String dataJson2="{\"version\":1,\"minerAddress\":\"1162eqbyXo8p4JPxbLVt94e8zL8TVgyqyeF9Ytg7PhC55o\",\"ownerAddress\":\"11D1gq3XVrkp2UEgJ25afSdEZuoncyz9JngBfKZjfjQxRW\"}";
 
         String sign2 = XenonCrypto.sign(privateKey2,dataJson2.getBytes());
         System.out.println(sign2);
 
-        String privateKey3="11B1xh3SVEnAhG8dijFGjY99V9JeJsehf6Lrst7ZyRjCXU";
+        String privateKey3="00808173ee96055fc3af64320a7ae20d611372f7240c057d1c4d89f466135efac5";
         String dataJson3="{\"version\":1,\"minerAddress\":\"1162eqbyXo8p4JPxbLVt94e8zL8TVgyqyeF9Ytg7PhC55o\",\"ownerAddress\":\"11D1gq3XVrkp2UEgJ25afSdEZuoncyz9JngBfKZjfjQxRW\",\"payerAddress\":\"11D1gq3XVrkp2UEgJ25afSdEZuoncyz9JngBfKZjfjQxRW\",\"location\":{\"version\":1,\"locationType\":0,\"latitude\":0,\"longitude\":0},\"minerInfo\":{\"version\":1,\"startHeight\":1,\"location\":\"{\\\"version\\\":1,\\\"locationType\\\":0,\\\"latitude\\\":0,\\\"longitude\\\":0}\",\"energy\":0,\"capabilities\":1,\"totalChargeVol\":0,\"totalUsageVol\":0},\"stakingFee\":0,\"minerSignature\":\"4CTJ9fwFDNHUqFhXRUm6Nq8aBmdZF1ErS833RExw1izjQ7FpEzT9h6KTBqWe12dt3NarxsexSmQpG9k4ue3YUC4Y\"}";
 
         String sign3 = XenonCrypto.sign(privateKey3,dataJson3.getBytes());
@@ -73,37 +57,48 @@ public class XenonCryptoTest {
 
     @Test
     public void test_sign2(){
-        XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair(Network.MAINNET,Algorithm.ECDSA);
+        XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair();
         System.out.println(xenonKeyPair);
 
-        String sign = XenonCrypto.sign(xenonKeyPair.getPrivateKey(), Base58.decode(xenonKeyPair.getPublicKey()));
+        String sign = XenonCrypto.sign(xenonKeyPair.getPrivateKey(), Hex.decode(xenonKeyPair.getPublicKey()));
         System.out.println(sign);
     }
 
     @Test
     public void test_verify_ecdsa(){
-        String privateKey="12KKhkurmNiJnKHngrbX7RXFxPfQGtGu9wgftYKn2Kd64YY";
-        String data="17jjMMaZbPifsB7wq9pHxU8ztyf2DeNJqLspCXtkpFDAtvbzikg6EgPbvf1E4MQ6KkSVCsdC8NmSaDRJVbpjhR71V";
-        String sign="B8fuMMnQgQTFCtpvMU6UqhXwMKXtTXmBNWXMA6kUa2zzpaCvMiHYXxVZFVTCzRg5Czq5Pp2NBKyYbr3GzMb7Asxk2";
-        String publickKey = XenonCrypto.getPublickKey(privateKey);
-        System.out.println("publickKey"+publickKey);
-        boolean result = XenonCrypto.verify(publickKey,data, sign);
+        String address="0xf97430b18e9318557893d25254ef681dc6ebf706";
+        String data="{\"version\":1,\"minerAddress\":\"1162eqbyXo8p4JPxbLVt94e8zL8TVgyqyeF9Ytg7PhC55o\",\"ownerAddress\":\"11D1gq3XVrkp2UEgJ25afSdEZuoncyz9JngBfKZjfjQxRW\",\"payerAddress\":\"11D1gq3XVrkp2UEgJ25afSdEZuoncyz9JngBfKZjfjQxRW\",\"location\":{\"version\":1,\"locationType\":0,\"latitude\":0,\"longitude\":0},\"minerInfo\":{\"version\":1,\"startHeight\":1,\"location\":\"{\\\"version\\\":1,\\\"locationType\\\":0,\\\"latitude\\\":0,\\\"longitude\\\":0}\",\"energy\":0,\"capabilities\":1,\"totalChargeVol\":0,\"totalUsageVol\":0},\"stakingFee\":0}";
+        String sign="7Br2scLxJcVozbsfHpxeQmQJ7ZjnNUTYDnZMRf8r3TDM1znTsLDbHRyUGZJdbvkQ7iBwS5Sx9jf8D5rS6JoRmPZ2r";
+
+        boolean result = XenonCrypto.verify(address,data, sign);
+        System.out.println(result);
+    }
+
+    @Test
+    public void test_getPublickKey_ecdsa(){
+        String data="{\"version\":1,\"ownerAddress\":\"1dMKCMoPYvdAcJPtvcrGKVXmxbNq1Vz8XBVc9yxQDcFyhmi7ixXCp9HG3fgMm4VZnG5rZvX1j7udPtRBauLypkCGWQenoophe6W6JZ2zVp2F9dDL9e1JzeoeKt4uBk83wrrETwVh2tiEztyPwFZU8zsr3Am5YFexH9TcWA9oHM8tUKEb\",\"minerAddress\":\"1PeSVZ1EixppqcbXU67KfxaqDpywS5Vi9s2SxTanqbsnFq84PAfb8jg5ZrF2zoGUprzryivguWWTATUnA8kjDKzc4a\"}";
+        String signature=Base58.encode(Hex.decode("73c42a8f3ec818f6f2462eb3cf1f41b2784bacabf06584ad1c1f72ede1c1f5811e56ea577c42dfc3904178cc6362b5aa35d02cb805e997bcb3bec0ff7e6de18b1c"));
+
+        XenonKeyPair xenonKeyPair = XenonCrypto.getPublickKey(data,signature);
+        System.out.println(xenonKeyPair);
+
+        boolean result = XenonCrypto.verify(xenonKeyPair.getAddress(),data.getBytes(), signature);
         System.out.println(result);
     }
 
     @Test
     public void test_verify(){
-        XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair(Network.MAINNET,Algorithm.ED25519);
+        XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair();
 
         String sign = XenonCrypto.sign(xenonKeyPair.getPrivateKey(),"test_data");
-        System.out.println("xenonKeyPair.getPublicKey:"+xenonKeyPair.getPublicKey());
+
         boolean result = XenonCrypto.verify(xenonKeyPair.getPublicKey(),"test_data", sign);
         System.out.println(result);
     }
 
     @Test
     public void test_verify2(){
-        XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair(Network.MAINNET,Algorithm.ED25519);
+        XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair();
 
         String sign = XenonCrypto.sign(xenonKeyPair.getPrivateKey(),"test_data".getBytes());
 
@@ -113,7 +108,7 @@ public class XenonCryptoTest {
 
     @Test
     public void test_verify3(){
-        XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair(Network.MAINNET,Algorithm.ED25519);
+        XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair();
 
         String sign = XenonCrypto.sign(xenonKeyPair.getPrivateKey(),"test_data");
 
@@ -132,8 +127,8 @@ public class XenonCryptoTest {
         //publickKey="04"+Hex.toHexString(Base58.decode(publickKey));
         //publickKey=Base58.encode(Hex.decode(publickKey));
 
-        byte[] secret = XenonCrypto.doECDH(privateKey,publickKey);
-        System.out.println(Hex.toHexString(secret));
+        //byte[] secret = XenonCrypto.doECDH(privateKey,publickKey);
+        //System.out.println(Hex.toHexString(secret));
     }
     @Test
     public void test_doECDH2() throws Exception{

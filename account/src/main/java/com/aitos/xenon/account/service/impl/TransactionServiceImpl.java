@@ -13,7 +13,6 @@ import com.aitos.xenon.account.service.AccountService;
 import com.aitos.xenon.account.service.TransactionService;
 import com.aitos.xenon.block.api.domain.dto.PoggGreenDataDto;
 import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
-import com.aitos.xenon.common.crypto.XenonCrypto;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.exceptions.ServiceException;
 import com.aitos.xenon.core.model.QueryParams;
@@ -150,7 +149,7 @@ public class TransactionServiceImpl implements TransactionService {
                 BigDecimal ownerAmount = entry.getValue().stream()
                         .map(item->item.getAmount()).reduce(BigDecimal::add)
                         .orElse(BigDecimal.ZERO);
-                addressList.add(XenonCrypto.getAddress(ownerAddress));
+                addressList.add(ownerAddress);
 
                 BigDecimal blanceEther=  Convert.toWei(ownerAmount, Convert.Unit.ETHER);
                 rewardList.add(blanceEther.toBigInteger());

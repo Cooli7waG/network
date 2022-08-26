@@ -8,8 +8,6 @@ import com.aitos.xenon.account.api.domain.vo.BmtStatisticsVo;
 import com.aitos.xenon.account.domain.Account;
 import com.aitos.xenon.account.mapper.AccountMapper;
 import com.aitos.xenon.account.service.AccountService;
-import com.aitos.xenon.common.crypto.Algorithm;
-import com.aitos.xenon.common.crypto.XenonCrypto;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -50,9 +48,7 @@ public class AccountServiceImpl implements AccountService {
                 BigInteger balance = erc20Service._foundations_initial_supply().send();
                 account.setBalance(balance.toString());
             } else {
-                //TODO 地址需要解码
-                String publicKey = XenonCrypto.convertorPublicKey(account.getAddress()).getPublicKey();
-                BigInteger blance = erc20Service.balanceOf(XenonCrypto.getAddress(publicKey)).send();
+                BigInteger blance = erc20Service.balanceOf(account.getAddress()).send();
                 account.setBalance(blance.toString());
             }
             return account;
@@ -67,29 +63,20 @@ public class AccountServiceImpl implements AccountService {
         try {
             Page<AccountVo> page = new Page<AccountVo>(accountSearchDto.getOffset(), accountSearchDto.getLimit());
             IPage<AccountVo> pageResult = accountMapper.list(page, accountSearchDto);
-            List<String> addressList = pageResult.getRecords().stream()
-                    .filter(item -> XenonCrypto.convertorPublicKey(item.getAddress()).getAlgorithm().equals(Algorithm.ECDSA))
-                    .map(AccountVo::getAddress)
-                    .collect(Collectors.toList());
-            List<String> ecdsaAddressList = addressList.stream().map(publickey -> XenonCrypto.getAddress(publickey)).collect(Collectors.toList());
-            List<BigInteger> list = erc20Service.balanceOf_multi(ecdsaAddressList).send();
+            List<String> addressList = pageResult.getRecords().stream().map(accountVo -> accountVo.getAddress()).collect(Collectors.toList());
+            List<BigInteger> list = erc20Service.balanceOf_multi(addressList).send();
             for (AccountVo accountVo : pageResult.getRecords()) {
-                Algorithm algorithm = XenonCrypto.convertorPublicKey(accountVo.getAddress()).getAlgorithm();
-                if (algorithm.equals(Algorithm.ECDSA)) {
-                    if (accountVo.getAccountType() == BusinessConstants.AccountType.NETWORK) {
-                        BigInteger balance = erc20Service._foundations_initial_supply().send();
-                        accountVo.setBalance(balance.toString());
-                    } else {
-                        for (int i = 0; i < addressList.size(); i++) {
-                            String publickey = addressList.get(i);
-                            if (publickey.equals(accountVo.getAddress())) {
-                                accountVo.setBalance(list.get(i).toString());
-                                break;
-                            }
+                if (accountVo.getAccountType() == BusinessConstants.AccountType.NETWORK) {
+                    BigInteger balance = erc20Service._foundations_initial_supply().send();
+                    accountVo.setBalance(balance.toString());
+                }else if (accountVo.getAccountType() == BusinessConstants.AccountType.WALLET) {
+                    for (int i = 0; i < addressList.size(); i++) {
+                        String publickey = addressList.get(i);
+                        if (publickey.equals(accountVo.getAddress())) {
+                            accountVo.setBalance(list.get(i).toString());
+                            break;
                         }
                     }
-                } else {
-                    accountVo.setBalance("0");
                 }
             }
             return pageResult;

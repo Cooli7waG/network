@@ -1,13 +1,12 @@
 package com.aitos.xenon.device.service.impl;
 
+import com.aitos.common.crypto.ecdsa.Ecdsa;
 import com.aitos.xenon.account.api.RemoteAccountService;
 import com.aitos.xenon.account.api.RemoteTransactionService;
 import com.aitos.xenon.account.api.domain.dto.AccountRegisterDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionDto;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
 import com.aitos.xenon.block.api.RemoteBlockService;
-import com.aitos.xenon.common.crypto.*;
-import com.aitos.xenon.common.crypto.ed25519.Base58;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.exceptions.ServiceException;
@@ -207,17 +206,17 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public String applyGameMiner(ApplyGameMiner applyGameMiner) {
         String str =applyGameMiner.getName()+"("+applyGameMiner.getEmail()+") Request Game Miner";
-        String srcPublicKey =null;
+        byte[] srcPublicKey =null;
         try{
             //恢复owner公钥
-            srcPublicKey = RecoverPublicKeyUtils.recoverPublicKeyHexString(applyGameMiner.getPersonalSign(), str.getBytes(StandardCharsets.UTF_8));
+            srcPublicKey = Ecdsa.getPublicKey( str.getBytes(),applyGameMiner.getPersonalSign());
             log.info("RecoverPublicKeyUtils.recoverPublicKeyHexString:{}",srcPublicKey);
-            byte[] bytes = srcPublicKey.getBytes(StandardCharsets.UTF_8);
+            /*byte[] bytes = srcPublicKey.getBytes(StandardCharsets.UTF_8);
             byte[] xenonBytes = new byte[bytes.length+2];
             System.arraycopy(bytes,0,xenonBytes,2,bytes.length);
             xenonBytes[0] = 0x00;
-            xenonBytes[1] = 0x01;
-            String ownerAddress = Base58.encode(xenonBytes);
+            xenonBytes[1] = 0x01;*/
+            String ownerAddress = Ecdsa.getAddress(srcPublicKey);
             log.info("applyGameMiner Recover ownerAddress:{}",ownerAddress);
             // 调用game miner服务生成miner地址进行预注册
             Result<String> gameMinerResult = remoteGameMinerService.register();

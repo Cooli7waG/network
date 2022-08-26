@@ -1,7 +1,8 @@
 package com.aitos.xenon.account.service;
 
+import com.aitos.common.crypto.coder.DataCoder;
+import com.aitos.common.crypto.ecdsa.Ecdsa;
 import com.aitos.xenon.account.domain.Account;
-import com.aitos.xenon.common.crypto.XenonCrypto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,20 +30,20 @@ public class AccountServiceTest {
     @Test
     public void test_save_sign(){
         String data="11AN9qPdD9fCWQKkhpkUxe6jeVw1xA8Q4otZfhbZK7P6ek";
-        String sign= XenonCrypto.sign(privateKey,data);
+        String sign= Ecdsa.sign(privateKey,data, DataCoder.BASE58);
         System.out.println(sign);
 
-        Boolean verify=XenonCrypto.verify(publicKey,data,sign);
+        Boolean verify=Ecdsa.verifyByPublicKey(publicKey,data,sign, DataCoder.BASE58);
         System.out.println(verify);
     }
 
     @Test
     public void test_save_sign2(){
         String data="{\"version\":1,\"minerAddress\":\"1162eqbyXo8p4JPxbLVt94e8zL8TVgyqyeF9Ytg7PhC55o\",\"ownerAddress\":\"11D1gq3XVrkp2UEgJ25afSdEZuoncyz9JngBfKZjfjQxRW\",\"location\":{\"version\":1,\"locationType\":0,\"latitude\":0,\"longitude\":0},\"minerInfo\":{\"version\":1,\"energy\":0,\"capabilities\":1,\"power\":10,\"deviceModel\":\"AD40\",\"deviceSerialNum\":\"100100101\"}}";
-        String sign= XenonCrypto.sign(privateKey,data.getBytes());
+        String sign= Ecdsa.sign(privateKey,data, DataCoder.BASE58);
         System.out.println(sign);
 
-        Boolean verify=XenonCrypto.verify(publicKey,data.getBytes(),sign);
+        Boolean verify=Ecdsa.verifyByPublicKey(publicKey,data.getBytes(),sign, DataCoder.BASE58);
         System.out.println(verify);
     }
 

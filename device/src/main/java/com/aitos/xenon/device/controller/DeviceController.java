@@ -1,7 +1,7 @@
 package com.aitos.xenon.device.controller;
 
-import com.aitos.xenon.block.api.RemotePoggService;
-import com.aitos.xenon.common.crypto.XenonCrypto;
+import com.aitos.common.crypto.coder.DataCoder;
+import com.aitos.common.crypto.ecdsa.Ecdsa;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.model.Page;
 import com.aitos.xenon.core.model.Result;
@@ -40,7 +40,7 @@ public class DeviceController {
         log.info("DeviceController.register address:{}",deviceRegister.getAddress());
         log.info("DeviceController.register FoundationSignature:{}",deviceRegister.getFoundationSignature());
         log.info("DeviceController.register foundationPublicKey:{}",foundationPublicKey);
-        Boolean verify= XenonCrypto.verify(foundationPublicKey,deviceRegister.getAddress(),deviceRegister.getFoundationSignature());
+        Boolean verify= Ecdsa.verifyByAddress(foundationPublicKey,deviceRegister.getAddress(),deviceRegister.getFoundationSignature(), DataCoder.BASE58);
         //JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(deviceRegister));
         //jsonObject.remove("foundationSignature");
         //String jsonData=jsonObject.toJSONString();
@@ -83,13 +83,13 @@ public class DeviceController {
         String minerData=paramsObject.toJSONString();
         log.info("onboard.minerData:{}",minerData);
 
-        if(!XenonCrypto.verify(payerAddress,payerData.getBytes(),payerSignature)){
+        if(!Ecdsa.verifyByAddress(payerAddress,payerData.getBytes(),payerSignature, DataCoder.BASE58)){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_PAYER_SIGN_ERROR);
         }
         /*if(!XenonCrypto.verify(ownerAddress,ownerData,ownerSignature)){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_OWNER_SIGN_ERROR);
         }*/
-        if(!XenonCrypto.verify(minerAddress,minerData.getBytes(),minerSignature)){
+        if(!Ecdsa.verifyByAddress(minerAddress,minerData.getBytes(),minerSignature, DataCoder.BASE58)){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_MINER_SIGN_ERROR);
         }
 
@@ -115,7 +115,7 @@ public class DeviceController {
     public Result terminate(@RequestBody DeviceTerminateMinerDto deviceTerminateMinerDto){
         log.info("terminate.params:{}",JSON.toJSONString(deviceTerminateMinerDto));
 
-        if(!XenonCrypto.verify(foundationPublicKey,deviceTerminateMinerDto.getAddress(),deviceTerminateMinerDto.getFoundationSignature())){
+        if(!Ecdsa.verifyByAddress(foundationPublicKey,deviceTerminateMinerDto.getAddress(),deviceTerminateMinerDto.getFoundationSignature(), DataCoder.BASE58)){
             return Result.failed(ApiStatus.BUSINESS_FOUNDATION_SIGN_ERROR);
         }
         deviceService.terminate(deviceTerminateMinerDto);

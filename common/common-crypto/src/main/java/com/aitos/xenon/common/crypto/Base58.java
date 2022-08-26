@@ -1,4 +1,4 @@
-package com.aitos.xenon.common.crypto.ed25519;
+package com.aitos.xenon.common.crypto;
  
 import java.util.Arrays;
  

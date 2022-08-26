@@ -122,11 +122,11 @@
                 <version>${xenon.version}</version>
             </dependency>
 
-            <dependency>
+            <!--<dependency>
                 <groupId>com.aitos</groupId>
                 <artifactId>common-crypto</artifactId>
                 <version>${xenon.version}</version>
-            </dependency>
+            </dependency>-->
 
             <dependency>
                 <groupId>com.aitos</groupId>
@@ -153,6 +153,11 @@
                 <groupId>com.aitos</groupId>
                 <artifactId>api-fundation</artifactId>
                 <version>${xenon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aitos</groupId>
+                <artifactId>aitos-common-crypto</artifactId>
+                <version>0.0.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

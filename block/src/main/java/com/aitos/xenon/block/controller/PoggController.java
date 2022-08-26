@@ -1,12 +1,13 @@
 package com.aitos.xenon.block.controller;
 
 
+import com.aitos.common.crypto.coder.DataCoder;
+import com.aitos.common.crypto.ecdsa.Ecdsa;
 import com.aitos.xenon.block.api.domain.dto.PoggGreenDataDto;
 import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
 import com.aitos.xenon.block.domain.PoggCommit;
 import com.aitos.xenon.block.service.PoggReportService;
 import com.aitos.xenon.block.service.PoggService;
-import com.aitos.xenon.common.crypto.XenonCrypto;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.ValidatorUtils;
@@ -53,7 +54,7 @@ public class PoggController {
         String data=paramsObject.toJSONString();
 
         //验证签名
-        if(!XenonCrypto.verify(address,data.getBytes(),signature)){
+        if(!Ecdsa.verifyByAddress(address,data.getBytes(),signature, DataCoder.BASE58)){
             return Result.failed(ApiStatus.BUSINESS_POGG_REPORT_SIGN_ERROR);
         }
 

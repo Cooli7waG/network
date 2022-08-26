@@ -1,6 +1,7 @@
 package com.aitos.xenon.account.api.domain.dto;
 
-import com.aitos.xenon.common.crypto.ed25519.Base58;
+
+import com.aitos.common.crypto.coder.Base58;
 import lombok.Data;
 import org.bouncycastle.util.encoders.Hex;
 

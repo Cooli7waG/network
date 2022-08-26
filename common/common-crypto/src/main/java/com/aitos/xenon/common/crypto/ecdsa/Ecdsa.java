@@ -3,25 +3,24 @@ package com.aitos.xenon.common.crypto.ecdsa;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.interfaces.ECPrivateKey;
-import org.bouncycastle.jce.interfaces.ECPublicKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 
-public class Keccak256Secp256k1 {
+public class Ecdsa {
     static {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    public static void main(String[] args) throws SignatureException {
-        String msg = "eyJ0cyI6MTExMTExMTExMSwidGVtcGVyYXR1cmUiOjI5OX0=";
+    public static void main(String[] args) throws Exception {
+        /*String msg = "eyJ0cyI6MTExMTExMTExMSwidGVtcGVyYXR1cmUiOjI5OX0=";
         String privateKey="257AC5637DCB8A42A9E937C0AED919508FC42E8177E2DF58734AAE85EA11DD5E";
         String signData=sign(privateKey,msg);
         System.out.println(signData);
@@ -36,7 +35,13 @@ public class Keccak256Secp256k1 {
 
         msg2 = "eyJ0cyI6MTExMTExMTE22xMSwidGVtcGVyYXR1cmUiOjI5OX0=";
          verifyResult=verify(publickey,msg2,sgin);
-        System.out.println(verifyResult);
+        System.out.println(verifyResult);*/
+
+        byte[] data="{\"version\":1,\"ownerAddress\":\"1dMKCMoPYvdAcJPtvcrGKVXmxbNq1Vz8XBVc9yxQDcFyhmi7ixXCp9HG3fgMm4VZnG5rZvX1j7udPtRBauLypkCGWQenoophe6W6JZ2zVp2F9dDL9e1JzeoeKt4uBk83wrrETwVh2tiEztyPwFZU8zsr3Am5YFexH9TcWA9oHM8tUKEb\",\"minerAddress\":\"1PeSVZ1EixppqcbXU67KfxaqDpywS5Vi9s2SxTanqbsnFq84PAfb8jg5ZrF2zoGUprzryivguWWTATUnA8kjDKzc4a\"}".getBytes(StandardCharsets.UTF_8);
+        String signature="73c42a8f3ec818f6f2462eb3cf1f41b2784bacabf06584ad1c1f72ede1c1f5811e56ea577c42dfc3904178cc6362b5aa35d02cb805e997bcb3bec0ff7e6de18b1c";
+
+        byte[] publicKey=getPublicKey(data,signature);
+        System.out.println(publicKey);
     }
 
     public static EcdsaKeyPair getKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
@@ -71,17 +76,30 @@ public class Keccak256Secp256k1 {
     }
 
     public static PrivateKey getPrivateKey(byte[] key) throws Exception {
-
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key);
         KeyFactory keyFactory = KeyFactory.getInstance("EC");
         return keyFactory.generatePrivate(keySpec);
     }
 
     public static PublicKey getPublicKey(byte[] key) throws Exception {
-
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key);
         KeyFactory keyFactory = KeyFactory.getInstance("EC");
         return keyFactory.generatePublic(keySpec);
+    }
+
+    public static byte[] getAddress(byte[] publicKey) throws Exception {
+        byte[] hash = Hash.sha3(publicKey);
+        byte[] address=Arrays.copyOfRange(hash, hash.length - 20, hash.length);
+        return address;
+    }
+
+    public static byte[] getPublicKey(byte[] data,String signature) throws Exception {
+        byte[] r = Hex.decode(signature.substring(0, 64));
+        byte[] s = Hex.decode(signature.substring(64, 128));
+        byte[] v = Hex.decode(signature.substring(128, 130));
+        Sign.SignatureData signatureData = new Sign.SignatureData(v, r, s);
+        BigInteger publicKey=Sign.signedMessageToKey(data,signatureData);
+        return publicKey.toByteArray();
     }
 
     public static byte[] getPublicKey(String privateKey) {
@@ -93,8 +111,6 @@ public class Keccak256Secp256k1 {
         BigInteger privKey = new BigInteger(privateKey, 16);
         BigInteger pubKey = Sign.publicKeyFromPrivate(privKey);
         ECKeyPair keyPair = new ECKeyPair(privKey, pubKey);
-        System.out.println("Private key: " + privKey.toString(16));
-        System.out.println("Public key: " + pubKey.toString(16));
 
         byte[] msgHash = Hash.sha3(data);
         Sign.SignatureData signature = Sign.signMessage(msgHash, keyPair, false);

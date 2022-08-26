@@ -2,12 +2,8 @@ package com.aitos.xenon.account.service;
 
 import com.aitos.blockchain.web3j.Erc20Service;
 import com.aitos.blockchain.web3j.We3jUtils;
-import com.aitos.xenon.common.crypto.Algorithm;
-import com.aitos.xenon.common.crypto.Network;
-import com.aitos.xenon.common.crypto.XenonCrypto;
-import com.aitos.xenon.common.crypto.XenonKeyPair;
-import com.aitos.xenon.common.crypto.ed25519.Base58;
-import org.apache.commons.codec.binary.Hex;
+import com.aitos.common.crypto.ecdsa.Ecdsa;
+import com.aitos.common.crypto.ecdsa.EcdsaKeyPair;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,10 +45,9 @@ public class ContractTest {
     @Test
     public void test_balanceOf() {
         try {
-            XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair(Network.MAINNET, Algorithm.ECDSA);
-            System.out.println(Hex.encodeHexString(Base58.decode(xenonKeyPair.getOriginalPublicKey())));
+            EcdsaKeyPair ecdsaKeyPair = Ecdsa.genKeyPair();
 
-            String address=XenonCrypto.getAddress("17jjMMaZbPifsB7wq9pHxU8ztyf2DeNJqLspCXtkpFDAtvbzikg6EgPbvf1E4MQ6KkSVCsdC8NmSaDRJVbpjhR71V");
+            String address=Ecdsa.getAddress(ecdsaKeyPair.getPublicKey());
             BigInteger balanceOf = erc20Service.balanceOf(address).send();
             System.out.println(balanceOf);
 
@@ -65,10 +60,9 @@ public class ContractTest {
     @Test
     public void test_rewardMiner_multi() {
         try {
-            XenonKeyPair xenonKeyPair = XenonCrypto.gerateKeyPair(Network.MAINNET, Algorithm.ECDSA);
-            System.out.println(Hex.encodeHexString(Base58.decode(xenonKeyPair.getOriginalPublicKey())));
+            EcdsaKeyPair ecdsaKeyPair = Ecdsa.genKeyPair();
 
-            String address=XenonCrypto.getAddress("17jjMMaZbPifsB7wq9pHxU8ztyf2DeNJqLspCXtkpFDAtvbzikg6EgPbvf1E4MQ6KkSVCsdC8NmSaDRJVbpjhR71V");
+            String address=Ecdsa.getAddress(ecdsaKeyPair.getPublicKey());
             List<String> list=new ArrayList<>();
             list.add(address);
             List<BigInteger> list2=new ArrayList<>();

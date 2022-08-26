@@ -20,9 +20,14 @@
             <groupId>com.aitos</groupId>
             <artifactId>common-core</artifactId>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>com.aitos</groupId>
             <artifactId>common-crypto</artifactId>
+        </dependency>-->
+
+        <dependency>
+            <groupId>com.aitos</groupId>
+            <artifactId>aitos-common-crypto</artifactId>
         </dependency>
     </dependencies>
 </project>

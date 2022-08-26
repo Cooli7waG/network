@@ -1,5 +1,8 @@
 package com.aitos.xenon.account.controller;
 
+import com.aitos.common.crypto.coder.Base58;
+import com.aitos.common.crypto.coder.DataCoder;
+import com.aitos.common.crypto.ecdsa.Ecdsa;
 import com.aitos.xenon.account.api.domain.dto.*;
 import com.aitos.xenon.account.api.domain.vo.TransactionVo;
 import com.aitos.xenon.account.domain.PoggReportMiner;
@@ -7,9 +10,6 @@ import com.aitos.xenon.account.domain.PoggRewardMiner;
 import com.aitos.xenon.account.domain.Transaction;
 import com.aitos.xenon.account.service.TransactionService;
 import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
-import com.aitos.xenon.common.crypto.XenonCrypto;
-import com.aitos.xenon.common.crypto.ed25519.Base58;
-import com.aitos.xenon.common.crypto.ed25519.Ed25519;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.model.Page;
 import com.aitos.xenon.core.model.Result;
@@ -17,6 +17,7 @@ import com.aitos.xenon.core.utils.BeanConvertor;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -43,9 +44,7 @@ public class TransactionController {
 
     @PostMapping("/transfer")
     public Result transfer(@RequestBody TransferDto transferDto){
-        byte[] signatureBytes= Base58.decode(transferDto.getSignature());
-        byte[] addressBytes= Base58.decode(transferDto.getPayments().get(0).getPayee());
-        Boolean verify= XenonCrypto.verify(foundationPublicKey,addressBytes,signatureBytes);
+        Boolean verify= Ecdsa.verifyByAddress(foundationPublicKey,transferDto.getPayments().get(0).getPayee(),transferDto.getSignature(), DataCoder.BASE58);
         if(!verify){
             return Result.failed(ApiStatus.BUSINESS_TRANSACTION_SIGN_ERROR);
         }

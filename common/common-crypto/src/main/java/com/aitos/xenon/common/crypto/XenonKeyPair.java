@@ -7,9 +7,5 @@ public class XenonKeyPair {
     private String privateKey;
     private String publicKey;
 
-    private Network  network;
-    private Algorithm  algorithm;
-
-    private String originalPrivateKey;
-    private String originalPublicKey;
+    private String address;
 }

@@ -1,6 +1,5 @@
 package com.aitos.xenon.common.crypto;
 
-import com.aitos.xenon.common.crypto.ed25519.Base58;
 import com.aitos.xenon.common.crypto.ed25519.Ed25519KeyPair;
 import com.aitos.xenon.common.crypto.ed25519.Ed25519;
 import org.bouncycastle.crypto.CryptoException;

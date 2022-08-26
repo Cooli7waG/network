@@ -3,10 +3,10 @@ package com.aitos.xenon.block.service;
 import com.aitos.xenon.block.domain.*;
 import com.aitos.xenon.block.mapper.PoggMapper;
 import com.aitos.xenon.block.mapper.PoggRewardMapper;
-import com.aitos.xenon.common.crypto.ed25519.Base58;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -120,8 +120,8 @@ public class PoggRewardTest {
         //奖励资格获得1次奖励
         int perRewardEligibilityBlocks=systemConfig.getPerRewardBlocks();
 
-        byte[] commitPrivateKeyBytes= Base58.decode(commitPrivatekey);
-        byte[] minerAddressByte=Base58.decode(minerAddress);
+        byte[] commitPrivateKeyBytes= Hex.decode(commitPrivatekey);
+        byte[] minerAddressByte=Hex.decode(minerAddress);
         byte[] ecdhBytes=new byte[commitPrivateKeyBytes.length+minerAddressByte.length];
         System.arraycopy(commitPrivateKeyBytes, 0, ecdhBytes, 0, commitPrivateKeyBytes.length);
         System.arraycopy(minerAddressByte, 0, ecdhBytes, commitPrivateKeyBytes.length-1, minerAddressByte.length);

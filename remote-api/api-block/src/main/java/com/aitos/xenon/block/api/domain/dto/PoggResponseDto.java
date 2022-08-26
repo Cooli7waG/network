@@ -1,8 +1,6 @@
 package com.aitos.xenon.block.api.domain.dto;
 
-import com.aitos.xenon.common.crypto.ed25519.Base58;
 import lombok.Data;
-import org.bouncycastle.util.encoders.Hex;
 
 @Data
 public class PoggResponseDto {

@@ -67,7 +67,7 @@
 
         <dependency>
             <groupId>com.aitos</groupId>
-            <artifactId>common-crypto</artifactId>
+            <artifactId>aitos-common-crypto</artifactId>
         </dependency>
 
 

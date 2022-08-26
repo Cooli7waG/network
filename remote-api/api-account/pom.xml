@@ -21,9 +21,18 @@
             <artifactId>common-core</artifactId>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>com.aitos</groupId>
             <artifactId>common-crypto</artifactId>
+        </dependency>-->
+
+        <dependency>
+            <groupId>com.aitos</groupId>
+            <artifactId>aitos-common-crypto</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
         </dependency>
     </dependencies>
 </project>

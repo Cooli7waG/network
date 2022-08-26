@@ -7,6 +7,7 @@ import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -58,6 +59,32 @@ public class ECKeyPair {
             npe.printStackTrace();
             return false;
         }
+    }
+
+    public static boolean verify(String address, byte[] data, byte[] signature) {
+        byte[] s = Hash.sha3(data);
+        byte v = signature[64];
+        if (v < 27) {
+            v += 27;
+        }
+        Sign.SignatureData signatureData = new Sign.SignatureData(v, Arrays.copyOfRange(signature, 0, 32),
+                Arrays.copyOfRange(signature, 32, 64));
+        boolean match = false;
+        for (int i = 0; i < 4; i++) {
+            BigInteger publicKey = Sign.recoverFromSignature(
+                    (byte) i,
+                    new ECDSASignature(new BigInteger(1, signatureData.getR()), new BigInteger(1, signatureData.getS())),
+                    s);
+            if (publicKey != null) {
+                byte[] hash = Hash.sha3(publicKey.toByteArray());
+                byte[] addressTemp=Arrays.copyOfRange(hash, hash.length - 20, hash.length);
+                match = address.equals(Hex.toHexString(addressTemp));
+                if (match) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static ECKeyPair create(KeyPair keyPair) {

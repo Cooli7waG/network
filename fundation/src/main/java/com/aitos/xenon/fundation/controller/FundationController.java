@@ -1,7 +1,7 @@
 package com.aitos.xenon.fundation.controller;
 
-import com.aitos.xenon.common.crypto.XenonCrypto;
-import com.aitos.xenon.common.crypto.ed25519.Base58;
+import com.aitos.common.crypto.coder.DataCoder;
+import com.aitos.common.crypto.ecdsa.Ecdsa;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.fundation.api.domain.dto.AirdropDto;
 import com.aitos.xenon.fundation.api.domain.dto.RegisterDto;
@@ -27,14 +27,14 @@ public class FundationController {
     @PostMapping("/register")
     public Result<String> register(@RequestBody String registerDto){
         log.info("register:{}", registerDto);
-        String sign = XenonCrypto.sign(foundationPrivateKey, Base58.decode(registerDto));
+        String sign = Ecdsa.sign(foundationPrivateKey, registerDto, DataCoder.BASE58);
         return Result.ok(sign);
     }
 
     @PostMapping("/airdrop")
     public Result<String> airdrop(@RequestBody String airdropDto){
         log.info("airdrop:{}", airdropDto);
-        String sign = XenonCrypto.sign(foundationPrivateKey, airdropDto.getBytes(StandardCharsets.UTF_8));
+        String sign = Ecdsa.sign(foundationPrivateKey, airdropDto, DataCoder.BASE58);
         return Result.ok(sign);
     }
 }
