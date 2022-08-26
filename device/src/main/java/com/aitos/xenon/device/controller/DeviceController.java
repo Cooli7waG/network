@@ -151,8 +151,8 @@ public class DeviceController {
     }
 
     @PostMapping("/apply")
-    public Result applyGameMiner(@RequestBody ApplyGameMiner applyGameMiner){
-        log.info("applyGameMiner:{}",JSON.toJSONString(applyGameMiner));
+    public Result applyGameMiner(@RequestBody String applyGameMiner){
+        log.info("applyGameMiner:{}",applyGameMiner);
         String result = deviceService.applyGameMiner(applyGameMiner);
         return Result.ok(result);
     }

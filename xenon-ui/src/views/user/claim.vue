@@ -13,9 +13,8 @@
 
 <script>
 import {claimGameMiner} from "@/api/miners";
-import Buffer from "vue-buffer";
 import {Base64} from "js-base64";
-import {getMetaMaskLoginUserAddress, personalSign} from "@/api/metamask_utils";
+import {getMetaMaskLoginUserAddress, personalSign,personalEcRecover} from "@/api/metamask_utils";
 
 export default {
   name: 'Arkreen',
@@ -51,6 +50,7 @@ export default {
         //let message = JSON.stringify(this.minerForm);
         let message = '{"version":1,"ownerAddress":"'+this.minerForm.ownerAddress+'","minerAddress":"'+this.minerForm.minerAddress+'"}'
         this.minerForm.signature = await personalSign(message);
+        //
         message = '{"version":1,"ownerAddress":"'+this.minerForm.ownerAddress+'","minerAddress":"'+this.minerForm.minerAddress+'","signature":"'+this.minerForm.signature+'"}'
         claimGameMiner(message).then(rsp => {
           console.log("claimGameMiner result:" + JSON.stringify(rsp))

@@ -10,5 +10,6 @@ import lombok.Data;
 public class ApplyGameMiner {
     private String name;
     private String email;
+    private String owner;
     private String personalSign;
 }

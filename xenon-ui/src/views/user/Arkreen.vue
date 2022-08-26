@@ -51,13 +51,14 @@ export default {
   data() {
     return {
       loading : false,
-      applyActive:false,
+      applyActive:true,
       labelPosition:'top',
       centerDialogVisible: false,
       userAddress: null,
       minerForm: {
         name: 'test',
         email: 'test@qq.com',
+        owner:undefined,
         personalSign:undefined
       },
       rules: {
@@ -80,9 +81,10 @@ export default {
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
           try {
-            let message = this.minerForm.name + "(" + this.minerForm.email + ") Request Game Miner";
-            this.minerForm.personalSign = await personalSign(message);;
-            applyGameMiner(this.minerForm).then(rsp =>{
+            this.minerForm.owner = this.userAddress;
+            let message = JSON.stringify(this.minerForm);
+            this.minerForm.personalSign = await personalSign(message);
+            applyGameMiner(JSON.stringify(this.minerForm)).then(rsp =>{
               console.log("applyGameMiner result:"+JSON.stringify(rsp))
               if(rsp.code == 0){
                 this.centerDialogVisible = false

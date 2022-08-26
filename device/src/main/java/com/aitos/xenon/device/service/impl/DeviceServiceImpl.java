@@ -33,6 +33,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.tomcat.util.buf.HexUtils;
+import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -200,22 +202,24 @@ public class DeviceServiceImpl implements DeviceService {
 
     /**
      * 解析公钥并生成需要的其他数据
-     * @param applyGameMiner
+     * @param str
      * @return
      */
     @Override
-    public String applyGameMiner(ApplyGameMiner applyGameMiner) {
-        String str =applyGameMiner.getName()+"("+applyGameMiner.getEmail()+") Request Game Miner";
+    public String applyGameMiner(String str) {
         byte[] srcPublicKey =null;
         try{
+            //
+            ApplyGameMiner applyGameMiner = JSON.parseObject(str, ApplyGameMiner.class);
+            System.out.println("----------------------------------------------------------------");
+            System.out.println(str);
+            System.out.println(applyGameMiner.getPersonalSign());
+            System.out.println("----------------------------------------------------------------");
             //恢复owner公钥
-            srcPublicKey = Ecdsa.getPublicKey( str.getBytes(),applyGameMiner.getPersonalSign());
+            JSONObject obj = JSON.parseObject(str, Feature.OrderedField);
+            obj.remove("personalSign");
+            srcPublicKey = Ecdsa.getPublicKey(obj.toJSONString().getBytes(StandardCharsets.UTF_8),applyGameMiner.getPersonalSign().substring(2));
             log.info("RecoverPublicKeyUtils.recoverPublicKeyHexString:{}",srcPublicKey);
-            /*byte[] bytes = srcPublicKey.getBytes(StandardCharsets.UTF_8);
-            byte[] xenonBytes = new byte[bytes.length+2];
-            System.arraycopy(bytes,0,xenonBytes,2,bytes.length);
-            xenonBytes[0] = 0x00;
-            xenonBytes[1] = 0x01;*/
             String ownerAddress = Ecdsa.getAddress(srcPublicKey);
             log.info("applyGameMiner Recover ownerAddress:{}",ownerAddress);
             // 调用game miner服务生成miner地址进行预注册
