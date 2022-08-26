@@ -22,23 +22,22 @@ export async function loginWithMetaMask() {
 
 export async function personalSign(message) {
     console.log("personalSign message:"+message)
-    //const msg = `0x${Buffer.from(message, 'utf8').toString('hex')}`;
-    //console.log("msg:"+msg)
+    const msg = `0x${Buffer.from(message, 'utf8').toString('hex')}`;
+    console.log("msg:"+msg)
     let address = getMetaMaskLoginUserAddress();
     console.log("personalSign address:"+address)
     const sign = await ethereum.request({
         method: 'personal_sign',
-        params: [message,address, ''],
+        params: [msg,address, ''],
     });
     console.log("personalSign result:" + sign);
     return sign;
 }
 
 export async function personalEcRecover(message,sign) {
-    const msg = `0x${Buffer.from(message, 'utf8').toString('hex')}`;
     const ecRecoverAddress = await ethereum.request({
         method: 'personal_ecRecover',
-        params: [msg, sign],
+        params: [message, sign],
     });
     return ecRecoverAddress;
 }

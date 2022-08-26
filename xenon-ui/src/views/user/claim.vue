@@ -55,6 +55,12 @@ export default {
         claimGameMiner(message).then(rsp => {
           console.log("claimGameMiner result:" + JSON.stringify(rsp))
           this.minerForm.signature = undefined;
+          if(rsp.code == 0){
+            this.$message.success("game miner claim success!");
+            this.$router.push("/account/" + this.minerForm.ownerAddress)
+          }else {
+            this.$message.error(rsp.msg);
+          }
         })
       }catch (err){
         this.$message.error("claim failed, please try again!");

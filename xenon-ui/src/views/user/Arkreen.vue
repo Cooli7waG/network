@@ -44,7 +44,7 @@
 
 <script>
 import {applyGameMiner} from "@/api/miners";
-import {getMetaMaskLoginUserAddress, personalSign} from "@/api/metamask_utils";
+import {getMetaMaskLoginUserAddress, personalEcRecover, personalSign} from "@/api/metamask_utils";
 
 export default {
   name: 'Arkreen',
@@ -83,7 +83,12 @@ export default {
           try {
             this.minerForm.owner = this.userAddress;
             let message = JSON.stringify(this.minerForm);
+            //let message = "";
             this.minerForm.personalSign = await personalSign(message);
+            //
+            //let personalEcRecoverStr = await personalEcRecover(message, this.minerForm.personalSign);
+            //console.log("personalEcRecoverStr:"+JSON.stringify(personalEcRecoverStr))
+            //
             applyGameMiner(JSON.stringify(this.minerForm)).then(rsp =>{
               console.log("applyGameMiner result:"+JSON.stringify(rsp))
               if(rsp.code == 0){
@@ -95,6 +100,7 @@ export default {
                 this.$message.error(rsp.msg);
               }
             })
+            this.minerForm.personalSign = undefined;
           }catch (err){
             this.$message.error("apply failed, please try again!");
           }

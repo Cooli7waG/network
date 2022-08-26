@@ -1,6 +1,7 @@
 package com.aitos.xenon.core.exceptions;
 
 import com.aitos.xenon.core.constant.ApiStatus;
+import com.aitos.xenon.core.exceptions.device.MinerClaimVerifyException;
 import com.aitos.xenon.core.exceptions.device.RecoverPublicKeyException;
 import com.aitos.xenon.core.model.Result;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -138,6 +139,16 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(RecoverPublicKeyException.class)
     public Result handleException(RecoverPublicKeyException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}',发生系统异常.", requestURI, e);
+        return Result.failed(e.getMessage());
+    }
+
+    /**
+     * MinerClaimVerifyException
+     */
+    @ExceptionHandler(MinerClaimVerifyException.class)
+    public Result handleMinerClaimVerifyException(MinerClaimVerifyException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',发生系统异常.", requestURI, e);
         return Result.failed(e.getMessage());

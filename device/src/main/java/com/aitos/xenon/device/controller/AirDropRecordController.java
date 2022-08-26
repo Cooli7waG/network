@@ -6,6 +6,7 @@ import com.aitos.xenon.block.api.RemoteBlockService;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.model.Result;
+import com.aitos.xenon.core.utils.MetaMaskUtils;
 import com.aitos.xenon.device.api.domain.dto.AirDropDto;
 import com.aitos.xenon.device.api.domain.dto.ClaimDto;
 import com.aitos.xenon.device.domain.AirDropRecord;
@@ -56,7 +57,7 @@ public class AirDropRecordController {
         log.info("AirDropRecordController.airDrop jsonData:{}",jsonData);
         log.info("AirDropRecordController.airDrop signature:{}",signature);
         AirDropDto airDropDto=JSON.parseObject(body,AirDropDto.class);
-        Boolean verify= Ecdsa.verifyByAddress(foundationPublicKey,jsonData.getBytes(),signature,DataCoder.BASE58);
+        Boolean verify= Ecdsa.verifyByAddress(foundationPublicKey,jsonData,signature,DataCoder.BASE58);
         if(!verify){
             return Result.failed(ApiStatus.VALIDATE_SIGN_FAILED);
         }
@@ -87,27 +88,18 @@ public class AirDropRecordController {
     @PostMapping("/claim")
     public Result claim(@RequestBody String body) throws Exception {
         log.info("claim.body:{}",body);
-
         JSONObject jsonObject=JSONObject.parseObject(body, Feature.OrderedField);
         String signature = jsonObject.getString("signature");
-
-        //String signature=Base58.encode(HexUtils.hexStringToByteArray(str.substring(2,str.length()-2)));
         jsonObject.remove("signature");
         String jsonData=jsonObject.toJSONString();
         //
-        byte[] srcPublicKey = Ecdsa.getPublicKey(jsonData.getBytes(),signature);
-        log.info("RecoverPublicKeyUtils.recoverPublicKeyHexString:{}",srcPublicKey);
-       /* byte[] bytes = srcPublicKey.getBytes(StandardCharsets.UTF_8);
-        byte[] xenonBytes = new byte[bytes.length+2];
-        System.arraycopy(bytes,0,xenonBytes,2,bytes.length);
-        xenonBytes[0] = 0x00;
-        xenonBytes[1] = 0x01;
-        String ownerAddress = Hex.toHexString(xenonBytes);
-        log.info("Recover owner address:{}",ownerAddress);*/
-        //
         ClaimDto claimDto=JSON.parseObject(body,ClaimDto.class);
         log.info("ClaimDto owner address:{}",claimDto.getOwnerAddress());
-        Boolean verify= Ecdsa.verifyByAddress(claimDto.getOwnerAddress(),jsonData,signature, DataCoder.BASE58);
+        //
+        byte[] message = MetaMaskUtils.getMessage(jsonData);
+        byte[] srcPublicKey = Ecdsa.getPublicKey(message,signature);
+        Boolean verify = Ecdsa.verifyByPublicKey(srcPublicKey,message,signature);
+        //Boolean verify= Ecdsa.verifyByAddress(srcPublicKey,message,signature, null);
         if(!verify){
             return Result.failed(ApiStatus.VALIDATE_SIGN_FAILED);
         }
@@ -118,14 +110,12 @@ public class AirDropRecordController {
         }else if(StringUtils.hasText(device.getOwnerAddress())){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_BOUND);
         }
-
         //检查空投状态
         AirDropRecord airDropRecordTemp=airDropRecordService.findNotClaimedByMinerAddress(claimDto.getMinerAddress());
         if(airDropRecordTemp==null){
             return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_NOT_EXISTED);
         }
         Result<Long> blockHeightResult = blockService.getBlockHeight();
-
         if(airDropRecordTemp!=null&&airDropRecordTemp.getExpiration()<blockHeightResult.getData()){
             return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_CLAIM_EXPIRED);
         }

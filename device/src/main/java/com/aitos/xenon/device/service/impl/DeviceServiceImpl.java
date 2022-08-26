@@ -17,6 +17,7 @@ import com.aitos.xenon.core.exceptions.device.MinerClaimVerifyException;
 import com.aitos.xenon.core.exceptions.device.RecoverPublicKeyException;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
+import com.aitos.xenon.core.utils.MetaMaskUtils;
 import com.aitos.xenon.device.api.RemoteDeviceService;
 import com.aitos.xenon.device.api.RemoteGameMinerService;
 import com.aitos.xenon.device.api.domain.dto.*;
@@ -207,21 +208,22 @@ public class DeviceServiceImpl implements DeviceService {
      */
     @Override
     public String applyGameMiner(String str) {
-        byte[] srcPublicKey =null;
         try{
             //
             ApplyGameMiner applyGameMiner = JSON.parseObject(str, ApplyGameMiner.class);
-            System.out.println("----------------------------------------------------------------");
-            System.out.println(str);
-            System.out.println(applyGameMiner.getPersonalSign());
-            System.out.println("----------------------------------------------------------------");
             //恢复owner公钥
             JSONObject obj = JSON.parseObject(str, Feature.OrderedField);
             obj.remove("personalSign");
-            srcPublicKey = Ecdsa.getPublicKey(obj.toJSONString().getBytes(StandardCharsets.UTF_8),applyGameMiner.getPersonalSign().substring(2));
-            log.info("RecoverPublicKeyUtils.recoverPublicKeyHexString:{}",srcPublicKey);
+            //
+            byte[] message = MetaMaskUtils.getMessage(obj.toJSONString());
+            byte[] srcPublicKey = Ecdsa.getPublicKey(message,applyGameMiner.getPersonalSign());
             String ownerAddress = Ecdsa.getAddress(srcPublicKey);
             log.info("applyGameMiner Recover ownerAddress:{}",ownerAddress);
+            // 判断恢复的owner地址与报文内的是否一致
+            if(!ownerAddress.equalsIgnoreCase(applyGameMiner.getOwner())){
+                log.info("remoteGameMinerService.register error: recover owner address not equals owner address");
+                throw new MinerApplyException("miner apply failed");
+            }
             // 调用game miner服务生成miner地址进行预注册
             Result<String> gameMinerResult = remoteGameMinerService.register();
             if(gameMinerResult==null || gameMinerResult.getCode() != ApiStatus.SUCCESS.getCode()){
@@ -238,9 +240,13 @@ public class DeviceServiceImpl implements DeviceService {
             deviceRegisterDto.setMinerType(BusinessConstants.DeviceMinerType.GAME_MINER);
             deviceRegisterDto.setTxData(applyGameMiner.getPersonalSign());
             //TODO 适配device register 只签名一个字段
-            Result<String> register = remoteFundationService.register(deviceRegisterDto.getAddress());
-            log.info("remoteFundationService.register result:{}",register.getData());
-            deviceRegisterDto.setFoundationSignature(register.getData());
+            Result<String> fundationRegister = remoteFundationService.register(deviceRegisterDto.getAddress());
+            log.info("remoteFundationService.register result:{}",JSON.toJSONString(fundationRegister));
+            if(fundationRegister.getCode() != ApiStatus.SUCCESS.getCode()){
+                log.info("remoteFundationService.register error:{}",JSON.toJSONString(fundationRegister));
+                throw new MinerApplyException("miner apply failed");
+            }
+            deviceRegisterDto.setFoundationSignature(fundationRegister.getData());
             //调用 miner register
             Result deviceRegister = remoteDeviceService.register(deviceRegisterDto);
             if(deviceRegister.getCode() != ApiStatus.SUCCESS.getCode()){
@@ -286,6 +292,7 @@ public class DeviceServiceImpl implements DeviceService {
             HashMap<String,String> hashMap = new HashMap();
             hashMap.put("minerAddress",minerAddress);
             hashMap.put("ownerAddress",ownerAddress);
+            //log.info("领取地址：http://localhost:8080/claim/"+ Base64Utils.encodeToString(JSON.toJSONString(hashMap).getBytes(StandardCharsets.UTF_8)));
             log.info("领取地址：http://localhost:8080/claim/"+ Base64Utils.encodeToString(JSON.toJSONString(hashMap).getBytes(StandardCharsets.UTF_8)));
             //
             return ApiStatus.SUCCESS.getMsg();
@@ -306,7 +313,7 @@ public class DeviceServiceImpl implements DeviceService {
         Result claim = remoteDeviceService.claim(claimGameMiner);
         log.info("remoteDeviceService.claim:{}",JSON.toJSONString(claim));
         if(claim.getCode() != ApiStatus.SUCCESS.getCode()){
-            throw new MinerClaimVerifyException("claim miner airdrop verify failed");
+            throw new MinerClaimVerifyException(claim.getMsg());
         }
         ClaimDto claimDto=JSON.parseObject(claimGameMiner,ClaimDto.class);
         GameMiner gameMiner = new GameMiner();
