@@ -1,3 +1,4 @@
+
 export function formatDate(value, format) {
     //value: 需要格式化的数据
     //format: 指定格式 yyyy-MM-dd hh:mm:ss
@@ -36,50 +37,67 @@ export function formatDate(value, format) {
 }
 
 export function formatString(value, index) {
-    if(value==null || value==undefined){
+    if (value == null || value == undefined) {
         return value;
     }
-    if(index==null || index == undefined || index<1){
+    if (index == null || index == undefined || index < 1) {
         index = 20;
     }
-    if(value.length>index) {
-        return value.substring(0,index)+"..."
-    }else {
+    if (value.length > index) {
+        return value.substring(0, index) + "..."
+    } else {
         return value;
     }
 }
 
 export function formatPower(value) {
-    if(value==null || value==undefined){
+    if (value == null || value == undefined) {
         return "0 W";
     }
-    if(value>10000) {
-        return (value/1000)+" kW";
-    }else {
-        return value+" W";
+    if (value > 10000) {
+        return (value / 1000) + " kW";
+    } else {
+        return value + " W";
     }
 }
 
 export function formatElectricity(value) {
-    if(value==null || value==undefined){
+    if (value == null || value == undefined) {
         return "0 Wh";
     }
-    if(value>10000) {
-        return (value/1000)+" kWh";
-    }else {
-        return value+" Wh";
+    if (value > 10000) {
+        return (value / 1000) + " kWh";
+    } else {
+        return value + " Wh";
     }
 }
 
 export function formatNumber(value) {
-    if(value==null || value==undefined){
+    if (value == null || value == undefined) {
         return 0;
     }
-    if(value.toString().concat(".")){
+    if (value.toString().concat(".")) {
         let str = value.toString();
         let strArr = str.split(".");
-        return Number(strArr[0]).toLocaleString()+"."+strArr[1];
-    }else {
+        return Number(strArr[0]).toLocaleString() + "." + strArr[1];
+    } else {
         return value.toLocaleString()
+    }
+}
+
+export function formatLocation(locationType, latitude, longitude) {
+    if (latitude == null || latitude == undefined) {
+        return "Unknown";
+    }
+    if (longitude == null || longitude == undefined) {
+        return "Unknown";
+    }
+    if (locationType == null || locationType == undefined) {
+        locationType = 1;
+    }
+    if (locationType == 1) {
+        return latitude + "," + longitude
+    } else {
+        return latitude + "," + longitude
     }
 }

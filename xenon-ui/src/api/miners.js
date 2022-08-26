@@ -47,6 +47,14 @@ export function getReward(data){
     })
 }
 
+export function getMinersByOwnerAddress(data){
+    return request({
+        url: '/device/device/getMinersByOwnerAddress',
+        method: 'post',
+        data:data
+    })
+}
+
 export function applyGameMiner(data){
     return request({
         url: '/device/device/apply',
@@ -62,3 +70,5 @@ export function claimGameMiner(data){
         data:data
     })
 }
+
+

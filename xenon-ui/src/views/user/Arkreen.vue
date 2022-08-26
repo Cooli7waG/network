@@ -2,15 +2,14 @@
   <el-container v-loading="loading" style="height: auto">
     <div class="contentDiv">
       <div class="titleDiv">Arkreen Website</div>
+      <div class="btnDiv">You Account Address:</div>
       <div class="btnDiv">{{ userAddress }}</div>
+      <div v-show="!applyActive" class="btnDiv" style="color: red">{{$t("common.msg.airdropEventNotStart")}}</div>
       <div class="btnDiv">
-        <el-button type="primary" @click="handleApplyGameMiner" :disabled="userAddress==null">Apply Game Miner</el-button>
+        <el-button type="primary" @click="handleApplyGameMiner" :disabled="userAddress==null||!applyActive">Apply Game Miner</el-button>
       </div>
       <div class="btnDiv">
-        <el-button type="success" @click="gotoMinerList" :disabled="userAddress==null">View My Miners</el-button>
-      </div>
-      <div class="btnDiv">
-        <el-button type="success" @click="Logout" :disabled="userAddress==null">Logout</el-button>
+        <el-button type="success" @click="gotoMinerList" :disabled="userAddress==null||!applyActive">View My Miners</el-button>
       </div>
     </div>
   </el-container>
@@ -44,13 +43,15 @@
 </template>
 
 <script>
-import Buffer from "vue-buffer";
 import {applyGameMiner} from "@/api/miners";
+import {getMetaMaskLoginUserAddress, personalSign} from "@/api/metamask_utils";
+
 export default {
   name: 'Arkreen',
   data() {
     return {
       loading : false,
+      applyActive:false,
       labelPosition:'top',
       centerDialogVisible: false,
       userAddress: null,
@@ -74,34 +75,27 @@ export default {
     this.getUserAddress();
   },
   methods: {
-    Logout(){
-      window.localStorage.removeItem('MateMaskAddress')
-      this.$router.push("/");
-    },
     submitForm(formName) {
       this.loading = true;
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          let message = this.minerForm.name + "(" + this.minerForm.email + ") Request Game Miner";
-          console.log("message:"+message)
-          const msg = `0x${Buffer.from(message, 'utf8').toString('hex')}`;
-          const sign = await ethereum.request({
-            method: 'personal_sign',
-            params: [msg, this.userAddress, ''],
-          });
-          console.log("personalSign result:" + sign)
-          this.minerForm.personalSign = sign;
-          applyGameMiner(this.minerForm).then(rsp =>{
-            console.log("applyGameMiner result:"+JSON.stringify(rsp))
-            if(rsp.code == 0){
-              this.centerDialogVisible = false
-              this.loading = false;
-              this.$message.success("apply successful, please wait for the mail patiently");
-            }else {
-              this.loading = false;
-              this.$message.error(rsp.msg);
-            }
-          })
+          try {
+            let message = this.minerForm.name + "(" + this.minerForm.email + ") Request Game Miner";
+            this.minerForm.personalSign = await personalSign(message);;
+            applyGameMiner(this.minerForm).then(rsp =>{
+              console.log("applyGameMiner result:"+JSON.stringify(rsp))
+              if(rsp.code == 0){
+                this.centerDialogVisible = false
+                this.loading = false;
+                this.$message.success("apply successful, please wait for the mail patiently");
+              }else {
+                this.loading = false;
+                this.$message.error(rsp.msg);
+              }
+            })
+          }catch (err){
+            this.$message.error("apply failed, please try again!");
+          }
         } else {
           this.loading = true;
           return false;
@@ -109,21 +103,24 @@ export default {
       });
     },
     handleApplyGameMiner() {
-      this.centerDialogVisible = true
+      if(!this.applyActive){
+        this.$message.error(this.$t("common.msg.airdropEventNotStart"));
+      }else {
+        this.centerDialogVisible = true
+      }
     },
     gotoMinerList() {
       this.$router.push("/account/" + this.userAddress)
     },
-    async getUserAddress() {
-      if (window.ethereum) {
-        const newAccounts = await ethereum.request({
-          method: 'eth_requestAccounts',
-        });
-        this.userAddress = newAccounts[0];
-        console.log("user address:"+this.userAddress)
-      } else {
-        this.$message.error(this.$t('common.msg.metaMaskNotFound'));
+    getUserAddress() {
+      this.userAddress = getMetaMaskLoginUserAddress()
+      if(this.userAddress == undefined || this.userAddress == null){
+        this.$message.error(this.$t('common.msg.notLoginWithMetaMask'));
+        return;
       }
+    },
+    changeApplyActive(){
+      this.applyActive = !this.applyActive;
     }
   },
 }
@@ -132,7 +129,7 @@ export default {
 .contentDiv {
   margin: 0 auto;
   background-color: #e7eaf3;
-  height: 250px;
+  height: 350px;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }
@@ -151,5 +148,6 @@ export default {
   border-top-right-radius: 5px;
   text-align: center;
   line-height: 50px;
+  padding: 0px 15px;
 }
 </style>

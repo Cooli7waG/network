@@ -1,6 +1,6 @@
 <template>
   <el-container style="height: auto">
-    <div class="contentDiv">
+    <div class="contentDiv" v-loading="loading">
       <div class="titleDiv">Arkreen Website</div>
       <div class="btnDiv" style="padding: 10px;">You Game Miner Address:</div>
       <div class="btnDiv" style="padding: 10px;">{{ minerForm.minerAddress }}</div>
@@ -15,11 +15,13 @@
 import {claimGameMiner} from "@/api/miners";
 import Buffer from "vue-buffer";
 import {Base64} from "js-base64";
+import {getMetaMaskLoginUserAddress, personalSign} from "@/api/metamask_utils";
 
 export default {
   name: 'Arkreen',
   data() {
     return {
+      loading:false,
       labelPosition:'top',
       centerDialogVisible: false,
       userAddress:undefined,
@@ -37,42 +39,27 @@ export default {
   },
   methods: {
     handleGetMinerAddress(){
-      console.log("this.$route.params.address:"+this.$route.params.address)
       let str = this.$route.params.address;
       let obj = JSON.parse(Base64.decode(str));
-      console.log("minerAddress:"+obj.minerAddress)
-      console.log("ownerAddress:"+obj.ownerAddress)
       this.minerForm.minerAddress = obj.minerAddress;
       this.minerForm.ownerAddress = obj.ownerAddress;
     },
     async submitForm() {
-      if (window.ethereum) {
-        const newAccounts = await ethereum.request({
-          method: 'eth_requestAccounts',
-        });
-        this.userAddress = newAccounts[0];
-      } else {
-        this.$message.error(this.$t('common.msg.metaMaskNotFound'));
-        return;
+      this.loading = true;
+      try {
+        //let message = this.minerForm.minerAddress + "(" + this.minerForm.userAddress + ") Request Game Miner";
+        //let message = JSON.stringify(this.minerForm);
+        let message = '{"version":1,"ownerAddress":"'+this.minerForm.ownerAddress+'","minerAddress":"'+this.minerForm.minerAddress+'"}'
+        this.minerForm.signature = await personalSign(message);
+        message = '{"version":1,"ownerAddress":"'+this.minerForm.ownerAddress+'","minerAddress":"'+this.minerForm.minerAddress+'","signature":"'+this.minerForm.signature+'"}'
+        claimGameMiner(message).then(rsp => {
+          console.log("claimGameMiner result:" + JSON.stringify(rsp))
+          this.minerForm.signature = undefined;
+        })
+      }catch (err){
+        this.$message.error("claim failed, please try again!");
       }
-      //let message = this.minerForm.minerAddress + "(" + this.minerForm.userAddress + ") Request Game Miner";
-      //let message = JSON.stringify(this.minerForm);
-      let message = '{"version":1,"ownerAddress":"'+this.minerForm.ownerAddress+'","minerAddress":"'+this.minerForm.minerAddress+'"}'
-      console.log("message:" + message)
-      console.log("this.userAddress:" + this.userAddress)
-      const msg = `0x${Buffer.from(message, 'utf8').toString('hex')}`;
-      const sign = await ethereum.request({
-        method: 'personal_sign',
-        params: [msg, this.userAddress, ''],
-      });
-      //
-      console.log("personalSign result:" + sign)
-      this.minerForm.signature = sign;
-      message = '{"version":1,"ownerAddress":"'+this.minerForm.ownerAddress+'","minerAddress":"'+this.minerForm.minerAddress+'","signature":"'+this.minerForm.signature+'"}'
-      claimGameMiner(message).then(rsp => {
-        console.log("claimGameMiner result:" + JSON.stringify(rsp))
-        this.minerForm.signature = undefined;
-      })
+      this.loading = false;
     },
     handleClaimGameMiner() {
       this.$confirm('Click "OK" to confirm the receipt', 'Tips', {
@@ -85,16 +72,11 @@ export default {
 
       });
     },
-    async getUserAddress() {
-      if (window.ethereum) {
-        const newAccounts = await ethereum.request({
-          method: 'eth_requestAccounts',
-        });
-        this.userAddress = newAccounts[0];
-        //
-        console.log("user address:"+this.userAddress)
-      } else {
-        this.$message.error(this.$t('common.msg.metaMaskNotFound'));
+    getUserAddress() {
+      this.userAddress = getMetaMaskLoginUserAddress()
+      if(this.userAddress == undefined || this.userAddress == null){
+        this.$message.error(this.$t('common.msg.notLoginWithMetaMask'));
+        return;
       }
     }
   },

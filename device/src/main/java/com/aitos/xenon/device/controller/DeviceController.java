@@ -142,6 +142,14 @@ public class DeviceController {
         return Result.ok();
     }
 
+    @PostMapping("/getMinersByOwnerAddress")
+    public Result<Page<DeviceVo>> getMinersByOwnerAddress(@RequestBody DeviceSearchDto deviceSearchDto){
+        log.info("getMinersByOwnerAddress:{}",JSON.toJSONString(deviceSearchDto));
+        IPage<DeviceVo> listPage= deviceService.getMinersByOwnerAddress(deviceSearchDto);
+        Page<DeviceVo> deviceVoPage=new Page<DeviceVo>(listPage.getTotal(),listPage.getRecords());
+        return Result.ok(deviceVoPage);
+    }
+
     @PostMapping("/apply")
     public Result applyGameMiner(@RequestBody ApplyGameMiner applyGameMiner){
         log.info("applyGameMiner:{}",JSON.toJSONString(applyGameMiner));

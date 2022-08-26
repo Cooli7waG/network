@@ -29,4 +29,12 @@ public interface DeviceMapper {
     void terminate(DeviceTerminateMinerDto deviceTerminateMinerDto);
 
     DeviceVo queryByMiner(@Param("minerAddress")String minerAddress);
+
+    /**
+     * 根据owner地址查询miner列表
+     * @param page
+     * @param queryParams
+     * @return
+     */
+    IPage<DeviceVo> getMinersByOwnerAddress(Page<DeviceVo> page, @Param("queryParams")DeviceSearchDto queryParams);
 }

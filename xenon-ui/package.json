@@ -9,6 +9,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@metamask/onboarding": "^1.0.1",
     "@noble/ed25519": "^1.6.1",
     "axios": "^0.27.2",
     "bignumber.js": "^9.0.2",
