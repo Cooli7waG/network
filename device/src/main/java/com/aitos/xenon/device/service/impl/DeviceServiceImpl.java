@@ -1,6 +1,8 @@
 package com.aitos.xenon.device.service.impl;
 
 import com.aitos.common.crypto.ecdsa.Ecdsa;
+import com.aitos.message.push.api.RemotePushService;
+import com.aitos.message.push.api.domain.dto.PushMessageDto;
 import com.aitos.xenon.account.api.RemoteAccountService;
 import com.aitos.xenon.account.api.RemoteTransactionService;
 import com.aitos.xenon.account.api.domain.dto.AccountRegisterDto;
@@ -34,9 +36,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.tomcat.util.buf.HexUtils;
-import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Base64Utils;
@@ -68,6 +69,10 @@ public class DeviceServiceImpl implements DeviceService {
     private RemoteDeviceService remoteDeviceService;
     @Autowired
     private RemoteGameMinerService remoteGameMinerService;
+    @Autowired
+    private RemotePushService remotePushService;
+    @Value("${xenon.web.claim}")
+    private String webClaimUrl;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -293,7 +298,20 @@ public class DeviceServiceImpl implements DeviceService {
             hashMap.put("minerAddress",minerAddress);
             hashMap.put("ownerAddress",ownerAddress);
             //log.info("领取地址：http://localhost:8080/claim/"+ Base64Utils.encodeToString(JSON.toJSONString(hashMap).getBytes(StandardCharsets.UTF_8)));
-            log.info("领取地址：http://localhost:8080/claim/"+ Base64Utils.encodeToString(JSON.toJSONString(hashMap).getBytes(StandardCharsets.UTF_8)));
+            String claimGameMinerUrl =  webClaimUrl + Base64Utils.encodeToString(JSON.toJSONString(hashMap).getBytes(StandardCharsets.UTF_8));
+            log.info("领取地址：{}",claimGameMinerUrl);
+            try{
+                PushMessageDto pushMessageDto = new PushMessageDto();
+                pushMessageDto.setTitile("You Game Miner Apply Result");
+                pushMessageDto.setMessageType(1);
+                pushMessageDto.setBadge(1);
+                pushMessageDto.setTo(applyGameMiner.getEmail());
+                pushMessageDto.setContent("Claim Url:"+claimGameMinerUrl);
+                Result result = remotePushService.pushMail(pushMessageDto);
+                log.info("邮件发送结果:{}",JSON.toJSONString(result));
+            }catch (Exception e){
+                log.error("邮件发送失败！");
+            }
             //
             return ApiStatus.SUCCESS.getMsg();
         }catch (Exception e){
