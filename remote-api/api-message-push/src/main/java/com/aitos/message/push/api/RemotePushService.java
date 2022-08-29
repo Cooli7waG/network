@@ -6,9 +6,8 @@ import com.aitos.xenon.core.model.Result;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 
-@FeignClient(value = "wake-push")
+@FeignClient(value = "message-push")
 public interface RemotePushService {
     /**
      * 发送邮件

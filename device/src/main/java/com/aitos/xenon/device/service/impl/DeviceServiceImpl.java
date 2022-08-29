@@ -302,11 +302,11 @@ public class DeviceServiceImpl implements DeviceService {
             log.info("领取地址：{}",claimGameMinerUrl);
             try{
                 PushMessageDto pushMessageDto = new PushMessageDto();
+                pushMessageDto.setTemplateId(1L);
                 pushMessageDto.setTitile("You Game Miner Apply Result");
-                pushMessageDto.setMessageType(1);
-                pushMessageDto.setBadge(1);
                 pushMessageDto.setTo(applyGameMiner.getEmail());
-                pushMessageDto.setContent("Claim Url:"+claimGameMinerUrl);
+                HashMap<String,String> customMap=new HashMap<>();
+                customMap.put("url",claimGameMinerUrl);
                 Result result = remotePushService.pushMail(pushMessageDto);
                 log.info("邮件发送结果:{}",JSON.toJSONString(result));
             }catch (Exception e){
