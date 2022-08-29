@@ -81,6 +81,9 @@ public enum ApiStatus implements ConstantsCode {
     BUSINESS_POGG_CHALLENGE_EXPIRED(4103,"pogg challenge expired"),
 
     BUSINESS_POGG_CHALLENGE_NO_HIT(4104,"pogg challenge no hit"),
+
+    // 空投相关
+    BUSINESS_AIRDROP_NOT_ACTIVE(6001,"airdrop not active"),
    ;
 
 

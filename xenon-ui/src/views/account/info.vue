@@ -50,7 +50,7 @@
       <el-table v-loading="minerLoading" :data="minerData" border style="width: 100%;margin-top: 5px">
         <el-table-column prop="address" label="Miner Address" width="220" :show-overflow-tooltip=true>
           <template v-slot="scope">
-            {{scope.row.address}}
+            <router-link :to="'/miner/'+scope.row.address">{{scope.row.address}}</router-link>
           </template>
         </el-table-column>
         <el-table-column prop="minerType" label="Miner Type">

@@ -47,6 +47,13 @@ export function getReward(data){
     })
 }
 
+export function getApplyActiveInfo(){
+    return request({
+        url: '/device/device/applyAirdrop',
+        method: 'post'
+    })
+}
+
 export function getMinersByOwnerAddress(data){
     return request({
         url: '/device/device/getMinersByOwnerAddress',

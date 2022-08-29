@@ -4,22 +4,28 @@
       <div class="titleDiv">Arkreen Website</div>
       <div class="btnDiv">You Account Address:</div>
       <div class="btnDiv">{{ userAddress }}</div>
-      <div v-show="!applyActive" class="btnDiv" style="color: red">{{$t("common.msg.airdropEventNotStart")}}</div>
+      <div v-show="!applyActive" class="btnDiv" style="color: red">{{ $t("common.msg.airdropEventNotStart") }}</div>
       <div class="btnDiv">
-        <el-button type="primary" @click="handleApplyGameMiner" :disabled="userAddress==null||!applyActive">Apply Game Miner</el-button>
+        <el-button type="primary" @click="handleApplyGameMiner" :disabled="userAddress==null||!applyActive">Apply Game
+          Miner
+        </el-button>
       </div>
       <div class="btnDiv">
-        <el-button type="success" @click="gotoMinerList" :disabled="userAddress==null||!applyActive">View My Miners</el-button>
+        <el-button type="success" @click="gotoMinerList" :disabled="userAddress==null||!applyActive">View My Miners
+        </el-button>
       </div>
     </div>
   </el-container>
-  <div v-loading="loading" v-show="centerDialogVisible" class="el-dialog__wrapper" style="z-index: 9999;background-color: rgba(0,0,0,0.5)">
-    <div role="dialog" aria-modal="true" aria-label="提示" class="el-dialog el-dialog--center" style="margin-top: 15vh; width: 30%;">
+  <div v-loading="loading" v-show="centerDialogVisible" class="el-dialog__wrapper"
+       style="z-index: 9999;background-color: rgba(0,0,0,0.5)">
+    <div role="dialog" aria-modal="true" aria-label="提示" class="el-dialog el-dialog--center"
+         style="margin-top: 15vh; width: 30%;">
       <div class="el-dialog__header">
         <span class="el-dialog__title">Apply Game Miner</span>
       </div>
       <div class="el-dialog__body">
-        <el-form :model="minerForm" :rules="rules" size="medium" :label-position="labelPosition" ref="minerForm" label-width="100px">
+        <el-form :model="minerForm" :rules="rules" size="medium" :label-position="labelPosition" ref="minerForm"
+                 label-width="100px">
           <el-form-item prop="name">
             <el-input v-model="minerForm.name" placeholder="Please enter the username"></el-input>
           </el-form-item>
@@ -43,36 +49,38 @@
 </template>
 
 <script>
-import {applyGameMiner} from "@/api/miners";
-import {getMetaMaskLoginUserAddress, personalEcRecover, personalSign} from "@/api/metamask_utils";
+import {applyGameMiner,getApplyActiveInfo} from "@/api/miners";
+import {getMetaMaskLoginUserAddress, personalSign} from "@/api/metamask_utils";
 
 export default {
   name: 'Arkreen',
   data() {
     return {
-      loading : false,
-      applyActive:true,
-      labelPosition:'top',
+      loading: false,
+      applyActive: false,
+      applyPersonalSign: false,
+      labelPosition: 'top',
       centerDialogVisible: false,
       userAddress: null,
       minerForm: {
-        name: 'test',
-        email: 'test@qq.com',
-        owner:undefined,
-        personalSign:undefined
+        name: undefined,
+        email: undefined,
+        owner: undefined,
+        personalSign: undefined
       },
       rules: {
         name: [
-          { required: true, message: 'Please enter the user name', trigger: 'blur' }
+          {required: true, message: 'Please enter the user name', trigger: 'blur'}
         ],
         email: [
-          { required: true, trigger: "blur", message: "Please enter your email" },
-          { type: 'email', message: 'Please enter the correct email address', trigger: ['blur', 'change'] }
+          {required: true, trigger: "blur", message: "Please enter your email"},
+          {type: 'email', message: 'Please enter the correct email address', trigger: ['blur', 'change']}
         ]
       },
     };
   },
   created() {
+    this.handleGetApplyActiveInfo();
     this.getUserAddress();
   },
   methods: {
@@ -82,26 +90,24 @@ export default {
         if (valid) {
           try {
             this.minerForm.owner = this.userAddress;
-            let message = JSON.stringify(this.minerForm);
-            //let message = "";
-            this.minerForm.personalSign = await personalSign(message);
+            if(this.applyPersonalSign){
+              let message = JSON.stringify(this.minerForm);
+              this.minerForm.personalSign = await personalSign(message);
+            }
             //
-            //let personalEcRecoverStr = await personalEcRecover(message, this.minerForm.personalSign);
-            //console.log("personalEcRecoverStr:"+JSON.stringify(personalEcRecoverStr))
-            //
-            applyGameMiner(JSON.stringify(this.minerForm)).then(rsp =>{
-              console.log("applyGameMiner result:"+JSON.stringify(rsp))
-              if(rsp.code == 0){
+            applyGameMiner(JSON.stringify(this.minerForm)).then(rsp => {
+              console.log("applyGameMiner result:" + JSON.stringify(rsp))
+              if (rsp.code == 0) {
                 this.centerDialogVisible = false
                 this.loading = false;
                 this.$message.success("apply successful, please wait for the mail patiently");
-              }else {
+              } else {
                 this.loading = false;
                 this.$message.error(rsp.msg);
               }
             })
             this.minerForm.personalSign = undefined;
-          }catch (err){
+          } catch (err) {
             this.$message.error("apply failed, please try again!");
           }
         } else {
@@ -111,9 +117,9 @@ export default {
       });
     },
     handleApplyGameMiner() {
-      if(!this.applyActive){
+      if (!this.applyActive) {
         this.$message.error(this.$t("common.msg.airdropEventNotStart"));
-      }else {
+      } else {
         this.centerDialogVisible = true
       }
     },
@@ -122,14 +128,26 @@ export default {
     },
     getUserAddress() {
       this.userAddress = getMetaMaskLoginUserAddress()
-      if(this.userAddress == undefined || this.userAddress == null){
+      if (this.userAddress == undefined || this.userAddress == null) {
         this.$message.error(this.$t('common.msg.notLoginWithMetaMask'));
         return;
       }
     },
-    changeApplyActive(){
+    changeApplyActive() {
       this.applyActive = !this.applyActive;
-    }
+    },
+    handleGetApplyActiveInfo(){
+      getApplyActiveInfo().then(rsp => {
+        console.log("applyGameMiner result:" + JSON.stringify(rsp))
+        if (rsp.code == 0) {
+          this.loading = false;
+          this.applyActive =  rsp.data.applyActive;
+          this.applyPersonalSign = rsp.data.applyActive;
+        } else {
+          this.loading = false;
+        }
+      })
+    },
   },
 }
 </script>

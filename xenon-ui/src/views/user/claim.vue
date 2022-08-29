@@ -95,6 +95,7 @@ export default {
   height: 250px;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
+  width: 45%;
 }
 
 .btnDiv {

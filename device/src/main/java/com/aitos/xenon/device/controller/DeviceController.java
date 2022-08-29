@@ -22,6 +22,8 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 @RestController
 @RequestMapping("/device")
 @Slf4j
@@ -33,6 +35,10 @@ public class DeviceController {
 
     @Value("${foundation.publicKey}")
     private String foundationPublicKey;
+    @Value("${xenon.airdrop.apply.active}")
+    private Boolean applyActive;
+    @Value("${xenon.airdrop.apply.personalSign}")
+    private Boolean applyPersonalSign;
 
     @PostMapping("/register")
     public Result register(@RequestBody DeviceRegisterDto deviceRegister){
@@ -152,6 +158,9 @@ public class DeviceController {
 
     @PostMapping("/apply")
     public Result applyGameMiner(@RequestBody String applyGameMiner){
+        if(!applyActive){
+            return Result.failed(ApiStatus.BUSINESS_AIRDROP_NOT_ACTIVE.getMsg());
+        }
         log.info("applyGameMiner:{}",applyGameMiner);
         String result = deviceService.applyGameMiner(applyGameMiner);
         return Result.ok(result);
@@ -162,5 +171,13 @@ public class DeviceController {
         log.info("DeviceController.claimGameMiner:{}",claimGameMiner);
         String result = deviceService.claimGameMiner(claimGameMiner);
         return Result.ok(result);
+    }
+
+    @PostMapping("/applyAirdrop")
+    public Result getApplyActiveInfo(){
+        HashMap<String,Boolean> map=new HashMap();
+        map.put("applyActive",applyActive);
+        map.put("applyPersonalSign",applyPersonalSign);
+        return Result.ok(map);
     }
 }

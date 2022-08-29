@@ -73,6 +73,8 @@ public class DeviceServiceImpl implements DeviceService {
     private RemotePushService remotePushService;
     @Value("${xenon.web.claim}")
     private String webClaimUrl;
+    @Value("${xenon.airdrop.apply.personalSign}")
+    private Boolean applyPersonalSign;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -214,20 +216,22 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public String applyGameMiner(String str) {
         try{
-            //
             ApplyGameMiner applyGameMiner = JSON.parseObject(str, ApplyGameMiner.class);
-            //恢复owner公钥
-            JSONObject obj = JSON.parseObject(str, Feature.OrderedField);
-            obj.remove("personalSign");
-            //
-            byte[] message = MetaMaskUtils.getMessage(obj.toJSONString());
-            byte[] srcPublicKey = Ecdsa.getPublicKey(message,applyGameMiner.getPersonalSign());
-            String ownerAddress = Ecdsa.getAddress(srcPublicKey);
-            log.info("applyGameMiner Recover ownerAddress:{}",ownerAddress);
-            // 判断恢复的owner地址与报文内的是否一致
-            if(!ownerAddress.equalsIgnoreCase(applyGameMiner.getOwner())){
-                log.info("remoteGameMinerService.register error: recover owner address not equals owner address");
-                throw new MinerApplyException("miner apply failed");
+            // 当需要签名校验时进行验证
+            if(applyPersonalSign){
+                //恢复owner公钥
+                JSONObject obj = JSON.parseObject(str, Feature.OrderedField);
+                obj.remove("personalSign");
+                //
+                byte[] message = MetaMaskUtils.getMessage(obj.toJSONString());
+                byte[] srcPublicKey = Ecdsa.getPublicKey(message,applyGameMiner.getPersonalSign());
+                String ownerAddress = Ecdsa.getAddress(srcPublicKey);
+                log.info("applyGameMiner Recover ownerAddress:{}",ownerAddress);
+                // 判断恢复的owner地址与报文内的是否一致
+                if(!ownerAddress.equalsIgnoreCase(applyGameMiner.getOwner())){
+                    log.info("remoteGameMinerService.register error: recover owner address not equals owner address");
+                    throw new MinerApplyException("miner apply failed");
+                }
             }
             // 调用game miner服务生成miner地址进行预注册
             Result<String> gameMinerResult = remoteGameMinerService.register();
@@ -261,7 +265,7 @@ public class DeviceServiceImpl implements DeviceService {
             //TODO 调用Miner AirDrop，部分数值暂时写死
             AirDropDto airDropDto = new AirDropDto();
             airDropDto.setMinerAddress(minerAddress);
-            airDropDto.setOwnerAddress(ownerAddress);
+            airDropDto.setOwnerAddress(applyGameMiner.getOwner());
             airDropDto.setVersion(1);
             // 30天
             Result<Long> blockHeight = remoteBlockService.getBlockHeight();
@@ -296,7 +300,7 @@ public class DeviceServiceImpl implements DeviceService {
             //TODO 发送邮件等通知owner
             HashMap<String,String> hashMap = new HashMap();
             hashMap.put("minerAddress",minerAddress);
-            hashMap.put("ownerAddress",ownerAddress);
+            hashMap.put("ownerAddress",applyGameMiner.getOwner());
             //log.info("领取地址：http://localhost:8080/claim/"+ Base64Utils.encodeToString(JSON.toJSONString(hashMap).getBytes(StandardCharsets.UTF_8)));
             String claimGameMinerUrl =  webClaimUrl + Base64Utils.encodeToString(JSON.toJSONString(hashMap).getBytes(StandardCharsets.UTF_8));
             log.info("领取地址：{}",claimGameMinerUrl);
@@ -305,7 +309,8 @@ public class DeviceServiceImpl implements DeviceService {
                 pushMessageDto.setTemplateId(1L);
                 pushMessageDto.setTitile("You Game Miner Apply Result");
                 pushMessageDto.setTo(applyGameMiner.getEmail());
-                HashMap<String,String> customMap=new HashMap<>();
+                HashMap<String,Object> customMap=new HashMap<>();
+                pushMessageDto.setCustomMap(customMap);
                 customMap.put("url",claimGameMinerUrl);
                 Result result = remotePushService.pushMail(pushMessageDto);
                 log.info("邮件发送结果:{}",JSON.toJSONString(result));
