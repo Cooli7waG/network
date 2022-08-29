@@ -11,6 +11,8 @@ import com.aitos.xenon.account.api.domain.vo.AccountVo;
 import com.aitos.xenon.block.api.RemoteBlockService;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
+import com.aitos.xenon.core.constant.RandomLocation;
+import com.aitos.xenon.core.constant.RandomLocationUtils;
 import com.aitos.xenon.core.exceptions.ServiceException;
 import com.aitos.xenon.core.exceptions.account.OwnerAccountNotExistException;
 import com.aitos.xenon.core.exceptions.device.DeviceExistedException;
@@ -270,9 +272,14 @@ public class DeviceServiceImpl implements DeviceService {
             // 30天
             Result<Long> blockHeight = remoteBlockService.getBlockHeight();
             airDropDto.setExpiration(blockHeight.getData()+(30*24*60));
-            //TODO 来源？
+            // 随机地理位置
             DeviceLocationDto deviceLocationDto = new DeviceLocationDto();
+            RandomLocation randomLocation = RandomLocationUtils.getRandomLocation();
+            deviceLocationDto.setLocationType(0);
+            deviceLocationDto.setLatitude(randomLocation.getLatitude());
+            deviceLocationDto.setLongitude(randomLocation.getLongitude());
             airDropDto.setLocation(deviceLocationDto);
+            log.info("DeviceLocationDto:{}",JSON.toJSONString(deviceLocationDto));
             //TODO 这里填写啥？
             DeviceInfoDto deviceInfoDto = new DeviceInfoDto();
             deviceInfoDto.setAddress(minerAddress);
