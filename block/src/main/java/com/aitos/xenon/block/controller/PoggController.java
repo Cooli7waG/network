@@ -54,7 +54,7 @@ public class PoggController {
         String data=paramsObject.toJSONString();
 
         //验证签名
-        if(!Ecdsa.verifyByAddress(address,data.getBytes(),signature, DataCoder.BASE58)){
+        if(!Ecdsa.verifyByAddress(address,data,signature, DataCoder.BASE58)){
             return Result.failed(ApiStatus.BUSINESS_POGG_REPORT_SIGN_ERROR);
         }
 

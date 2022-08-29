@@ -184,8 +184,8 @@ public class PoggServiceImpl implements PoggService {
         //奖励资格获得1次奖励
         int perRewardEligibilityBlocks = systemConfig.getPerRewardBlocks();
 
-        byte[] commitPrivateKeyBytes = Hex.decode(commitPrivatekey);
-        byte[] minerAddressByte = Hex.decode(minerAddress);
+        byte[] commitPrivateKeyBytes = Hex.decode(commitPrivatekey.replaceAll("(?i)0x",""));
+        byte[] minerAddressByte = Hex.decode(minerAddress.replaceAll("(?i)0x",""));
         byte[] ecdhBytes = new byte[commitPrivateKeyBytes.length + minerAddressByte.length];
         System.arraycopy(commitPrivateKeyBytes, 0, ecdhBytes, 0, commitPrivateKeyBytes.length);
         System.arraycopy(minerAddressByte, 0, ecdhBytes, commitPrivateKeyBytes.length - 1, minerAddressByte.length);
