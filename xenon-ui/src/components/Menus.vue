@@ -24,7 +24,8 @@
         <ul v-else class="box">
           <li class="user">
             <a style="cursor: pointer;">
-              <img src="@/assets/metamask-logo.png" style="width: 25px"><span @click="loginApp">{{ formatString(userAddress) }}</span>
+              <!--<img src="@/assets/metamask-logo.png" style="width: 25px">-->
+              <span @click="loginApp">{{ formatString(userAddress) }}</span>
             </a>
             <ul class="down-menu">
               <li @click="gotoBrowser()">Browser</li>

@@ -90,6 +90,7 @@ export default {
         if (valid) {
           try {
             this.minerForm.owner = this.userAddress;
+            console.log("this.applyPersonalSign:"+this.applyPersonalSign)
             if(this.applyPersonalSign){
               let message = JSON.stringify(this.minerForm);
               this.minerForm.personalSign = await personalSign(message);
@@ -142,7 +143,7 @@ export default {
         if (rsp.code == 0) {
           this.loading = false;
           this.applyActive =  rsp.data.applyActive;
-          this.applyPersonalSign = rsp.data.applyActive;
+          this.applyPersonalSign = rsp.data.applyPersonalSign;
         } else {
           this.loading = false;
         }
