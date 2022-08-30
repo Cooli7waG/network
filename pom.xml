@@ -163,7 +163,7 @@
             <dependency>
                 <groupId>com.aitos</groupId>
                 <artifactId>aitos-common-crypto</artifactId>
-                <version>0.0.10</version>
+                <version>0.0.11</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
