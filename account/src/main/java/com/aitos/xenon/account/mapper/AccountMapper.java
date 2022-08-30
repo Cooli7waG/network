@@ -26,5 +26,5 @@ public interface AccountMapper {
 
     List<Account> findListByIds(@Param("idsList")List<Long> idsList);
 
-    void updateEarning(@Param("rewards")List<PoggRewardDetailDto> rewards, LocalDateTime updateTime);
+    void updateEarning(@Param("rewards")List<PoggRewardDetailDto> rewards,@Param("updateTime") LocalDateTime updateTime);
 }

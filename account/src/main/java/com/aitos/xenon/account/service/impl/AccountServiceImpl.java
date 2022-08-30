@@ -47,9 +47,6 @@ public class AccountServiceImpl implements AccountService {
             Account account = accountMapper.findByAddress(address);
             if (account == null || account.getAccountType().equals(BusinessConstants.AccountType.MINER)) {
                 return null;
-            } else if (account.getAccountType() == BusinessConstants.AccountType.NETWORK) {
-                BigInteger balance = erc20Service._foundations_initial_supply().send();
-                account.setBalance(balance.toString());
             } else {
                 BigInteger blance = erc20Service.balanceOf(account.getAddress()).send();
                 account.setBalance(blance.toString());
@@ -69,10 +66,7 @@ public class AccountServiceImpl implements AccountService {
             List<String> addressList = pageResult.getRecords().stream().map(accountVo -> accountVo.getAddress()).collect(Collectors.toList());
             List<BigInteger> list = erc20Service.balanceOf_multi(addressList).send();
             for (AccountVo accountVo : pageResult.getRecords()) {
-                if (accountVo.getAccountType() == BusinessConstants.AccountType.NETWORK) {
-                    BigInteger balance = erc20Service._foundations_initial_supply().send();
-                    accountVo.setBalance(balance.toString());
-                }else if (accountVo.getAccountType() == BusinessConstants.AccountType.WALLET) {
+                if (accountVo.getAccountType() != BusinessConstants.AccountType.MINER) {
                     for (int i = 0; i < addressList.size(); i++) {
                         String publickey = addressList.get(i);
                         if (publickey.equals(accountVo.getAddress())) {
