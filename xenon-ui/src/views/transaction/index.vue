@@ -54,7 +54,7 @@
         </el-table-column>
         <el-table-column prop="miner" label="Owner Address" width="220" :show-overflow-tooltip=true>
           <template #default="scope">
-            <router-link :to="'/caaount/'+scope.row.owner">{{scope.row.owner }}</router-link>
+            <router-link :to="'/account/'+scope.row.owner">{{scope.row.owner }}</router-link>
           </template>
         </el-table-column>
         <el-table-column prop="txType" :label="$t('txs.table.txType')" width="180">
@@ -108,7 +108,6 @@ export default {
       },
       tableList: []
     })
-    const router = useRouter()
     const route = useRoute()
 
     const pageSizeChange = (pageSize) => {
@@ -136,7 +135,7 @@ export default {
       } else if (data.query.select == "2") {
         params['height'] = data.query.keyword
       } else if (data.query.select == "3") {
-        params['address'] = data.query.keyword
+        params['fromAddress'] = data.query.keyword
       }
       transactionList(params).then((result) => {
         data.query.page.total = result.data.total

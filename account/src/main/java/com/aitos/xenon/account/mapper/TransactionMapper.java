@@ -1,5 +1,6 @@
 package com.aitos.xenon.account.mapper;
 
+import com.aitos.xenon.account.api.domain.dto.TransactionSearchDto;
 import com.aitos.xenon.account.domain.PoggReportMiner;
 import com.aitos.xenon.account.domain.PoggRewardMiner;
 import com.aitos.xenon.account.domain.Transaction;
@@ -21,7 +22,7 @@ public interface TransactionMapper {
 
     IPage<Transaction> listOld(Page<Transaction> page, @Param("queryParams") QueryParams queryParams);
 
-    IPage<TransactionReport> list(Page<TransactionReport> page, @Param("queryParams") QueryParams queryParams);
+    IPage<TransactionReport> list(Page<TransactionReport> page, @Param("queryParams") TransactionSearchDto queryParams);
 
     /**
      * 保存Report交易
