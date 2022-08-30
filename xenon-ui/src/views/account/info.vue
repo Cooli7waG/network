@@ -15,11 +15,11 @@
     </el-row>
     <el-row :gutter="20" class="info-box">
       <el-col :span="4">{{$t('accountinfo.info.earningMint')}}:</el-col>
-      <el-col :span="16">{{account.earningMint}}</el-col>
+      <el-col :span="16">{{formatToken(account.earningMint)}}</el-col>
     </el-row>
     <el-row :gutter="20" class="info-box">
       <el-col :span="4">{{$t('accountinfo.info.earningService')}}:</el-col>
-      <el-col :span="16">{{account.earningService}}</el-col>
+      <el-col :span="16">{{formatToken(account.earningService)}}</el-col>
     </el-row>
     <el-row :gutter="20" class="info-box">
       <el-col :span="4">{{$t('accountinfo.info.amountMiner')}}:</el-col>
@@ -95,7 +95,7 @@
 
 <script>
 import {findByAddress} from '@/api/account.js'
-import {formatDate,formatPower,formatElectricity,formatLocation} from "@/utils/data_format";
+import {formatDate,formatPower,formatElectricity,formatLocation,formatToken,getTokenFixed} from "@/utils/data_format";
 import {toEther} from '@/utils/utils.js'
 import {getMinersByOwnerAddress} from "@/api/miners";
 import Constant from '@/utils/constant.js'
@@ -144,7 +144,8 @@ export default {
         if(result.data==null){
           this.noData=true
         }else{
-          this.account.balance=toEther(this.account.balance,8)
+          const fixed = getTokenFixed(this.account.balance);
+          this.account.balance=toEther(this.account.balance,fixed)
           this.isShow = true;
           this.handleGetMiners();
         }
@@ -171,6 +172,12 @@ export default {
     },
     formatLocation(locationType,latitude,longitude){
       return formatLocation(locationType,latitude,longitude)
+    },
+    formatToken(value) {
+      return formatToken(value)
+    },
+    getTokenFixed(value) {
+      return getTokenFixed(value)
     }
   },
   created() {

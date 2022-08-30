@@ -38,16 +38,16 @@
     </el-row>
     <el-row :gutter="20">
       <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.earningMint') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ data.device.earningMint }}</el-col>
+      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ formatToken(data.device.earningMint) }}</el-col>
     </el-row>
     <el-row :gutter="20">
       <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.earningService') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ data.device.earningService }}</el-col>
+      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ formatToken(data.device.earningService) }}</el-col>
     </el-row>
 
     <el-row :gutter="20">
       <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.power') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ formatPower(data.device.power) }}</el-col>
+      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ data.device.power/1000 }} kW</el-col>
     </el-row>
 
     <el-row :gutter="20">
@@ -117,7 +117,7 @@
           </el-table-column>
           <el-table-column prop="amount" label="Amount" width="180">
             <template #default="scope">
-              {{formatNumber((scope.row.amount).toFixed(2))}}
+              {{formatToken(scope.row.amount)}}
             </template>
           </el-table-column>
           <el-table-column prop="rewardPercent" label="Reward Percent">
@@ -145,12 +145,12 @@
 </template>
 
 <script>
-import "@/assets/css/iconfont_bak.css"
+import "@/assets/css/iconfont.css"
 import Constant from '@/utils/constant.js'
 import {queryByMiner,getReport,getReward} from '@/api/miners.js'
 import {onMounted, reactive} from "vue";
 import {useRoute} from 'vue-router'
-import {formatDate,formatPower,formatNumber,formatElectricity} from "@/utils/data_format";
+import {formatDate,formatPower,formatNumber,formatElectricity,formatToken} from "@/utils/data_format";
 
 export default {
   components: {},
@@ -255,6 +255,9 @@ export default {
     formatNumber() {
       return formatNumber
     },
+    formatToken() {
+      return formatToken
+    },
     Constant() {
       return Constant
     }
@@ -292,7 +295,6 @@ export default {
       });
     }
     onMounted(() => {
-      console.log("onMounted")
       data.query.minerAddress = route.params.address;
       data.page.address = route.params.address;
       loadQueryByMiner()
