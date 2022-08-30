@@ -38,9 +38,21 @@
             {{Constant.AccountType[scope.row.accountType]}}
           </template>
         </el-table-column>
-        <el-table-column prop="balance" :label="$t('account.table.balance')" align="right"/>
-        <el-table-column prop="earningMint" :label="$t('account.table.earningMint')" />
-        <el-table-column prop="earningService" :label="$t('account.table.earningService')" />
+        <el-table-column prop="balance" :label="$t('account.table.balance')" align="right">
+          <template #default="scope">
+            {{scope.row.balance}}
+          </template>
+        </el-table-column>
+        <el-table-column prop="earningMint" :label="$t('account.table.earningMint')" >
+          <template #default="scope">
+            {{formatToken(scope.row.earningMint)}}
+          </template>
+        </el-table-column>
+        <el-table-column prop="earningService" :label="$t('account.table.earningService')">
+          <template #default="scope">
+            {{formatToken(scope.row.earningService)}}
+          </template>
+        </el-table-column>
         <el-table-column prop="amountMiner" :label="$t('account.table.amountMiner')">
           <template #default="scope">
             <router-link v-if="scope.row.accountType==1&&scope.row.amountMiner>0" :to="{name:'Miners',params:{ownerAddress:scope.row.address}}">{{scope.row.amountMiner}}</router-link>
@@ -59,7 +71,7 @@
 </template>
 
 <script>
-import { formatDate,formatString } from '@/utils/data_format.js'
+import { formatDate,formatString,formatToken,getTokenFixed } from '@/utils/data_format.js'
 import {list} from '@/api/account.js'
 import {onMounted, reactive} from "vue";
 import { useRouter } from 'vue-router'
@@ -75,6 +87,12 @@ export default {
     },
     formatString() {
       return formatString
+    },
+    formatToken() {
+      return formatToken
+    },
+    getTokenFixed() {
+      return getTokenFixed
     },
     Constant() {
       return Constant
@@ -124,7 +142,8 @@ export default {
 
           const list=[]
           result.data.items.forEach(item=>{
-            item.balance=toEther(item.balance,8)
+            const fixed = getTokenFixed(item.balance);
+            item.balance=item.balance==null?0:toEther(item.balance,fixed)
             list.push(item)
           })
           data.tableList=list

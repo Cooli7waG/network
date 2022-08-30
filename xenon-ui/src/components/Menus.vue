@@ -18,25 +18,72 @@
     </el-col>
     <el-col :span="4" class="login">
       <div style="float: right;margin-right: 10px" v-show="isShow">
-        <div v-if="userAddress==undefined" style="line-height: 50px">
-          <el-button type="text" style="color: #FFFFFF" @click="loginApp">{{ $t('menus.login') }}</el-button>
+        <div style="line-height: 50px">
+          <el-button type="text" style="color: #FFFFFF" @click="openDrawer">
+            <i class="iconfont icon-qianbao wallet-img"/>
+          </el-button>
         </div>
-        <ul v-else class="box">
-          <li class="user">
-            <a style="cursor: pointer;">
-              <!--<img src="@/assets/metamask-logo.png" style="width: 25px">-->
-              <span @click="loginApp">{{ formatString(userAddress) }}</span>
-            </a>
-            <ul class="down-menu">
-              <li @click="gotoBrowser()">Browser</li>
-              <li @click="gotoMyMiner()">My Miners</li>
-              <li @click="Logout()">Logout</li>
-            </ul>
-          </li>
-        </ul>
       </div>
     </el-col>
   </el-row>
+  <div v-show="drawer" tabindex="-1" class="el-drawer__wrapper" style="z-index: 9999;">
+    <div role="document" tabindex="-1" class="el-drawer__container el-drawer__open" @click="closeDrawer">
+      <div tabindex="-1" class="el-drawer rtl" style="width: 350px;right: 0;margin-top: 58px" @click="stopPropagation">
+        <header id="el-drawer__title" class="el-drawer__header">
+          <ul class="box" style="text-align: left">
+            <li class="user">
+              <!--<a style="cursor: pointer">My Wallet ⏷</a>-->
+              <a style="cursor: pointer">My Wallet</a>
+            </li>
+          </ul>
+          <span style="cursor: pointer" @click="copyAddress">{{ userAddress == undefined ? "" : formatAddress(userAddress) }}</span>
+        </header>
+        <div style="height: 1px;width: 100%;background-color: silver"></div>
+        <section class="el-drawer__body" v-if="userAddress==undefined">
+          <span>If you don't have a </span>
+          <el-tooltip class="item" effect="dark"
+                      content="A crypto wallet is an application or hardware device that allows individuals to store and retrieve digital items."
+                      placement="top-start">
+            <el-button style="border: 0px #FFFFFF solid;font-size: 16px"><b>wallet</b></el-button>
+          </el-tooltip>
+          <span>yet, you can select a provider and create one now.</span>
+          <div style="margin-top: 25px">
+            <el-row class="login_select">
+              <el-col :span="18">
+                <img src="../assets/metamask-logo.png" style="width: 25px;vertical-align:sub">
+                <span style="margin-left: 10px"><b>MetaMask</b></span>
+              </el-col>
+              <el-col :span="5">
+                <el-button type="primary" round @click="loginApp">Popular</el-button>
+              </el-col>
+            </el-row>
+          </div>
+        </section>
+        <section class="el-drawer__body" v-else>
+          <div style="margin-top: 25px">
+            <el-row class="login_select btn_xenon" @click="gotoBrowser">
+              <el-col :span="24">
+                <i class="iconfont icon-liulanqi" style="color: black"></i>
+                <span style="margin-left: 5px"><b>Browser</b></span>
+              </el-col>
+            </el-row>
+            <el-row class="login_select btn_xenon" @click="gotoMyMiner">
+              <el-col :span="24">
+                <i class="iconfont icon-miner_" style="color: black"></i>
+                <span style="margin-left: 10px"><b>My Miners</b></span>
+              </el-col>
+            </el-row>
+            <el-row class="login_select btn_xenon" @click="Logout">
+              <el-col :span="24">
+                <i class="iconfont icon-tuichu" style="color: black"></i>
+                <span style="margin-left: 10px"><b>Log out</b></span>
+              </el-col>
+            </el-row>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -54,6 +101,8 @@ export default {
   },
   data() {
     return {
+      drawer: false,
+      direction: 'rtl',
       isShow: true,
       userAddress: undefined
     }
@@ -62,23 +111,46 @@ export default {
     this.getInfo();
   },
   methods: {
-    autoActive(){
+    copyAddress() {
+      const input = document.createElement('input')
+      input.value = this.userAddress;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("Copy");
+      document.body.removeChild(input);
+      this.$message.success("Copied!")
+    },
+    stopPropagation(event) {
+      event.stopPropagation();
+    },
+    closeDrawer() {
+      this.drawer = false
+    },
+    openDrawer() {
+      this.drawer = true
+    },
+    formatAddress(address) {
+      return address.substring(0, 6) + "..." + address.substring(address.length - 4)
+    },
+    autoActive() {
       let path = this.$route.path;
-      if(path.startsWith("/miner/")){
+      if (path.startsWith("/miner/")) {
         return "/miners"
       }
-      if(path.startsWith("/account/")){
+      if (path.startsWith("/account/")) {
         return "/accounts"
       }
-      if(path.startsWith("/tx/")){
+      if (path.startsWith("/tx/")) {
         return "/txs"
       }
       return path;
     },
     gotoMyMiner() {
+      this.closeDrawer()
       this.$router.push("/account/" + this.userAddress)
     },
     gotoBrowser() {
+      this.closeDrawer()
       this.$router.push("/")
     },
     Logout() {
@@ -88,6 +160,7 @@ export default {
         type: 'warning'
       }).then(() => {
         removeMetaMaskUserAddress()
+        this.closeDrawer()
         this.userAddress = undefined;
         this.$router.push("/");
       }).catch(() => {
@@ -108,18 +181,19 @@ export default {
       try {
         if (window.ethereum) {
           this.userAddress = await loginWithMetaMask();
+          this.closeDrawer();
           let path = this.$route.path;
-          if(path == "/user"){
+          if (path == "/user") {
             this.$router.go(0);
-          }else if(path.startsWith("/claim/")){
+          } else if (path.startsWith("/claim/")) {
             this.$router.go(0);
-          }else {
+          } else {
             this.$router.push("/user");
           }
         } else {
           this.$message.error(this.$t('common.msg.metaMaskNotFound'));
         }
-      }catch (err){
+      } catch (err) {
         this.$message.error(this.$t('common.msg.LoginWithMetaMaskFailed'));
       }
     }
@@ -127,41 +201,137 @@ export default {
 }
 </script>
 <style scoped>
-.box{
+.btn_xenon {
+  text-align: center;
+  cursor: pointer;
+  background-color: aliceblue !important;
+}
+.btn_xenon:hover {
+  background-color: rgb(83, 168, 255) !important;
+}
+.login_select {
+  height: 45px;
+  line-height: 45px;
+  background-color: aliceblue;
+  padding-right: 20px;
+  padding-left: 6px;
+  border-radius: 5px;
+  margin-top: 10px;
+  z-index: 99;
+}
+
+.el-drawer__open .el-drawer.rtl {
+  animation: rtl-drawer-in .4s 0ms;
+}
+
+@keyframes rtl-drawer-out {
+  0% {
+    transform: translate(0)
+  }
+  to {
+    transform: translate(100%)
+  }
+}
+
+@keyframes rtl-drawer-in {
+  0% {
+    transform: translate(100%)
+  }
+  to {
+    transform: translate(0)
+  }
+}
+
+.el-drawer {
+  position: absolute;
+  box-sizing: border-box;
+  background-color: #fff;
+  display: flex;
+}
+
+.el-drawer__container {
+  position: relative;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.el-drawer__header {
+  align-items: center;
+  color: #72767b;
+  display: flex;
+  margin-bottom: 2px !important;
+  padding: var(--el-drawer-padding-primary);
+  padding-bottom: 0;
+}
+
+.el-drawer__wrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  margin: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.wallet-img {
+  font-size: 26px;
+}
+
+.wallet-img:hover {
+  color: silver;
+}
+
+.box {
   list-style: none;
   width: 150px;
 }
-.down-menu{
+
+.down-menu {
   list-style: none;
   padding: 5px 0px;
 }
+
 a {
   text-decoration: none;
-  color: #fff;
+  color: #000000;
+  font-weight: bold;
 }
-
+li {
+  text-align: left;
+}
+ul {
+  padding-inline-start: 2px !important;
+}
 ul.box > li.user {
   width: 150px;
   height: 20px;
+  z-index: 99999;
 }
 
 ul.box > li.user > a {
   width: 100%;
   height: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: left;
   align-items: center;
+
 }
 
 ul.box > li.user:hover .down-menu {
   display: block;
+  background-color: silver;
 }
 
 ul.box > li > .down-menu {
-  background: #fff;
+  background: #FFFFFF;
   width: 150px;
   display: none;
-  border: 1px solid silver;
   border-radius: 3px;
 }
 
@@ -172,9 +342,9 @@ ul.box > li > .down-menu > li {
   text-align: center;
   height: 40px;
   line-height: 40px;
-  border-bottom: 1px solid #fff;
+  border-bottom: 1px solid rgb(229, 232, 235);
   cursor: pointer;
-  padding: 0px 20px;
+  padding: 0px 0px;
 }
 
 ul.box > li > .down-menu > li:hover {
@@ -184,5 +354,12 @@ ul.box > li > .down-menu > li:hover {
 .login {
   background-color: #545c64;
   border-bottom: solid 1px var(--el-menu-border-color);
+}
+.el-dropdown-link {
+  cursor: pointer;
+  color: #409EFF;
+}
+.el-icon-arrow-down {
+  font-size: 12px;
 }
 </style>

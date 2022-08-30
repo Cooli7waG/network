@@ -1,6 +1,6 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3593592 */
-  src: url('/src/assets/font/iconfont.ttf?t=1660703406802') format('truetype');
+  src: url('/src/assets/font/iconfont.ttf?t=1661854268281') format('truetype');
 }
 
 .iconfont {
@@ -9,6 +9,26 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-miner_:before {
+  content: "\e615";
+}
+
+.icon-dashboard:before {
+  content: "\e78b";
+}
+
+.icon-liulanqi:before {
+  content: "\e605";
+}
+
+.icon-tuichu:before {
+  content: "\e7ed";
+}
+
+.icon-qianbao:before {
+  content: "\e6b9";
 }
 
 .icon-meiyuan8:before {
