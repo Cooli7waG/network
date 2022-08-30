@@ -47,6 +47,16 @@
             <el-link @click="()=>{data.query.keyword=scope.row.height;search();}">{{ scope.row.height }}</el-link>
           </template>
         </el-table-column>
+        <el-table-column prop="miner" label="Miner Address" width="220" :show-overflow-tooltip=true>
+          <template #default="scope">
+            <router-link :to="'/miner/'+scope.row.miner">{{scope.row.miner }}</router-link>
+          </template>
+        </el-table-column>
+        <el-table-column prop="miner" label="Owner Address" width="220" :show-overflow-tooltip=true>
+          <template #default="scope">
+            <router-link :to="'/caaount/'+scope.row.owner">{{scope.row.owner }}</router-link>
+          </template>
+        </el-table-column>
         <el-table-column prop="txType" :label="$t('txs.table.txType')" width="180">
           <template #default="scope">
             {{ scope.row.txType ? Constant.TXType[scope.row.txType] : '' }}
@@ -58,7 +68,6 @@
           </template>
         </el-table-column>
       </el-table>
-
     </el-col>
   </el-row>
 </template>

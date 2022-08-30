@@ -101,3 +101,88 @@ export function formatLocation(locationType, latitude, longitude) {
         return latitude + "," + longitude
     }
 }
+
+export function formatToken(value) {
+    console.log("formatToken value:"+value)
+    if (value == null || value == undefined) {
+        return 0;
+    }
+    let fixed = 0;
+    if(value>1000){
+        //1，超过1000，不显示小数；
+        fixed = 0;
+    }else if(value>100 && value <=1000){
+        //2，100～1000，显示1位小数；
+        fixed = 1;
+    }else if(value>10 && value <=100){
+        //3，10～100，显示2位小数；
+        fixed = 2;
+    }else if(value>1 && value <=10){
+        //4，1～10，显示4位小数；
+        fixed = 4;
+    }else if(value>0.1 && value <=1){
+        //5，0.01～1，显示实际小数位数或最多4位小数；
+        let str = value.toString();
+        let strArr = str.split(".");
+        if(strArr[1] == undefined){
+            fixed = 0;
+        }else if(strArr[1].length>8){
+            fixed = 4;
+        }else {
+            fixed = strArr[1].length;
+        }
+    }else{
+        //6，小于0.01，显示实际小数位数或最多8位小数
+        let str = value.toString();
+        let strArr = str.split(".");
+        if(strArr[1] == undefined){
+            fixed = 0;
+        }else if(strArr[1].length>8){
+            fixed = 8;
+        }else {
+            fixed = strArr[1].length;
+        }
+    }
+    //
+    console.log("fixed:"+fixed)
+    const num = Number(value).toFixed(fixed)
+    console.log("Number(value).toFixed(fixed):"+num)
+    return formatNumber(num);
+}
+
+export function getTokenFixed(value) {
+    let fixed = 0;
+    if (value == null || value == undefined) {
+        return fixed;
+    }
+    if(value>1000){
+        fixed = 0;
+    }else if(value>100 && value <=1000){
+        fixed = 1;
+    }else if(value>10 && value <=100){
+        fixed = 2;
+    }else if(value>1 && value <=10){
+        fixed = 4;
+    }else if(value>0.1 && value <=1){
+        let str = value.toString();
+        let strArr = str.split(".");
+        if(strArr[1] == undefined){
+            fixed = 0;
+        }else if(strArr[1].length>8){
+            fixed = 4;
+        }else {
+            fixed = strArr[1].length;
+        }
+    }else{
+        let str = value.toString();
+        let strArr = str.split(".");
+        if(strArr[1] == undefined){
+            fixed = 0;
+        }else if(strArr[1].length>8){
+            fixed = 8;
+        }else {
+            fixed = strArr[1].length;
+        }
+    }
+    return fixed;
+}

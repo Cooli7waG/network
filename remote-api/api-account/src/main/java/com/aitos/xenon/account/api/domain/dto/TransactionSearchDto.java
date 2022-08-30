@@ -13,4 +13,6 @@ public class TransactionSearchDto extends QueryParams {
     private String fromAddress;
 
     private String hash;
+
+    private Integer txType;
 }

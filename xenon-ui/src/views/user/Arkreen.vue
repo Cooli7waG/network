@@ -57,7 +57,7 @@ export default {
   data() {
     return {
       loading: false,
-      applyActive: false,
+      applyActive: true,
       applyPersonalSign: false,
       labelPosition: 'top',
       centerDialogVisible: false,
@@ -90,14 +90,12 @@ export default {
         if (valid) {
           try {
             this.minerForm.owner = this.userAddress;
-            console.log("this.applyPersonalSign:"+this.applyPersonalSign)
             if(this.applyPersonalSign){
               let message = JSON.stringify(this.minerForm);
               this.minerForm.personalSign = await personalSign(message);
             }
             //
             applyGameMiner(JSON.stringify(this.minerForm)).then(rsp => {
-              console.log("applyGameMiner result:" + JSON.stringify(rsp))
               if (rsp.code == 0) {
                 this.centerDialogVisible = false
                 this.loading = false;
@@ -139,10 +137,9 @@ export default {
     },
     handleGetApplyActiveInfo(){
       getApplyActiveInfo().then(rsp => {
-        console.log("applyGameMiner result:" + JSON.stringify(rsp))
         if (rsp.code == 0) {
           this.loading = false;
-          this.applyActive =  rsp.data.applyActive;
+          //this.applyActive =  rsp.data.applyActive;
           this.applyPersonalSign = rsp.data.applyPersonalSign;
         } else {
           this.loading = false;

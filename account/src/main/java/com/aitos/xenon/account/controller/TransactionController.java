@@ -8,6 +8,7 @@ import com.aitos.xenon.account.api.domain.vo.TransactionVo;
 import com.aitos.xenon.account.domain.PoggReportMiner;
 import com.aitos.xenon.account.domain.PoggRewardMiner;
 import com.aitos.xenon.account.domain.Transaction;
+import com.aitos.xenon.account.domain.TransactionReport;
 import com.aitos.xenon.account.service.TransactionService;
 import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
 import com.aitos.xenon.core.constant.ApiStatus;
@@ -66,12 +67,19 @@ public class TransactionController {
         return Result.ok(transactionVo);
     }
 
-    @GetMapping("/list")
-    public Result<Page<TransactionVo>> list(TransactionSearchDto queryParams){
-        IPage<Transaction> listPage= transactionService.list(queryParams);
-
+    @GetMapping("/listOld")
+    public Result<Page<TransactionVo>> listOld(TransactionSearchDto queryParams){
+        IPage<Transaction> listPage= transactionService.listOld(queryParams);
         List<TransactionVo>  listVo=BeanConvertor.toList(listPage.getRecords(),TransactionVo.class);
         Page<TransactionVo> page=new Page<>(listPage.getTotal(),listVo);
+        return Result.ok(page);
+    }
+
+    @GetMapping("/list")
+    public Result<Page<TransactionReport>> list(TransactionSearchDto queryParams){
+        IPage<TransactionReport> listPage= transactionService.list(queryParams);
+        List<TransactionReport>  listVo=BeanConvertor.toList(listPage.getRecords(),TransactionReport.class);
+        Page<TransactionReport> page=new Page<>(listPage.getTotal(),listVo);
         return Result.ok(page);
     }
 

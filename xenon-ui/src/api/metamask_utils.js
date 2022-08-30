@@ -21,16 +21,16 @@ export async function loginWithMetaMask() {
 }
 
 export async function personalSign(message) {
-    console.log("personalSign message:"+message)
+    //console.log("personalSign message:"+message)
     const msg = `0x${Buffer.from(message, 'utf8').toString('hex')}`;
-    console.log("msg:"+msg)
+    //console.log("msg:"+msg)
     let address = getMetaMaskLoginUserAddress();
-    console.log("personalSign address:"+address)
+    //console.log("personalSign address:"+address)
     const sign = await ethereum.request({
         method: 'personal_sign',
         params: [msg,address, ''],
     });
-    console.log("personalSign result:" + sign);
+    //console.log("personalSign result:" + sign);
     return sign;
 }
 

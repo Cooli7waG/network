@@ -3,6 +3,7 @@ package com.aitos.xenon.account.mapper;
 import com.aitos.xenon.account.domain.PoggReportMiner;
 import com.aitos.xenon.account.domain.PoggRewardMiner;
 import com.aitos.xenon.account.domain.Transaction;
+import com.aitos.xenon.account.domain.TransactionReport;
 import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
 import com.aitos.xenon.core.model.QueryParams;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -18,7 +19,9 @@ public interface TransactionMapper {
 
     Transaction query(@Param("txHash") String txHash);
 
-    IPage<Transaction> list(Page<Transaction> page, @Param("queryParams") QueryParams queryParams);
+    IPage<Transaction> listOld(Page<Transaction> page, @Param("queryParams") QueryParams queryParams);
+
+    IPage<TransactionReport> list(Page<TransactionReport> page, @Param("queryParams") QueryParams queryParams);
 
     /**
      * 保存Report交易
@@ -49,4 +52,6 @@ public interface TransactionMapper {
     IPage<PoggRewardMiner> getRewardByMinerAddress(Page<PoggRewardMiner> page, @Param("queryParams")PoggReportDto queryParams);
 
     List<Transaction> getAll();
+
+    void saveTransactionReport(TransactionReport transactionReport);
 }

@@ -106,9 +106,12 @@
             style="margin-top: 5px"
         />
         <el-table v-loading="data.rewardLoading" :data="data.rewardData" border style="width: 100%;margin-top: 5px">
-          <el-table-column prop="address" label="Miner Address" width="220" :show-overflow-tooltip=true>
-          </el-table-column>
           <el-table-column prop="hash" label="Transaction Hash" width="220" :show-overflow-tooltip=true>
+            <template #default="scope">
+              <router-link :to="'/tx/'+scope.row.hash">{{scope.row.hash}}</router-link>
+            </template>
+          </el-table-column>
+          <el-table-column prop="address" label="Miner Address" width="220" :show-overflow-tooltip=true>
           </el-table-column>
           <el-table-column prop="height" label="Block Height">
           </el-table-column>

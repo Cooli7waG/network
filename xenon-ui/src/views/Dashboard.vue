@@ -30,14 +30,6 @@
           <div class="label">{{ $t('dashboard.tokenSupply') }}</div>
           <div class="content">{{ data.blockchainstats.tokenSupply }}/{{ data.blockchainstats.totalBMTMarket }}</div>
         </div>
-        <!--<div class="text item">
-          <div class="label">{{ $t('dashboard.tokenCirculatingSupply') }}</div>
-          <div class="content">{{ data.blockchainstats.tokenSupply }}</div>
-        </div>
-        <div class="text item">
-          <div class="label">{{ $t('dashboard.tokenMaxSupply') }}</div>
-          <div class="content">{{ data.blockchainstats.totalBMTMarket }}</div>
-        </div>-->
       </el-card>
     </el-col>
   </el-row>
@@ -50,7 +42,7 @@
 import {getBlockchainstats, getMinerStatistics} from '@/api/statistics.js'
 import {onMounted, reactive} from "vue";
 import {toEther} from '@/utils/utils.js'
-import {formatPower, formatElectricity} from '@/utils/data_format.js'
+import {formatPower, formatElectricity,getTokenFixed} from '@/utils/data_format.js'
 
 import "ol/ol.css"
 import Map from "ol/Map"
@@ -81,6 +73,9 @@ export default {
     formatElectricity() {
       return formatElectricity
     },
+    getTokenFixed() {
+      return getTokenFixed
+    },
   },
   setup() {
 
@@ -103,8 +98,10 @@ export default {
     const loadBlockchainstats = () => {
       getBlockchainstats().then((result) => {
         data.blockchainstats = result.data;
-        data.blockchainstats.tokenSupply = toEther(data.blockchainstats.tokenSupply, 8)
-        data.blockchainstats.totalBMTMarket = toEther(data.blockchainstats.totalBMTMarket, 8)
+        let fixed1 = getTokenFixed(data.blockchainstats.tokenSupply);
+        data.blockchainstats.tokenSupply = toEther(data.blockchainstats.tokenSupply, fixed1)
+        let fixed2 = getTokenFixed(data.blockchainstats.tokenSupply);
+        data.blockchainstats.totalBMTMarket = toEther(data.blockchainstats.totalBMTMarket, fixed2)
       }).catch((err) => {
         console.log(err);
       });

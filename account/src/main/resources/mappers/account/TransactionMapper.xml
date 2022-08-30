@@ -16,7 +16,7 @@
     <select id="query" resultType="com.aitos.xenon.account.domain.Transaction">
         select * from <include refid="tableName"/> where hash=#{txHash}
     </select>
-    <select id="list" resultType="com.aitos.xenon.account.domain.Transaction">
+    <select id="listOld" resultType="com.aitos.xenon.account.domain.Transaction">
         select * from <include refid="tableName"/>
         <where>
             <if test="queryParams.height!=null">
@@ -32,9 +32,33 @@
         order by create_time desc
     </select>
 
+    <select id="list" resultType="com.aitos.xenon.account.domain.TransactionReport">
+        select * from transaction_report
+        <where>
+            <if test="queryParams.height!=null">
+                height=#{queryParams.height}
+            </if>
+            <if test="queryParams.hash!=null and queryParams.hash!=''">
+                and hash=#{queryParams.hash}
+            </if>
+            <if test="queryParams.txType!=null and queryParams.txType!=''">
+                and tx_type=#{queryParams.txType}
+            </if>
+            <if test="queryParams.fromAddress!=null and queryParams.fromAddress!=''">
+                and (miner=#{queryParams.fromAddress} or owner=#{queryParams.fromAddress})
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
     <insert id="saveReport" useGeneratedKeys="true" keyProperty="id" parameterType="com.aitos.xenon.account.domain.PoggReportMiner">
         insert into pogg_report_miner(address,power,total,hash,height,timestamp,create_time)
         value (#{address},#{power},#{total},#{hash},#{height},#{timestamp},NOW())
+    </insert>
+
+    <insert id="saveTransactionReport" useGeneratedKeys="true" keyProperty="id" parameterType="com.aitos.xenon.account.domain.PoggReportMiner">
+        insert into transaction_report(hash,tx_type,height,miner,owner,create_time)
+        value (#{hash},#{txType},#{height},#{miner},#{owner},NOW())
     </insert>
 
     <insert id="saveReward" useGeneratedKeys="true" keyProperty="id" parameterType="com.aitos.xenon.account.domain.PoggRewardMiner">

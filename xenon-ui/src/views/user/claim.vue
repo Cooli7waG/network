@@ -46,14 +46,10 @@ export default {
     async submitForm() {
       this.loading = true;
       try {
-        //let message = this.minerForm.minerAddress + "(" + this.minerForm.userAddress + ") Request Game Miner";
-        //let message = JSON.stringify(this.minerForm);
         let message = '{"version":1,"ownerAddress":"'+this.minerForm.ownerAddress+'","minerAddress":"'+this.minerForm.minerAddress+'"}'
         this.minerForm.signature = await personalSign(message);
-        //
         message = '{"version":1,"ownerAddress":"'+this.minerForm.ownerAddress+'","minerAddress":"'+this.minerForm.minerAddress+'","signature":"'+this.minerForm.signature+'"}'
         claimGameMiner(message).then(rsp => {
-          console.log("claimGameMiner result:" + JSON.stringify(rsp))
           this.minerForm.signature = undefined;
           if(rsp.code == 0){
             this.$message.success("game miner claim success!");

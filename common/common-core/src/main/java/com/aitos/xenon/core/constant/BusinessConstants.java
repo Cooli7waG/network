@@ -148,4 +148,12 @@ public interface BusinessConstants
     interface MakerInfo {
         String GAME_MINER = "Arkreen";
     }
+
+    interface TxAddressType {
+        String ADDRESS = "address";
+        String MINER_ADDRESS = "minerAddress";
+        String MINER = "miner";
+        String OWNER_ADDRESS = "ownerAddress";
+        String OWNER = "owner";
+    }
 }
