@@ -8,7 +8,7 @@
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
         insert into <include refid="tableName"/> (address,balance,account_type,nonce,create_time)
-        value (#{address},#{balance},#{accountType},0,NOW())
+        value (#{address},#{balance},#{accountType},0,#{createTime})
     </insert>
 
     <update id="update">
@@ -20,7 +20,7 @@
             <if test="nonce != null and nonce !=''">
                 nonce=#{nonce},
             </if>
-            update_time=now()
+            update_time=#{updateTime}
         </set>
         where address=#{address}
     </update>
@@ -31,7 +31,7 @@
             <if test="balance != null and balance !=''">
                 balance=balance+#{balance},
             </if>
-            update_time=now()
+            update_time=#{updateTime}
         </set>
         where id=#{id}
     </update>
@@ -40,7 +40,7 @@
             update <include refid="tableName"/>
             <set>
                 earning_mint=earning_mint+#{item.amount},
-                update_time=now()
+                update_time=#{updateTime}
             </set>
             where address=#{item.address}
         </foreach>

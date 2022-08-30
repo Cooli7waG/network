@@ -29,6 +29,7 @@ import org.web3j.utils.Convert;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,6 +56,7 @@ public class TransactionServiceImpl implements TransactionService {
         //TODO 提取数据分别保存
         abstractTransaction(transaction);
         abstractTransactionReport(transaction);
+        transaction.setCreateTime(LocalDateTime.now());
         transactionMapper.save(transaction);
     }
 
@@ -96,6 +98,7 @@ public class TransactionServiceImpl implements TransactionService {
             //TODO 是否需要通过miner address查询出owner address
 
             //数据入库
+            transactionReport.setCreateTime(new Date());
             transactionMapper.saveTransactionReport(transactionReport);
         }catch (Exception e){
             log.error("abstractTransactionReport error:{}",e.getMessage());
@@ -121,6 +124,7 @@ public class TransactionServiceImpl implements TransactionService {
                         report.setAddress(poggReportDto.getAddress());
                     }
                 }
+                report.setCreateTime(new Date());
                 transactionMapper.saveReport(report);
             } else if (BusinessConstants.TXType.TX_REWARD_POGG == transaction.getTxType()) {
                 log.info("transaction type:{} = {}", transaction.getTxType(), "TX_REWARD_POGG");
@@ -141,6 +145,7 @@ public class TransactionServiceImpl implements TransactionService {
                 for (PoggRewardMiner rewardMiner : rewardList) {
                     BigDecimal divide = rewardMiner.getAmount().divide(totalAmount, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
                     rewardMiner.setRewardPercent(divide.toString());
+                    rewardMiner.setCreateTime(new Date());
                     transactionMapper.saveReward(rewardMiner);
                 }
             } else {

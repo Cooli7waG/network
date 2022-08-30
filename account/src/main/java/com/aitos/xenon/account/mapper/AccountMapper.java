@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -25,5 +26,5 @@ public interface AccountMapper {
 
     List<Account> findListByIds(@Param("idsList")List<Long> idsList);
 
-    void updateEarning(@Param("rewards")List<PoggRewardDetailDto> rewards);
+    void updateEarning(@Param("rewards")List<PoggRewardDetailDto> rewards, LocalDateTime updateTime);
 }

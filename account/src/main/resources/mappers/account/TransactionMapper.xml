@@ -8,7 +8,7 @@
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
         insert into <include refid="tableName"/> (from_address,account_id,height,hash,tx_type,status,data,create_time)
-        value (#{fromAddress},#{accountId},#{height},#{hash},#{txType},#{status},#{data},NOW())
+        value (#{fromAddress},#{accountId},#{height},#{hash},#{txType},#{status},#{data},#{createTime})
     </insert>
     <select id="findByAddress" resultType="com.aitos.xenon.account.domain.Transaction">
         select * from <include refid="tableName"/> where address=#{address}
@@ -53,17 +53,17 @@
 
     <insert id="saveReport" useGeneratedKeys="true" keyProperty="id" parameterType="com.aitos.xenon.account.domain.PoggReportMiner">
         insert into pogg_report_miner(address,power,total,hash,height,timestamp,create_time)
-        value (#{address},#{power},#{total},#{hash},#{height},#{timestamp},NOW())
+        value (#{address},#{power},#{total},#{hash},#{height},#{timestamp},#{createTime})
     </insert>
 
     <insert id="saveTransactionReport" useGeneratedKeys="true" keyProperty="id" parameterType="com.aitos.xenon.account.domain.PoggReportMiner">
         insert into transaction_report(hash,tx_type,height,miner,owner,create_time)
-        value (#{hash},#{txType},#{height},#{miner},#{owner},NOW())
+        value (#{hash},#{txType},#{height},#{miner},#{owner},#{createTime})
     </insert>
 
     <insert id="saveReward" useGeneratedKeys="true" keyProperty="id" parameterType="com.aitos.xenon.account.domain.PoggRewardMiner">
         insert into pogg_reward_miner(address,amount,owner_address,hash,height,reward_percent,create_time)
-            value (#{address},#{amount},#{ownerAddress},#{hash},#{height},#{rewardPercent},NOW())
+            value (#{address},#{amount},#{ownerAddress},#{hash},#{height},#{rewardPercent},#{createTime})
     </insert>
 
     <select id="getReportByMinerAddress" resultType="com.aitos.xenon.account.domain.PoggReportMiner">

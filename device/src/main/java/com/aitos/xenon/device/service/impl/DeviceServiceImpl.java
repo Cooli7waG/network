@@ -85,6 +85,7 @@ public class DeviceServiceImpl implements DeviceService {
 
         device.setEarningMint(BigDecimal.valueOf(0));
         device.setEarningService(BigDecimal.valueOf(0));
+        device.setCreateTime(LocalDateTime.now());
         deviceMapper.save(device);
 
         AccountRegisterDto accountRegisterDto =new AccountRegisterDto();

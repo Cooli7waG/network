@@ -25,11 +25,11 @@
                                           record_num,
                                           create_time,
                                           update_time)
-        VALUES (#{address}, #{ownerAddress}, #{minerType}, #{epoch}, #{recordNum}, NOW(), NOW())
+        VALUES (#{address}, #{ownerAddress}, #{minerType}, #{epoch}, #{recordNum}, #{createTime}, #{createTime})
     </insert>
     <update id="updateSubtotal">
         update pogg_report_subtotal
-        set update_time = NOW(),
+        set update_time =  #{updateTime},
             record_num  = #{recordNum}
         where id = #{id}
     </update>

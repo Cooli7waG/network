@@ -9,7 +9,7 @@
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
         insert into <include refid="tableName"/> (address,miner_type,maker,create_time)
-        value (#{address},#{minerType},#{maker},NOW())
+        value (#{address},#{minerType},#{maker},#{createTime})
     </insert>
 
     <select id="findByAddress" resultType="com.aitos.xenon.device.domain.Device">

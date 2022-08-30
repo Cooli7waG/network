@@ -74,6 +74,7 @@ public class PoggServiceImpl implements PoggService {
         poggCommit.setHeight(block.getHeight());
         poggCommit.setEpoch(epoch + 1);
         poggCommit.setStatus(BusinessConstants.POGGCommitStatus.NOT_OVER);
+        poggCommit.setCreateTime(LocalDateTime.now());
         poggMapper.saveCommit(poggCommit);
 
         if (currentPoggCommit != null) {
