@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,11 +31,13 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void save(Account account) {
+        account.setCreateTime(LocalDateTime.now());
         accountMapper.save(account);
     }
 
     @Override
     public void update(Account account) {
+        account.setUpdateTime(LocalDateTime.now());
         accountMapper.update(account);
     }
 
@@ -93,6 +96,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void updateBalance(Account account) {
+        account.setUpdateTime(LocalDateTime.now());
         accountMapper.updateBalance(account);
     }
 
@@ -123,6 +127,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void updateEarning(List<PoggRewardDetailDto> rewards) {
-        accountMapper.updateEarning(rewards);
+        accountMapper.updateEarning(rewards,LocalDateTime.now());
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -84,11 +85,13 @@ public class PoggReportServiceImpl implements PoggReportService {
         PoggReportSubtotal poggReportSubtotalTemp = poggReportMapper.findSubtotalByEpoch(poggReportSubtotal.getAddress(), poggReportSubtotal.getEpoch());
         if (poggReportSubtotalTemp == null) {
             poggReportSubtotal.setRecordNum(poggReportSubtotal.getRecordNum() > 12 ? 12 : poggReportSubtotal.getRecordNum());
+            poggReportSubtotal.setCreateTime(LocalDateTime.now());
             poggReportMapper.saveSubtotal(poggReportSubtotal);
         } else if (poggReportSubtotalTemp.getRecordNum() < RECORD_NUM) {
             poggReportSubtotal.setId(poggReportSubtotalTemp.getId());
             int recordNum = poggReportSubtotalTemp.getRecordNum() + poggReportSubtotal.getRecordNum();
             poggReportSubtotal.setRecordNum(recordNum > RECORD_NUM ? RECORD_NUM : recordNum);
+            poggReportSubtotal.setUpdateTime(LocalDateTime.now());
             poggReportMapper.updateSubtotal(poggReportSubtotal);
         }
     }

@@ -8,7 +8,7 @@
 
     <insert id="saveCommit">
         insert into <include refid="tableName"/> (private_key,public_key,epoch,height,status,create_time)
-        value (#{privateKey},#{publicKey},#{epoch},#{height},#{status},now())
+        value (#{privateKey},#{publicKey},#{epoch},#{height},#{status},#{createTime})
     </insert>
 
     <select id="findCurrentCommit" resultType="com.aitos.xenon.block.domain.PoggCommit">
