@@ -20,7 +20,7 @@ public interface AccountMapper {
     void update(Account account);
     void updateBalance(Account account);
 
-    Account findByAddress(String address);
+    AccountVo findByAddress(String address);
 
     IPage<AccountVo> list(Page<AccountVo> page,@Param("queryParams") AccountSearchDto accountSearchDto);
 

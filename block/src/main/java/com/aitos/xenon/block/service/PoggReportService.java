@@ -22,4 +22,10 @@ public interface PoggReportService {
      * @return
      */
     List<PoggReportSubtotalStatistics> findSubtotalStatisticsList(long startEpoch,long endEpoch);
+
+    /**
+     * 计算平均发电功率
+     * @return
+     */
+    double avgPower(String ownerAddress);
 }

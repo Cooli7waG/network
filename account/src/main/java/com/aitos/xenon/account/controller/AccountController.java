@@ -28,7 +28,7 @@ public class AccountController {
 
     @PostMapping("/register")
     public Result<Long> register(@RequestBody AccountRegisterDto accountRegister){
-        Account accountTemp=accountService.findByAddress(accountRegister.getAddress());
+        AccountVo accountTemp=accountService.findByAddress(accountRegister.getAddress());
         if(accountTemp!=null){
             return Result.failed(ApiStatus.BUSINESS_ACCOUNT_EXISTED);
         }
@@ -39,20 +39,19 @@ public class AccountController {
 
     @GetMapping("/findByAddress/{address}")
     public Result<AccountVo> findByAddress(@PathVariable("address") String address){
-        Account accountTemp=accountService.findByAddress(address);
-        AccountVo account= BeanConvertor.toBean(accountTemp,AccountVo.class);
-        return Result.ok(account);
+        AccountVo accountTemp=accountService.findByAddress(address);
+        return Result.ok(accountTemp);
     }
 
     @GetMapping("/balance/{address}")
     public Result<String> getBalance(@PathVariable("address") String address){
-        Account accountTemp=accountService.findByAddress(address);
+        AccountVo accountTemp=accountService.findByAddress(address);
         return Result.ok(accountTemp.getBalance());
     }
 
     @GetMapping("/nonce/{address}")
     public Result<Long> getNonce(@PathVariable("address") String address){
-        Account accountTemp=accountService.findByAddress(address);
+        AccountVo accountTemp=accountService.findByAddress(address);
         if(accountTemp==null){
             return Result.failed(ApiStatus.BUSINESS_ACCOUNT_NOT_EXIST);
         }

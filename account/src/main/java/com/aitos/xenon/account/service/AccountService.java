@@ -18,7 +18,7 @@ public interface AccountService {
 
     void update(Account account);
 
-    Account findByAddress(String address);
+    AccountVo findByAddress(String address);
 
     IPage<AccountVo> list(AccountSearchDto accountSearchDto);
 

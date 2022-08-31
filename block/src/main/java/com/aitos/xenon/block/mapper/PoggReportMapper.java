@@ -24,4 +24,6 @@ public interface PoggReportMapper {
     PoggReportSubtotal findSubtotalByEpoch(@Param("address") String address, @Param("epoch") Long epoch);
 
     List<PoggReportSubtotalStatistics> findSubtotalStatisticsList(@Param("startEpoch")long startEpoch,@Param("endEpoch") long endEpoch);
+
+    double avgPower(@Param("ownerAddress")String ownerAddress);
 }

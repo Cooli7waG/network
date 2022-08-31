@@ -36,13 +36,25 @@
         where id=#{id}
     </update>
     <update id="updateEarning">
-        <foreach collection="rewards" item="item" separator=";">
+       <!-- <foreach collection="rewards" item="item" separator=";">
             update <include refid="tableName"/>
             <set>
                 earning_mint=earning_mint+#{item.amount},
                 update_time=#{updateTime}
             </set>
             where address=#{item.address}
+        </foreach>-->
+        update <include refid="tableName"/>
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="earning_mint =case" suffix="end,">
+                <foreach collection="rewards" item="item" index="index">
+                    when address=#{item.address} then earning_mint+#{item.amount}
+                </foreach>
+            </trim>
+        </trim>
+        where address in
+        <foreach collection="rewards" index="index" item="item" separator="," open="(" close=")">
+            #{item.address}
         </foreach>
     </update>
 
@@ -58,7 +70,7 @@
         </where>
         order by create_time desc
     </select>
-    <select id="findByAddress" resultType="com.aitos.xenon.account.domain.Account">
+    <select id="findByAddress" resultType="com.aitos.xenon.account.api.domain.vo.AccountVo">
         select * from <include refid="tableName"/> where address=#{address}
     </select>
     <select id="list" resultType="com.aitos.xenon.account.api.domain.vo.AccountVo">

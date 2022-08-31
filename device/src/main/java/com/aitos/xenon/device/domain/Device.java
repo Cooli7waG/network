@@ -11,9 +11,6 @@ public class Device extends BaseModel {
     private String address;
 
     private String ownerAddress;
-
-    private String name;
-
     /**
      * Miner类型
      */

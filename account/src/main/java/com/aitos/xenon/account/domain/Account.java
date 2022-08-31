@@ -11,8 +11,6 @@ public class Account extends BaseModel {
 
     private String address;
 
-    private String web3Address;
-
     private String balance;
 
     private Long nonce;
