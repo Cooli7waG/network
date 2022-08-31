@@ -32,13 +32,13 @@
             <router-link :to="{name:'Transaction',params:{height:scope.row.height}}">{{scope.row.height}}</router-link>
           </template>
         </el-table-column>
-        <el-table-column prop="amountTransaction" :label="$t('block.table.amountTransaction')" width="200" align="right">
+        <el-table-column prop="amountTransaction" :label="$t('block.table.amountTransaction')" width="200">
           <template #default="scope">
             <router-link v-if="scope.row.amountTransaction>0" :to="{name:'Transaction',params:{height:scope.row.height}}">{{scope.row.amountTransaction}}</router-link>
             <span v-else>{{scope.row.amountTransaction}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="blockTime" :label="$t('block.table.blockTime')" width="180" />
+        <el-table-column prop="blockIntervalTime" :label="$t('block.table.blockTime')" width="180" />
         <el-table-column prop="createTime" :label="$t('block.table.createTime')">
           <template #default="scope">
             {{formatDate(scope.row.createTime, "yyyy-MM-dd hh:mm:ss")}}
@@ -76,7 +76,7 @@ export default {
         block:'',
         page:{
           currentPage:1,
-          pageSize:10,
+          pageSize:20,
           total:0
         }
       },

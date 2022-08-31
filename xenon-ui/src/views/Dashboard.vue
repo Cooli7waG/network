@@ -12,7 +12,7 @@
         </div>
         <div class="text item">
           <div class="label">{{ $t('dashboard.totalChargeVol') }}</div>
-          <div class="content">{{ formatElectricity(data.minerStatistics.totalChargeVol) }}</div>
+          <div class="content">{{ data.minerStatistics.totalChargeVol }}</div>
         </div>
       </el-card>
     </el-col>
@@ -36,14 +36,78 @@
   <el-row>
     <div id="map" class="map"></div>
   </el-row>
+  <div v-show="data.minersDrawer" tabindex="-1" class="el-drawer__wrapper" style="z-index: 9999;">
+    <div role="document" tabindex="-1" class="el-drawer__container el-drawer__open">
+      <div tabindex="-1" class="el-drawer ltr" style="width: 450px;right: 0;margin-top: 58px">
+        <header id="el-drawer__title" class="el-drawer__header">
+          <span><i class="iconfont icon-miner_" style="color: black"></i>  Miners</span>
+          <span style="cursor: pointer;" @click="data.minersDrawer = false"><i class="iconfont icon-shibai" style="color: black;color: #72767b;font-size: 30px"></i></span>
+        </header>
+        <div style="height: 1px;width: 100%;background-color: silver"></div>
+        <section class="el-drawer__body">
+          <el-collapse v-loading="data.minerInfoLoad" accordion>
+            <el-collapse-item v-for="(miner,index) in data.minersList" :title="miner.address" :name="index">
+              <el-row :gutter="20">
+                <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">Address:</el-col>
+                <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
+                  <router-link :to="'/miner/'+miner.address">{{miner.address}}</router-link>
+                </el-col>
+              </el-row>
+              <el-row :gutter="20">
+                <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">Miner Type:</el-col>
+                <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
+                  {{ miner.minerType ? Constant.MinerType[miner.minerType] : '' }}
+                </el-col>
+              </el-row>
+              <el-row :gutter="20">
+                <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">Owner:</el-col>
+                <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ miner.ownerAddress }}</el-col>
+              </el-row>
+              <el-row :gutter="20">
+                <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">Maker:</el-col>
+                <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ miner.maker }}</el-col>
+              </el-row>
+              <el-row :gutter="20">
+                <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">Location:</el-col>
+                <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
+                  {{ miner.latitude + "," + miner.longitude }}
+                  <i class="iconfont icon-weizhi" style="color: deepskyblue;cursor: pointer" @click="gotoMap(data.device.latitude,data.device.longitude)"/>
+                </el-col>
+              </el-row>
+              <el-row :gutter="20">
+                <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">Create Time:</el-col>
+                <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
+                  {{ formatDate(miner.createTime, "yyyy-MM-dd hh:mm:ss") }}
+                </el-col>
+              </el-row>
+              <el-row :gutter="20">
+                <el-col :xl="24">Total Mining Revenue: {{ " "+formatToken(miner.earningMint) }}</el-col>
+              </el-row>
+              <el-row :gutter="20">
+                <el-col :xl="24">Total Service Revenue: {{ " "+formatToken(miner.earningService) }}</el-col>
+              </el-row>
+              <el-row :gutter="20">
+                <el-col :xl="24">Average power generation: {{ " "+formatPower(miner.power/1000) }}</el-col>
+              </el-row>
+              <el-row :gutter="20">
+                <el-col :xl="24">
+                  Total Power Generation: {{ " "+(miner.totalEnergyGeneration / 1000 / 1000).toFixed(3)+" kWh" }}
+                </el-col>
+              </el-row>
+            </el-collapse-item>
+          </el-collapse>
+        </section>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-import {getBlockchainstats, getMinerStatistics} from '@/api/statistics.js'
+import {getBlockchainstats, getMinerStatistics,getMinerLocation,loadMinersInfo} from '@/api/statistics.js'
 import {onMounted, reactive} from "vue";
 import {toEther} from '@/utils/utils.js'
-import {formatPower, formatElectricity,getTokenFixed} from '@/utils/data_format.js'
-
+import {formatPower, formatElectricity, getTokenFixed, getAddress, formatDate,formatToken} from '@/utils/data_format.js'
+import Constant from '@/utils/constant.js'
 import "ol/ol.css"
 import Map from "ol/Map"
 import OSM from "ol/source/OSM"
@@ -59,14 +123,15 @@ import Circle from "ol/style/Circle"
 import Stroke from "ol/style/Stroke"
 import Select from "ol/interaction/Select"
 import View from "ol/View"
-
-
 export default {
   name: 'Dashboard',
   props: {
     msg: String
   },
   computed: {
+    formatDate() {
+      return formatDate
+    },
     formatPower() {
       return formatPower
     },
@@ -76,10 +141,23 @@ export default {
     getTokenFixed() {
       return getTokenFixed
     },
+    getAddress() {
+      return getAddress
+    },
+    formatToken() {
+      return formatToken
+    },
+    Constant() {
+      return Constant
+    }
   },
   setup() {
 
     const data = reactive({
+      minersDrawer: false,
+      minerInfoLoad: true,
+      direction: 'rtl',
+      minersList: null,
       blockchainstats: {
         usdbmtMarketPrice: 0,
         totalBMTMarket: 0,
@@ -111,32 +189,10 @@ export default {
       getMinerStatistics().then((result) => {
         console.log(result)
         data.minerStatistics = result.data;
-        data.minerStatistics.totalChargeVol = (data.minerStatistics.totalChargeVol / 1000 / 1000).toFixed(3)
+        data.minerStatistics.totalChargeVol = (data.minerStatistics.totalChargeVol/1000 / 1000).toFixed(3)+" kWh"
       }).catch((err) => {
         console.log(err);
       });
-    }
-
-    const addFeatures = (source, nb) => {
-      var ssize = 20;		// seed size
-      var ext = data.map.getView().calculateExtent(data.map.getSize());
-      var dx = ext[2] - ext[0];
-      var dy = ext[3] - ext[1];
-      var dl = Math.min(dx, dy);
-      var features = [];
-      for (var i = 0; i < nb / ssize; ++i) {
-        var seed = [ext[0] + dx * Math.random(), ext[1] + dy * Math.random()]
-        for (var j = 0; j < ssize; j++) {
-          var f = new Feature(new Point([
-            seed[0] + dl / 10 * Math.random(),
-            seed[1] + dl / 10 * Math.random()
-          ]));
-          f.set('id', i * ssize + j);
-          features.push(f);
-        }
-      }
-      source.clear(true);
-      source.addFeatures(features);
     }
 
     const styleFn = function (f, res) {
@@ -227,24 +283,71 @@ export default {
       data.map.addInteraction(select);
       select.on('select', function (e) {
         if (e.selected.length) {
-          var f = e.selected[0].get('features');
+          const f = e.selected[0].get('features');
           if (f) {
-            console.log(e.selected[0].get('features').length)
+            let minerAddressList = [];
+            let features = e.selected[0].get('features');
+            for (let i=0;i<features.length;i++){
+              minerAddressList.push(features[i].values_.id);
+            }
+            //
+            showMinerList(minerAddressList);
           } else {
-            console.log(0)
+            console.log("f---->"+f)
           }
-        } else {
-          console.log(0)
         }
       });
-
       var source = new VectorSource();
-      addFeatures(source, 2000);
-
+      addFeatures(source);
       var layerSource = new VectorLayer({source: source, visible: true})
       data.map.addLayer(layerSource);
 
       createHexBin(source);
+    }
+
+    const showMinerList = (minerAddressList) => {
+      if(!data.minersDrawer){
+        data.minersDrawer = true;
+      }
+      //
+      loadMinersInfo(minerAddressList).then((result) => {
+        if(result.code == 0){
+          data.minersList = result.data;
+        }else {
+
+        }
+        data.minerInfoLoad = false
+      }).catch((err) => {
+        console.log(err);
+      });
+    }
+
+    const addFeatures = (source) => {
+      //
+      let minerLocation = undefined;
+      getMinerLocation().then((result) => {
+        minerLocation = result.data
+        //
+        var features = [];
+        for (const key in minerLocation) {
+          let location = minerLocation[key]
+          //
+          //var f = new Feature(new Point([location.longitude, location.latitude]));
+          //
+          let x = (location.longitude * 20037508.34) / 180
+          let y = Math.log(Math.tan(((90 + location.latitude) * Math.PI) / 360)) / (Math.PI / 180)
+          y = (y * 20037508.34) / 180
+          const f = new Feature(new Point([x, y]));
+          //
+          f.set('id', key);
+          features.push(f);
+        }
+        source.clear(true);
+        source.addFeatures(features);
+        //
+      }).catch((err) => {
+        console.log(err);
+      });
     }
 
     onMounted(() => {
@@ -259,6 +362,90 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.btn_xenon {
+  text-align: center;
+  cursor: pointer;
+  background-color: aliceblue !important;
+}
+.btn_xenon:hover {
+  background-color: rgb(83, 168, 255) !important;
+}
+.login_select {
+  height: 45px;
+  line-height: 45px;
+  background-color: aliceblue;
+  padding-right: 20px;
+  padding-left: 6px;
+  border-radius: 5px;
+  margin-top: 10px;
+  z-index: 99;
+}
+
+.el-drawer__open .el-drawer.ltr {
+  animation: ltr-drawer-in .4s 0ms;
+}
+
+@keyframes ltr-drawer-in {
+  0% {
+    transform:translate(-100%)
+  }
+  to {
+    transform:translate(0)
+  }
+}
+@keyframes ltr-drawer-out {
+  0% {
+    transform:translate(0)
+  }
+  to {
+    transform:translate(-100%)
+  }
+}
+
+.el-drawer {
+  position: absolute;
+  box-sizing: border-box;
+  background-color: #fff;
+  display: flex;
+}
+
+.el-drawer__container {
+  position: relative;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  width: 450px;
+}
+
+.el-drawer__header {
+  align-items: center;
+  color: #72767b;
+  display: flex;
+  margin-bottom: 2px !important;
+  padding: var(--el-drawer-padding-primary);
+  padding-bottom: 0;
+}
+
+.el-drawer__wrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  margin: 0;
+  width: 450px;
+}
+
+.wallet-img {
+  font-size: 26px;
+}
+
+.wallet-img:hover {
+  color: silver;
+}
 .box-card {
   .item {
     margin-bottom: 20px;

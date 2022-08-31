@@ -38,7 +38,7 @@
             {{Constant.AccountType[scope.row.accountType]}}
           </template>
         </el-table-column>
-        <el-table-column prop="balance" :label="$t('account.table.balance')" align="right">
+        <el-table-column prop="balance" :label="$t('account.table.balance')">
           <template #default="scope">
             {{scope.row.balance}}
           </template>
@@ -105,7 +105,7 @@ export default {
         address:'',
         page:{
           currentPage:1,
-          pageSize:10,
+          pageSize:20,
           total:0
         }
       },

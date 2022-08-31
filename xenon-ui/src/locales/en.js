@@ -146,7 +146,7 @@ export default {
             terminate:"Terminate",
             earningMint:"Total Mining Revenue",
             earningService:"Total Service Revenue",
-            power:"Average power generation (kW)",
+            power:"Average power generation",
             totalEnergyGeneration:"Total Power Generation (kWh)",
             createTime:"Create Time",
         },

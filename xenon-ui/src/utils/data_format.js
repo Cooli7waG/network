@@ -147,3 +147,7 @@ export function getTokenFixed(value) {
     }
     return fixed;
 }
+
+export function getAddress(value) {
+    return value.substring(0,6)+"..."+value.substring(value.length-4)
+}

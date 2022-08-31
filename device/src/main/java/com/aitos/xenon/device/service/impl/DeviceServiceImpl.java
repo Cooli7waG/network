@@ -21,6 +21,8 @@ import com.aitos.xenon.core.exceptions.device.MinerClaimVerifyException;
 import com.aitos.xenon.core.exceptions.device.RecoverPublicKeyException;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
+import com.aitos.xenon.core.utils.Location;
+import com.aitos.xenon.core.utils.LocationTransformUtils;
 import com.aitos.xenon.core.utils.MetaMaskUtils;
 import com.aitos.xenon.device.api.RemoteDeviceService;
 import com.aitos.xenon.device.api.RemoteGameMinerService;
@@ -47,6 +49,7 @@ import org.springframework.util.Base64Utils;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -56,13 +59,10 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Autowired
     private DeviceMapper deviceMapper;
-
     @Autowired
     private RemoteAccountService remoteAccountService;
-
     @Autowired
     private RemoteTransactionService remoteTransactionService;
-
     @Autowired
     private RemoteBlockService remoteBlockService;
     @Autowired
@@ -77,6 +77,8 @@ public class DeviceServiceImpl implements DeviceService {
     private String webClaimUrl;
     @Value("${xenon.airdrop.apply.personalSign}")
     private Boolean applyPersonalSign;
+
+    private static HashMap MINER_LOCATION_CACHE = new HashMap();
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -367,5 +369,35 @@ public class DeviceServiceImpl implements DeviceService {
         Page<DeviceVo> page=new Page<DeviceVo>(queryParams.getOffset(),queryParams.getLimit());
         IPage<DeviceVo> pageResult=deviceMapper.getMinersByOwnerAddress(page,queryParams);
         return pageResult;
+    }
+
+    /**
+     * 获取所有miner位置信息
+     * @return
+     */
+    @Override
+    public HashMap getMinerLocation() {
+        if(MINER_LOCATION_CACHE.size()==0){
+            List<DeviceVo> deviceList = deviceMapper.getAllMinerLocation();
+            for (DeviceVo deviceVo : deviceList) {
+                //Location location = LocationTransformUtils.transformTo3857(deviceVo.getLongitude(), deviceVo.getLatitude());
+                Location location = new Location();
+                location.setLatitude(deviceVo.getLatitude());
+                location.setLongitude(deviceVo.getLongitude());
+                MINER_LOCATION_CACHE.put(deviceVo.getAddress(),location);
+            }
+        }
+        return MINER_LOCATION_CACHE;
+    }
+
+    @Override
+    public List<DeviceVo> loadMinersInfo(ArrayList<String> addressList) {
+        List<DeviceVo> deviceList = new ArrayList<>();
+        for (String address : addressList) {
+            Device byAddress = findByAddress(address);
+            DeviceVo deviceVo = BeanConvertor.toBean(byAddress, DeviceVo.class);
+            deviceList.add(deviceVo);
+        }
+        return deviceList;
     }
 }

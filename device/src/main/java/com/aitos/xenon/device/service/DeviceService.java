@@ -6,6 +6,8 @@ import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.domain.DeviceDetial;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public interface DeviceService {
@@ -46,4 +48,12 @@ public interface DeviceService {
      * @return
      */
     IPage<DeviceVo> getMinersByOwnerAddress(DeviceSearchDto deviceSearchDto);
+
+    /**
+     * 获取所有miner位置信息
+     * @return
+     */
+    HashMap getMinerLocation();
+
+    List<DeviceVo> loadMinersInfo(ArrayList<String> addressList);
 }

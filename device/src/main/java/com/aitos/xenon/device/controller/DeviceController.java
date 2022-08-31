@@ -22,7 +22,9 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/device")
@@ -32,7 +34,6 @@ public class DeviceController {
 
     @Autowired
     private DeviceService deviceService;
-
     @Value("${foundation.publicKey}")
     private String foundationPublicKey;
     @Value("${xenon.airdrop.apply.active}")
@@ -156,6 +157,16 @@ public class DeviceController {
         return Result.ok(deviceVoPage);
     }
 
+    /**
+     * 获取所有miner位置信息
+     * @return
+     */
+    @PostMapping("/getMinerLocation")
+    public Result<HashMap> getMinerLocation(){
+        HashMap map = deviceService.getMinerLocation();
+        return Result.ok(map);
+    }
+
     @PostMapping("/apply")
     public Result applyGameMiner(@RequestBody String applyGameMiner){
         if(!applyActive){
@@ -179,5 +190,15 @@ public class DeviceController {
         map.put("applyActive",applyActive);
         map.put("applyPersonalSign",applyPersonalSign);
         return Result.ok(map);
+    }
+
+    @PostMapping("/loadMinersInfo")
+    public Result loadMinersInfo(@RequestBody(required = false) ArrayList<String> addressList){
+        log.info("loadMinersInfo:{}",JSON.toJSONString(addressList));
+        if(addressList==null||addressList.size()<=0){
+            return Result.failed();
+        }
+        List<DeviceVo> deviceList = deviceService.loadMinersInfo(addressList);
+        return Result.ok(deviceList);
     }
 }

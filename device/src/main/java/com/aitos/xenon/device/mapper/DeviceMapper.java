@@ -37,4 +37,10 @@ public interface DeviceMapper {
      * @return
      */
     IPage<DeviceVo> getMinersByOwnerAddress(Page<DeviceVo> page, @Param("queryParams")DeviceSearchDto queryParams);
+
+    /**
+     * 获取所有设备位置信息
+     * @return
+     */
+    List<DeviceVo> getAllMinerLocation();
 }

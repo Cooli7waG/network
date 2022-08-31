@@ -1,6 +1,7 @@
 <template>
   <el-row style="background-color: #545c64">
     <el-col :span="20">
+
       <el-menu
           :default-active="autoActive()"
           class="el-menu-demo"
@@ -9,6 +10,9 @@
           text-color="#fff"
           active-text-color="#ffd04b"
           :router="true">
+        <div style="height: 59px;line-height: 59px;padding-left: 15px">
+          <img src="../assets/logo-arkreen.png" style="width: 40px;height: 40px;margin-top: 8px;margin-inline-end: 15px;">
+        </div>
         <el-menu-item index="/">{{ $t('menus.dashboard') }}</el-menu-item>
         <el-menu-item index="/miners">{{ $t('menus.miners') }}</el-menu-item>
         <el-menu-item index="/accounts">{{ $t('menus.accounts') }}</el-menu-item>
@@ -32,7 +36,6 @@
         <header id="el-drawer__title" class="el-drawer__header">
           <ul class="box" style="text-align: left">
             <li class="user">
-              <!--<a style="cursor: pointer">My Wallet ⏷</a>-->
               <a style="cursor: pointer">My Wallet</a>
             </li>
           </ul>
@@ -61,6 +64,12 @@
         </section>
         <section class="el-drawer__body" v-else>
           <div style="margin-top: 25px">
+            <el-row class="login_select btn_xenon" @click="gotoApplyGameMiner">
+              <el-col :span="24">
+                <i class="iconfont icon-liulanqi" style="color: black"></i>
+                <span style="margin-left: 5px"><b>Apply Game Miner</b></span>
+              </el-col>
+            </el-row>
             <el-row class="login_select btn_xenon" @click="gotoBrowser">
               <el-col :span="24">
                 <i class="iconfont icon-liulanqi" style="color: black"></i>
@@ -152,6 +161,10 @@ export default {
     gotoBrowser() {
       this.closeDrawer()
       this.$router.push("/")
+    },
+    gotoApplyGameMiner(){
+      this.$router.push("/user");
+      this.closeDrawer();
     },
     Logout() {
       this.$confirm('Are you sure want to logout?', 'Tips', {
