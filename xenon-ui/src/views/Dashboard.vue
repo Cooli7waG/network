@@ -48,37 +48,35 @@
           <el-collapse v-loading="data.minerInfoLoad" accordion>
             <el-collapse-item v-for="(miner,index) in data.minersList" :title="miner.address" :name="index">
               <el-row :gutter="20">
-                <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">Address:</el-col>
-                <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
+                <el-col :xs="12" :sm="8">Address:</el-col>
+                <el-col :xs="12" :sm="16">
                   <router-link :to="'/miner/'+miner.address">{{miner.address}}</router-link>
                 </el-col>
               </el-row>
               <el-row :gutter="20">
-                <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">Miner Type:</el-col>
-                <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
+                <el-col :xs="12" :sm="8">Miner Type:</el-col>
+                <el-col :xs="12" :sm="16">
                   {{ miner.minerType ? Constant.MinerType[miner.minerType] : '' }}
                 </el-col>
               </el-row>
               <el-row :gutter="20">
-                <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">Owner:</el-col>
-                <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ miner.ownerAddress }}</el-col>
+                <el-col :xs="12" :sm="8">Owner:</el-col>
+                <el-col :xs="12" :sm="16">{{ miner.ownerAddress }}</el-col>
               </el-row>
               <el-row :gutter="20">
-                <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">Maker:</el-col>
-                <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ miner.maker }}</el-col>
+                <el-col :xs="12" :sm="8">Maker:</el-col>
+                <el-col :xs="12" :sm="16">{{ miner.maker }}</el-col>
               </el-row>
               <el-row :gutter="20">
-                <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">Location:</el-col>
-                <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
+                <el-col :xs="12" :sm="8">Location:</el-col>
+                <el-col :xs="12" :sm="16">
                   {{ miner.latitude + "," + miner.longitude }}
                   <i class="iconfont icon-weizhi" style="color: deepskyblue;cursor: pointer" @click="gotoMap(data.device.latitude,data.device.longitude)"/>
                 </el-col>
               </el-row>
               <el-row :gutter="20">
-                <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">Create Time:</el-col>
-                <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
-                  {{ formatDate(miner.createTime, "yyyy-MM-dd hh:mm:ss") }}
-                </el-col>
+                <el-col :xs="12" :sm="8">Create Time:</el-col>
+                <el-col :xs="12" :sm="16">{{ formatDate(miner.createTime, "yyyy-MM-dd hh:mm:ss") }}</el-col>
               </el-row>
               <el-row :gutter="20">
                 <el-col :xl="24">Total Mining Revenue: {{ " "+formatToken(miner.earningMint) }}</el-col>
@@ -310,6 +308,7 @@ export default {
         data.minersDrawer = true;
       }
       //
+      data.minerInfoLoad = true;
       loadMinersInfo(minerAddressList).then((result) => {
         if(result.code == 0){
           data.minersList = result.data;

@@ -93,7 +93,19 @@ public class DeviceServiceImpl implements DeviceService {
         device.setEarningService(BigDecimal.valueOf(0));
         device.setCreateTime(LocalDateTime.now());
         deviceMapper.save(device);
-
+        //更新缓存的miner地理位置
+        try{
+            List<DeviceVo> deviceList = deviceMapper.getAllMinerLocation();
+            for (DeviceVo deviceVo : deviceList) {
+                Location location = new Location();
+                location.setLatitude(deviceVo.getLatitude());
+                location.setLongitude(deviceVo.getLongitude());
+                MINER_LOCATION_CACHE.put(deviceVo.getAddress(),location);
+            }
+        }catch (Exception e){
+            log.error("更新地理位置失败：{}",e.getMessage());
+        }
+        //
         AccountRegisterDto accountRegisterDto =new AccountRegisterDto();
         accountRegisterDto.setAddress(device.getAddress());
         accountRegisterDto.setAccountType(BusinessConstants.AccountType.MINER);
@@ -407,9 +419,8 @@ public class DeviceServiceImpl implements DeviceService {
     public List<DeviceVo> loadMinersInfo(ArrayList<String> addressList) {
         List<DeviceVo> deviceList = new ArrayList<>();
         for (String address : addressList) {
-            Device byAddress = findByAddress(address);
-            DeviceVo deviceVo = BeanConvertor.toBean(byAddress, DeviceVo.class);
-            deviceList.add(deviceVo);
+            DeviceVo byAddress = queryByMiner(address);
+            deviceList.add(byAddress);
         }
         return deviceList;
     }
