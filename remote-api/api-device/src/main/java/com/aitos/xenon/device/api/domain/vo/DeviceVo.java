@@ -11,9 +11,6 @@ public class DeviceVo  {
     private Long id;
     private String address;
     private String ownerAddress;
-
-    private String name;
-
     /**
      * Miner类型
      */
@@ -69,13 +66,21 @@ public class DeviceVo  {
     private String deviceSerialNum;
 
     /**
-     * 平均发电功率
+     * 发电功率
      */
     private String power;
+    /**
+     * 平均发电功率
+     */
+    private Double avgPower;
     /**
      * 总发电量（千瓦时）
      */
     private String totalEnergyGeneration;
+    /**
+     * 奖励收益
+     */
+    private BigDecimal balance;
 
     private LocalDateTime createTime;
 

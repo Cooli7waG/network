@@ -20,11 +20,11 @@ public interface AccountMapper {
     void update(Account account);
     void updateBalance(Account account);
 
-    Account findByAddress(String address);
+    AccountVo findByAddress(String address);
 
     IPage<AccountVo> list(Page<AccountVo> page,@Param("queryParams") AccountSearchDto accountSearchDto);
 
     List<Account> findListByIds(@Param("idsList")List<Long> idsList);
 
-    void updateEarning(@Param("rewards")List<PoggRewardDetailDto> rewards, LocalDateTime updateTime);
+    void updateEarning(@Param("rewards")List<PoggRewardDetailDto> rewards,@Param("updateTime") LocalDateTime updateTime);
 }

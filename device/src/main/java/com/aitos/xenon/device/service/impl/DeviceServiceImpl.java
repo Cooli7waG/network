@@ -9,6 +9,7 @@ import com.aitos.xenon.account.api.domain.dto.AccountRegisterDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionDto;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
 import com.aitos.xenon.block.api.RemoteBlockService;
+import com.aitos.xenon.block.api.RemotePoggService;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.constant.RandomLocation;
@@ -65,6 +66,9 @@ public class DeviceServiceImpl implements DeviceService {
     private RemoteTransactionService remoteTransactionService;
     @Autowired
     private RemoteBlockService remoteBlockService;
+    @Autowired
+    private RemotePoggService remotePoggService;
+
     @Autowired
     private RemoteFundationService remoteFundationService;
     @Autowired
@@ -205,6 +209,15 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public DeviceVo queryByMiner(String minerAddress) {
         DeviceVo device=deviceMapper.queryByMiner(minerAddress);
+        if (device != null) {
+            Result<Double> result = remotePoggService.avgPower(device.getAddress());
+            log.info("queryByMiner.result={}",JSON.toJSONString(result));
+            if(result.getCode()==ApiStatus.SUCCESS.getCode()){
+                device.setAvgPower(result.getData());
+            }else{
+                device.setAvgPower(0D);
+            }
+        }
         return device;
     }
 

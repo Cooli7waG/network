@@ -92,10 +92,9 @@ public class PoggController {
         return Result.ok(txHash);
     }
 
-    @PostMapping("/poggHitPerBlocks")
-    public Result<HashMap<String,String>> poggHitPerBlocks(){
-        HashMap<String,String> hashMap=new HashMap<>(1);
-        hashMap.put("challengeHit",challengeHit+"");
-        return Result.ok(hashMap);
+    @GetMapping("/report/avgPower")
+    public Result<Double> avgPower(String ownerAddress){
+        double avgPower = poggReportService.avgPower(ownerAddress);
+        return Result.ok(avgPower);
     }
 }

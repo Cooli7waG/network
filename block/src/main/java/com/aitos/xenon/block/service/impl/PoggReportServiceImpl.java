@@ -101,5 +101,8 @@ public class PoggReportServiceImpl implements PoggReportService {
         return poggReportMapper.findSubtotalStatisticsList(startEpoch, endEpoch);
     }
 
-
+    @Override
+    public double avgPower(String ownerAddress) {
+        return poggReportMapper.avgPower(ownerAddress);
+    }
 }

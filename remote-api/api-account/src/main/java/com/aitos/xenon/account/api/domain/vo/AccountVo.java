@@ -13,8 +13,6 @@ public class AccountVo {
 
     private String address;
 
-    private String web3Address;
-
     private String balance;
 
     private Long nonce;
@@ -24,10 +22,17 @@ public class AccountVo {
      */
     private Integer  accountType;
 
+    /**
+     * 总挖矿收入
+     */
     private long earningMint;
-
+    /**
+     * 总服务收入
+     */
     private long earningService;
-
+    /**
+     * miner数量
+     */
     private int amountMiner;
 
     private LocalDateTime createTime;

@@ -2,6 +2,7 @@ package com.aitos.xenon.account.service;
 
 import com.aitos.common.crypto.coder.DataCoder;
 import com.aitos.common.crypto.ecdsa.Ecdsa;
+import com.aitos.xenon.account.api.domain.vo.AccountVo;
 import com.aitos.xenon.account.domain.Account;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +85,14 @@ public class AccountServiceTest {
         account.setBalance(new BigInteger("37.5").toString());
         account.setNonce(1l);
         accountService.update(account);
+    }
+
+
+    @Test
+    public void test_findByAddress(){
+
+        AccountVo byAddress = accountService.findByAddress("0xefe22f370d03ace02f82e379a754b072123e4db2");
+        System.out.println(byAddress);
     }
 
 
