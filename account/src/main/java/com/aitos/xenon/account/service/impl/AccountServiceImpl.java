@@ -42,12 +42,10 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account findByAddress(String address) {
+    public AccountVo findByAddress(String address) {
         try {
-            Account account = accountMapper.findByAddress(address);
-            if (account == null || account.getAccountType().equals(BusinessConstants.AccountType.MINER)) {
-                return null;
-            } else {
+            AccountVo account = accountMapper.findByAddress(address);
+            if (account == null) {
                 BigInteger blance = erc20Service.balanceOf(account.getAddress()).send();
                 account.setBalance(blance.toString());
             }
@@ -66,13 +64,11 @@ public class AccountServiceImpl implements AccountService {
             List<String> addressList = pageResult.getRecords().stream().map(accountVo -> accountVo.getAddress()).collect(Collectors.toList());
             List<BigInteger> list = erc20Service.balanceOf_multi(addressList).send();
             for (AccountVo accountVo : pageResult.getRecords()) {
-                if (accountVo.getAccountType() != BusinessConstants.AccountType.MINER) {
-                    for (int i = 0; i < addressList.size(); i++) {
-                        String publickey = addressList.get(i);
-                        if (publickey.equals(accountVo.getAddress())) {
-                            accountVo.setBalance(list.get(i).toString());
-                            break;
-                        }
+                for (int i = 0; i < addressList.size(); i++) {
+                    String publickey = addressList.get(i);
+                    if (publickey.equals(accountVo.getAddress())) {
+                        accountVo.setBalance(list.get(i).toString());
+                        break;
                     }
                 }
             }

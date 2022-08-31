@@ -47,7 +47,7 @@
 
     <el-row :gutter="20">
       <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.power') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ data.device.power/1000 }} kW</el-col>
+      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ (data.device.avgPower/1000/1000).toFixed(3) }} kW</el-col>
     </el-row>
 
     <el-row :gutter="20">

@@ -5,6 +5,7 @@ import com.aitos.xenon.account.api.domain.dto.PoggRewardDetailDto;
 import com.aitos.xenon.account.api.domain.dto.PoggRewardDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionSearchDto;
 import com.aitos.xenon.account.api.domain.dto.TransferDto;
+import com.aitos.xenon.account.api.domain.vo.AccountVo;
 import com.aitos.xenon.account.domain.*;
 import com.aitos.xenon.account.mapper.TransactionMapper;
 import com.aitos.xenon.account.service.AccountService;
@@ -161,8 +162,6 @@ public class TransactionServiceImpl implements TransactionService {
     public void transfer(TransferDto transferDto) {
 
         try {
-            Account account = accountService.findByAddress(transferDto.getPayments().get(0).getPayeeToHex());
-
             BigDecimal fee = Convert.fromWei(transferDto.getFee().toString(), Convert.Unit.ETHER);
            /* TransactionReceipt transactionReceipt=erc20Service.transfer(We3jUtils.toWeb3Address(account.getAddress()),fee.toBigInteger()).send();
 
@@ -208,8 +207,9 @@ public class TransactionServiceImpl implements TransactionService {
             TransactionReceipt transactionReceipt = erc20Service.rewardMiner_multi(addressList, rewardList).send();
 
             // todo 更新miner账户余额
+            log.info("updateEarning...");
             accountService.updateEarning(poggRewardDto.getRewards());
-
+            log.info("updateEarning...");
 
             //记录交易
             String data = JSON.toJSONString(poggRewardDto);
