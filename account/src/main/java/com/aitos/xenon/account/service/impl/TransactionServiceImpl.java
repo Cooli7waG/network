@@ -55,8 +55,10 @@ public class TransactionServiceImpl implements TransactionService {
     public void transaction(Transaction transaction) {
         transaction.setStatus(1);
         //TODO 提取数据分别保存
-        abstractTransaction(transaction);
-        abstractTransactionReport(transaction);
+        if(!transaction.getData().equals("[]")) {
+            abstractTransaction(transaction);
+            abstractTransactionReport(transaction);
+        }
         transaction.setCreateTime(LocalDateTime.now());
         transactionMapper.save(transaction);
     }
@@ -192,38 +194,36 @@ public class TransactionServiceImpl implements TransactionService {
             List<String> addressList = new ArrayList<>();
             List<BigInteger> rewardList = new ArrayList<>();
 
-            Map<String, List<PoggRewardDetailDto>> groupBy = poggRewardDto.getRewards().stream().collect(Collectors.groupingBy(PoggRewardDetailDto::getOwnerAddress));
-            for (Map.Entry<String, List<PoggRewardDetailDto>> entry : groupBy.entrySet()) {
-                String ownerAddress = entry.getKey();
-                BigDecimal ownerAmount = entry.getValue().stream()
-                        .map(item -> item.getAmount()).reduce(BigDecimal::add)
-                        .orElse(BigDecimal.ZERO);
-                addressList.add(ownerAddress);
+            if(poggRewardDto.getRewards().size()>0){
+                Map<String, List<PoggRewardDetailDto>> groupBy = poggRewardDto.getRewards().stream().collect(Collectors.groupingBy(PoggRewardDetailDto::getOwnerAddress));
+                for (Map.Entry<String, List<PoggRewardDetailDto>> entry : groupBy.entrySet()) {
+                    String ownerAddress = entry.getKey();
+                    BigDecimal ownerAmount = entry.getValue().stream()
+                            .map(item -> item.getAmount()).reduce(BigDecimal::add)
+                            .orElse(BigDecimal.ZERO);
+                    addressList.add(ownerAddress);
 
-                BigDecimal blanceEther = Convert.toWei(ownerAmount, Convert.Unit.ETHER);
-                rewardList.add(blanceEther.toBigInteger());
+                    BigDecimal blanceEther = Convert.toWei(ownerAmount, Convert.Unit.ETHER);
+                    rewardList.add(blanceEther.toBigInteger());
+                }
+                //调用合约发送奖励
+                TransactionReceipt transactionReceipt = erc20Service.rewardMiner_multi(addressList, rewardList).send();
+                log.info("erc20.transactionReceipt={}",transactionReceipt.getTransactionHash());
+                // 更新miner账户余额
+                accountService.updateEarning(poggRewardDto.getRewards());
             }
-            //调用合约发送奖励
-            TransactionReceipt transactionReceipt = erc20Service.rewardMiner_multi(addressList, rewardList).send();
-
-            // todo 更新miner账户余额
-            log.info("updateEarning...");
-            accountService.updateEarning(poggRewardDto.getRewards());
-            log.info("updateEarning...");
-
             //记录交易
             String data = JSON.toJSONString(poggRewardDto);
             String txHash = DigestUtils.sha256Hex(data);
-
             Transaction transaction = new Transaction();
             transaction.setData(data);
             transaction.setHash(txHash);
             transaction.setHeight(poggRewardDto.getHeight());
             transaction.setTxType(BusinessConstants.TXType.TX_REWARD_POGG);
             this.transaction(transaction);
-            return transactionReceipt.getTransactionHash();
+            return txHash;
         } catch (Exception e) {
-            log.error("transfer.error:{}", e);
+            log.error("poggReward.error:{}", e);
             throw new ServiceException(e.getMessage());
         }
     }

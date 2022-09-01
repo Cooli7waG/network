@@ -1,6 +1,8 @@
 package com.aitos.xenon.block.service;
 
+import com.aitos.xenon.account.api.domain.dto.PoggRewardDetailDto;
 import com.aitos.xenon.block.api.domain.dto.PoggGreenDataDto;
+import com.alibaba.fastjson.JSON;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,5 +53,10 @@ public class PoggServiceTest {
         String minerAddress="PZ8Tyr4Nx8MHsRAGMpZmZ6TWY63dXWSCyYX7kae74h2wDin6wmJwpbMqGUrKxMf2FQA3nw616bhpmXKrEEQ5A3KkcY793AsKpF7EA5Rf1Yq1scnPAXunZEQd";
         Integer total=200;
         //poggService.processAwardEligibility(commitPrivatekey,minerAddress,total);
+    }
+    @Test
+    public void test_json(){
+        List<PoggRewardDetailDto> poggRewardDetailDtos = JSON.parseArray("[]", PoggRewardDetailDto.class);
+        System.out.println(poggRewardDetailDtos);
     }
 }

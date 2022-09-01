@@ -45,7 +45,7 @@ public class AccountServiceImpl implements AccountService {
     public AccountVo findByAddress(String address) {
         try {
             AccountVo account = accountMapper.findByAddress(address);
-            if (account == null) {
+            if (account != null) {
                 BigInteger blance = erc20Service.balanceOf(account.getAddress()).send();
                 account.setBalance(blance.toString());
             }

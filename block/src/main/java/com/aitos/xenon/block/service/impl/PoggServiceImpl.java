@@ -120,37 +120,34 @@ public class PoggServiceImpl implements PoggService {
         long startEpoch = poggCommit.getEpoch() - systemConfig.getCalDataRange();
         long endEpoch = poggCommit.getEpoch();
 
+        String rewardsJson="[]";
         /**
          * 查询统计出每个miner中所有epoch的记录条数(单个epoch最高12条)，
          * 并且过滤了当前epoch里没有记录的miner
          */
         List<PoggReportSubtotalStatistics> subtotalStatisticsList = poggReportService.findSubtotalStatisticsList(startEpoch, endEpoch);
-        if (subtotalStatisticsList.size() == 0) {
-            return;
+        if (subtotalStatisticsList.size() > 0){
+            //获得有资格的miner
+            List<PoggReportSubtotalStatistics> qualifiedMinerList = subtotalStatisticsList.parallelStream()
+                    .filter(item -> processAwardEligibility(poggCommit.getPrivateKey(), item.getAddress(), item.getTotal()))
+                    .collect(Collectors.toList());
+            if (qualifiedMinerList.size() > 0) {
+                //计算总的奖励权重
+                BigDecimal totalRewardWeight = calTotalRewardWeight(systemConfig, qualifiedMinerList);
+
+                //计算每个miner获得的奖励
+                List<PoggRewardDetail> rewards = subtotalStatisticsList.stream().map(item -> {
+                    BigDecimal awardNumber = rewardCalculation(systemConfig, totalRewardWeight, item.getMinerType(), item.getTotal());
+                    PoggRewardDetail poggRewardDetail = new PoggRewardDetail();
+                    poggRewardDetail.setAddress(item.getAddress());
+                    poggRewardDetail.setOwnerAddress(item.getOwnerAddress());
+                    poggRewardDetail.setAmount(awardNumber);
+                    return poggRewardDetail;
+                }).collect(Collectors.toList());
+
+                rewardsJson = JSON.toJSONString(rewards);
+            }
         }
-
-        //获得有资格的miner
-        List<PoggReportSubtotalStatistics> qualifiedMinerList = subtotalStatisticsList.parallelStream()
-                .filter(item -> processAwardEligibility(poggCommit.getPrivateKey(), item.getAddress(), item.getTotal()))
-                .collect(Collectors.toList());
-        if (qualifiedMinerList.size() == 0) {
-            return;
-        }
-
-        //计算总的奖励权重
-        BigDecimal totalRewardWeight = calTotalRewardWeight(systemConfig, qualifiedMinerList);
-
-
-        //计算每个miner获得的奖励
-        List<PoggRewardDetail> rewards = subtotalStatisticsList.stream().map(item -> {
-            BigDecimal awardNumber = rewardCalculation(systemConfig, totalRewardWeight, item.getMinerType(), item.getTotal());
-            PoggRewardDetail poggRewardDetail = new PoggRewardDetail();
-            poggRewardDetail.setAddress(item.getAddress());
-            poggRewardDetail.setOwnerAddress(item.getOwnerAddress());
-            poggRewardDetail.setAmount(awardNumber);
-            return poggRewardDetail;
-        }).collect(Collectors.toList());
-
         //封装数据，并存入到数据库中
         PoggReward poggReward = new PoggReward();
         poggReward.setHeight(block.getHeight());
@@ -158,7 +155,7 @@ public class PoggServiceImpl implements PoggService {
         poggReward.setStartEpoch(startEpoch);
         poggReward.setEndEpoch(endEpoch);
         poggReward.setStatus(BusinessConstants.POGGRewardStatus.UN_ISSUED);
-        poggReward.setRewardsJson(JSON.toJSONString(rewards));
+        poggReward.setRewardsJson(rewardsJson);
         poggReward.setCreateTime(LocalDateTime.now());
         poggRewardMapper.save(poggReward);
 
