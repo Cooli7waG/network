@@ -55,7 +55,7 @@ public class TransactionServiceImpl implements TransactionService {
     public void transaction(Transaction transaction) {
         transaction.setStatus(1);
         //TODO 提取数据分别保存
-        if(!transaction.getData().equals("[]")) {
+        if(!"[]".equals(transaction.getData())) {
             abstractTransaction(transaction);
             abstractTransactionReport(transaction);
         }

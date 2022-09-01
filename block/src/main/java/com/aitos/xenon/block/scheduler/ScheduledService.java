@@ -63,7 +63,7 @@ public class ScheduledService {
     @Scheduled(cron = "0 30 * * * *")
     @Transactional(rollbackFor = Exception.class)
     public void giveOutRewardsTask(){
-        log.info("rewardCalculationTask");
+        log.info("giveOutRewardsTask");
         poggService.giveOutRewards();
     }
 }

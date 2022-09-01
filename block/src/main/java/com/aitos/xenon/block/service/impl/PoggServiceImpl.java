@@ -136,7 +136,7 @@ public class PoggServiceImpl implements PoggService {
                 BigDecimal totalRewardWeight = calTotalRewardWeight(systemConfig, qualifiedMinerList);
 
                 //计算每个miner获得的奖励
-                List<PoggRewardDetail> rewards = subtotalStatisticsList.stream().map(item -> {
+                List<PoggRewardDetail> rewards = qualifiedMinerList.stream().map(item -> {
                     BigDecimal awardNumber = rewardCalculation(systemConfig, totalRewardWeight, item.getMinerType(), item.getTotal());
                     PoggRewardDetail poggRewardDetail = new PoggRewardDetail();
                     poggRewardDetail.setAddress(item.getAddress());
