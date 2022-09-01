@@ -40,7 +40,7 @@ start(){
         if [ $? -eq "0" ]; then
                 echo "${APP_NAME} is already running, PID=${PID}"
         else
-                nohup java -Xms512m -Xmx512m  -Xloggc:logs/${APP_NAME}_gc.log -jar ${APP_NAME} --spring.profiles.active=${APP_ENV} > /dev/null 2>&1 &
+                nohup java -Xms512m -Xmx512m -Xmn256m  -Xloggc:logs/${APP_NAME}_gc.log -jar ${APP_NAME} --spring.profiles.active=${APP_ENV} > /dev/null 2>&1 &
                 PID=$(echo $!)
                 echo "${APP_NAME} start success, PID=$!"
         fi

@@ -131,6 +131,7 @@ public class PoggServiceImpl implements PoggService {
             List<PoggReportSubtotalStatistics> qualifiedMinerList = subtotalStatisticsList.parallelStream()
                     .filter(item -> processAwardEligibility(poggCommit.getPrivateKey(), item.getAddress(), item.getTotal()))
                     .collect(Collectors.toList());
+            log.info("qualifiedMinerList.size={}",qualifiedMinerList.size());
             if (qualifiedMinerList.size() > 0) {
                 //计算总的奖励权重
                 BigDecimal totalRewardWeight = calTotalRewardWeight(systemConfig, qualifiedMinerList);
@@ -200,7 +201,7 @@ public class PoggServiceImpl implements PoggService {
         BigInteger seed = new BigInteger(sha256Bytes).remainder(new BigInteger(perRewardEligibilityBlocks + ""));
 
         System.out.println(seed);
-        return seed.compareTo(new BigInteger("0")) != 0;
+        return seed.compareTo(new BigInteger("0")) == 0;
     }
 
     /**
