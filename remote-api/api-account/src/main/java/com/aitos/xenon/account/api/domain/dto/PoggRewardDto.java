@@ -14,9 +14,13 @@ public class PoggRewardDto {
      */
     private String verifiableEvidence;
 
+    @JSONField(serialize = false)
     private Long startEpoch;
 
+    @JSONField(serialize = false)
     private Long endEpoch;
+
+    private Long epoch;
 
     /**
      * 奖励明细
@@ -36,4 +40,8 @@ public class PoggRewardDto {
     private String msg;
 
     private Long height;
+
+    public Long getEpoch() {
+        return endEpoch;
+    }
 }

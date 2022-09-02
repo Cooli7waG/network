@@ -9,7 +9,7 @@
           <router-view />
         </el-main>
         <el-footer>
-          © 2022 . aitos.io
+          {{ $t('footer')}}
         </el-footer>
       </el-container>
     </el-container>

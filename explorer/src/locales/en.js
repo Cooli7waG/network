@@ -59,6 +59,7 @@ export default {
         tokenCirculatingSupply: 'Circulating Supply',
         tokenMaxSupply: 'Max Supply'
     },
+    footer:'© 2022 Arkreen Network',
     txs: {
         path:{
             home:"Home",
