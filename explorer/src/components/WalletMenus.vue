@@ -13,11 +13,9 @@
         <div style="height: 59px;line-height: 59px;padding-left: 15px">
           <img src="../assets/logo-arkreen.png" style="width: 40px;height: 40px;margin-top: 8px;margin-inline-end: 15px;">
         </div>
-        <el-menu-item index="/">{{ $t('menus.dashboard') }}</el-menu-item>
-        <el-menu-item index="/miners">{{ $t('menus.miners') }}</el-menu-item>
-        <el-menu-item index="/accounts">{{ $t('menus.accounts') }}</el-menu-item>
-        <el-menu-item index="/blocks">{{ $t('menus.blocks') }}</el-menu-item>
-        <el-menu-item index="/txs">{{ $t('menus.txs') }}</el-menu-item>
+        <el-menu-item index="/wallet/miners">{{ $t('menus.miners') }}</el-menu-item>
+        <el-menu-item index="/wallet/blocks">{{ $t('menus.blocks') }}</el-menu-item>
+        <el-menu-item index="/wallet/txs">{{ $t('menus.txs') }}</el-menu-item>
       </el-menu>
     </el-col>
     <el-col :span="4" class="login">

@@ -1,23 +1,11 @@
 <template>
   <div class="common-layout">
-    <el-container>
-      <el-header style="z-index: 999">
-        <Menus/>
-      </el-header>
-      <el-container>
-        <el-main>
-          <router-view />
-        </el-main>
-        <el-footer>
-          © 2022 . aitos.io
-        </el-footer>
-      </el-container>
-    </el-container>
+    <router-view />
   </div>
 </template>
 
 <script>
-import Menus from '@/components/Menus.vue'
+import Menus from '@/components/ExplorerMenus.vue'
 export default {
   name: 'App',
   components: {
