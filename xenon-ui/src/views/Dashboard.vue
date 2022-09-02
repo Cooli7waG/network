@@ -112,7 +112,9 @@ import OSM from "ol/source/OSM"
 import TileLayer from "ol/layer/Tile"
 import VectorLayer from "ol/layer/Vector"
 import VectorSource from "ol/source/Vector"
+import XYZSource from "ol/source/XYZ"
 import HexBinource from "ol-ext/source/HexBin"
+import DayNight from "ol-ext/source/DayNight"
 import Point from "ol/geom/Point"
 import Feature from "ol/Feature"
 import Style from "ol/style/Style"
@@ -225,7 +227,8 @@ export default {
       }
     };
 
-    const createHexBin = (source) => {
+    //创建六边形图层
+    const createHexBinLayer = (source) => {
       const hexbin = new HexBinource({
         source: source,		// source of the bin
         size: 100000			// hexagon size (in map unit)
@@ -237,7 +240,64 @@ export default {
         style: styleFn
       })
 
-      data.map.addLayer(vectorLayer);
+      return vectorLayer;
+    }
+
+    //创建marker图层
+    const createMarkerLayer = () => {
+      var markerSource = new VectorSource();
+      addFeatures(markerSource);
+      var markerLayer = new VectorLayer({source: markerSource, visible: true})
+      return markerLayer;
+    }
+
+    //创建日照图层
+    const createDayNightLayer = () => {
+      var dayNightSource = new DayNight({ });
+      var dayNightLayer=new VectorLayer({
+        source: dayNightSource,
+        style: new Style({
+          image: new Circle({
+            radius: 5,
+            fill: new Fill({ color: 'red' })
+          }),
+          fill: new Fill({
+            color: [0,0,50,.5]
+          })
+        })
+      })
+
+      return dayNightLayer;
+    }
+
+    //创建底图
+    const createBaseLayer=()=>{
+      var layers=[]
+      var esriLayer=new TileLayer({
+        source: new XYZSource({
+          attributions:
+              'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/' +
+              'rest/services/World_Topo_Map/MapServer">ArcGIS</a>',
+          url:
+              /*'https://server.arcgisonline.com/ArcGIS/rest/services/' +
+              'World_Topo_Map/MapServer/tile/{z}/{y}/{x}',*/
+              'https://wayback.maptiles.arcgis.com/arcgis/rest/services/world_imagery/wmts/1.0.0/default028mm/mapserver/tile/32645/{z}/{y}/{x}'
+        }),
+      })
+      //layers.push(esriLayer)
+
+      var world_Street_MapLayer=new TileLayer({
+        source: new XYZSource({
+          attributions:
+              'Tiles © <a href="https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer">ArcGIS</a>',
+          url:
+          /*'https://server.arcgisonline.com/ArcGIS/rest/services/' +
+          'World_Topo_Map/MapServer/tile/{z}/{y}/{x}',*/
+              'https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
+        }),
+      })
+      layers.push(world_Street_MapLayer)
+      return layers
     }
 
     const initMap = () => {
@@ -258,13 +318,11 @@ export default {
           })
         })
       })
+
+
+      const baseLayers=createBaseLayer()
       data.map = new Map({
-        layers: [
-          new TileLayer({
-            source: new OSM(),
-            style: defaultStyle
-          })
-        ],
+        layers: baseLayers,
         target: "map",
         view: new View({
           center: [0, 0],
@@ -277,30 +335,40 @@ export default {
         })
       })
 
-      var select = new Select();
+
+
+      //日照图层
+      const dayNightLayer = createDayNightLayer();
+      data.map.addLayer(dayNightLayer);
+
+      //标注点图层
+      var markerLayer = createMarkerLayer();
+      data.map.addLayer(markerLayer);
+
+      //六边形图层
+      const hexBinLayerLayer = createHexBinLayer(markerLayer.getSource());
+      data.map.addLayer(hexBinLayerLayer);
+
+
+      //创建feature选择器
+      var select = new Select({layers:[markerLayer,hexBinLayerLayer]});
       data.map.addInteraction(select);
       select.on('select', function (e) {
         if (e.selected.length) {
-          const f = e.selected[0].get('features');
-          if (f) {
+          const features = e.selected[0].get('features');
+          if (features) {
             let minerAddressList = [];
-            let features = e.selected[0].get('features');
+            console.log(features)
             for (let i=0;i<features.length;i++){
               minerAddressList.push(features[i].values_.id);
             }
             //
             showMinerList(minerAddressList);
           } else {
-            console.log("f---->"+f)
+            console.log("f---->"+features)
           }
         }
       });
-      var source = new VectorSource();
-      addFeatures(source);
-      var layerSource = new VectorLayer({source: source, visible: true})
-      data.map.addLayer(layerSource);
-
-      createHexBin(source);
     }
 
     const showMinerList = (minerAddressList) => {
@@ -459,7 +527,7 @@ export default {
 
 .map {
   width: 100%;
-  height: 400px;
+  height: 800px;
   margin-top: 20px;
 }
 </style>
