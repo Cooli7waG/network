@@ -34,7 +34,7 @@ public class PoggGreenDataDto {
                 PoggGreenDataDto poggGreenDataDto=new PoggGreenDataDto();
                 poggGreenDataDto.setVersion(data[0]);
 
-                poggGreenDataDto.setTimestamp(new BigInteger(Arrays.copyOfRange(data,1,6)).longValue());
+                poggGreenDataDto.setTimestamp(new BigInteger(Arrays.copyOfRange(data,1,6)).longValue()*1000);
                 poggGreenDataDto.setPower(new BigInteger(Arrays.copyOfRange(data,6,12)).longValue());
                 poggGreenDataDto.setTotal(new BigInteger(Arrays.copyOfRange(data,12,20)).longValue());
                 poggGreenDataDto.setCreateTime(LocalDateTime.now());

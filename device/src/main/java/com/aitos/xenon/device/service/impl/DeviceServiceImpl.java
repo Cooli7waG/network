@@ -3,10 +3,12 @@ package com.aitos.xenon.device.service.impl;
 import com.aitos.common.crypto.ecdsa.Ecdsa;
 import com.aitos.message.push.api.RemotePushService;
 import com.aitos.message.push.api.domain.dto.PushMessageDto;
+import com.aitos.xenon.account.api.RemoteAccountRewardService;
 import com.aitos.xenon.account.api.RemoteAccountService;
 import com.aitos.xenon.account.api.RemoteTransactionService;
 import com.aitos.xenon.account.api.domain.dto.AccountRegisterDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionDto;
+import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsVo;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
 import com.aitos.xenon.block.api.RemoteBlockService;
 import com.aitos.xenon.block.api.RemotePoggService;
@@ -81,6 +83,9 @@ public class DeviceServiceImpl implements DeviceService {
     private String webClaimUrl;
     @Value("${xenon.airdrop.apply.personalSign}")
     private Boolean applyPersonalSign;
+
+    @Autowired
+    private RemoteAccountRewardService remoteAccountRewardService;
 
     private static HashMap MINER_LOCATION_CACHE = new HashMap();
 
@@ -222,10 +227,14 @@ public class DeviceServiceImpl implements DeviceService {
     public DeviceVo queryByMiner(String minerAddress) {
         DeviceVo device=deviceMapper.queryByMiner(minerAddress);
         if (device != null) {
-            Result<Double> result = remotePoggService.avgPower(device.getAddress());
-            log.info("queryByMiner.result={}",JSON.toJSONString(result));
-            if(result.getCode()==ApiStatus.SUCCESS.getCode()){
-                device.setAvgPower(result.getData());
+            Result<AccountRewardStatisticsVo> accountStatistics = remoteAccountRewardService.statistics(device.getAddress());
+            log.info("queryByMiner.result={}",JSON.toJSONString(accountStatistics));
+            if(accountStatistics.getCode()==ApiStatus.SUCCESS.getCode()){
+                AccountRewardStatisticsVo accountRewardStatisticsVo = accountStatistics.getData();
+                device.setTotalReward(accountRewardStatisticsVo.getTotalReward());
+                device.setAvgReward(accountRewardStatisticsVo.getAvgReward());
+                device.setTodayReward(accountRewardStatisticsVo.getTodayReward());
+                device.setYesterdayReward(accountRewardStatisticsVo.getYesterdayReward());
             }else{
                 device.setAvgPower(0D);
             }

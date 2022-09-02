@@ -8,6 +8,7 @@ import com.aitos.xenon.account.api.domain.dto.TransferDto;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
 import com.aitos.xenon.account.domain.*;
 import com.aitos.xenon.account.mapper.TransactionMapper;
+import com.aitos.xenon.account.service.AccountRewardService;
 import com.aitos.xenon.account.service.AccountService;
 import com.aitos.xenon.account.service.TransactionService;
 import com.aitos.xenon.block.api.domain.dto.PoggGreenDataDto;
@@ -49,6 +50,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private AccountRewardService accountRewardService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -194,7 +198,13 @@ public class TransactionServiceImpl implements TransactionService {
             List<String> addressList = new ArrayList<>();
             List<BigInteger> rewardList = new ArrayList<>();
 
+            //生成交易数据
+            String data = JSON.toJSONString(poggRewardDto);
+            String txHash = DigestUtils.sha256Hex(data);
+
             if(poggRewardDto.getRewards().size()>0){
+                List<AccountReward>  accountRewardList=new ArrayList<>();
+
                 Map<String, List<PoggRewardDetailDto>> groupBy = poggRewardDto.getRewards().stream().collect(Collectors.groupingBy(PoggRewardDetailDto::getOwnerAddress));
                 for (Map.Entry<String, List<PoggRewardDetailDto>> entry : groupBy.entrySet()) {
                     String ownerAddress = entry.getKey();
@@ -205,16 +215,37 @@ public class TransactionServiceImpl implements TransactionService {
 
                     BigDecimal blanceEther = Convert.toWei(ownerAmount, Convert.Unit.ETHER);
                     rewardList.add(blanceEther.toBigInteger());
+
+                    AccountReward  accountReward=new AccountReward();
+                    accountReward.setAddress(ownerAddress);
+                    accountReward.setAmount(ownerAmount);
+                    accountReward.setAccountType(BusinessConstants.AccountType.WALLET);
+                    accountReward.setCreateTime(LocalDateTime.now());
+                    accountReward.setHash(txHash);
+                    accountReward.setHeight(poggRewardDto.getHeight());
+                    accountRewardList.add(accountReward);
                 }
                 //调用合约发送奖励
                 TransactionReceipt transactionReceipt = erc20Service.rewardMiner_multi(addressList, rewardList).send();
                 log.info("erc20.transactionReceipt={}",transactionReceipt.getTransactionHash());
                 // 更新miner账户余额
                 accountService.updateEarning(poggRewardDto.getRewards());
+
+                //奖励明细记录
+                poggRewardDto.getRewards().forEach(item->{
+                    AccountReward  accountReward=new AccountReward();
+                    accountReward.setAddress(item.getAddress());
+                    accountReward.setAmount(item.getAmount());
+                    accountReward.setAccountType(BusinessConstants.AccountType.MINER);
+                    accountReward.setOwnerAddress(item.getOwnerAddress());
+                    accountReward.setCreateTime(LocalDateTime.now());
+                    accountReward.setHash(txHash);
+                    accountReward.setHeight(poggRewardDto.getHeight());
+                    accountRewardList.add(accountReward);
+                });
+                accountRewardService.batchSave(accountRewardList);
             }
             //记录交易
-            String data = JSON.toJSONString(poggRewardDto);
-            String txHash = DigestUtils.sha256Hex(data);
             Transaction transaction = new Transaction();
             transaction.setData(data);
             transaction.setHash(txHash);

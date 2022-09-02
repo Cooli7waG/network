@@ -82,6 +82,24 @@ public class DeviceVo  {
      */
     private BigDecimal balance;
 
+
+    /**
+     * 总奖励
+     */
+    private BigDecimal totalReward;
+    /**
+     * 平均奖励
+     */
+    private BigDecimal avgReward;
+    /**
+     * 今日奖励
+     */
+    private BigDecimal todayReward;
+    /**
+     * 昨日奖励
+     */
+    private BigDecimal yesterdayReward;
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;
