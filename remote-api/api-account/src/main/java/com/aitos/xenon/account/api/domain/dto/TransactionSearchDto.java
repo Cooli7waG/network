@@ -10,7 +10,7 @@ import java.util.List;
 public class TransactionSearchDto extends QueryParams {
     private Long height;
 
-    private String fromAddress;
+    private String address;
 
     private String hash;
 

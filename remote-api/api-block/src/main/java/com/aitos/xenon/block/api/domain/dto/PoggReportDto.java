@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
-public class PoggReportDto extends QueryParams {
+public class PoggReportDto {
     @NotNull(message = "请填写版本号")
     private Integer version;
 
@@ -29,4 +29,9 @@ public class PoggReportDto extends QueryParams {
     private Long epoch;
     private Integer minerType;
     private String ownerAddress;
+    /**
+     * 交易hash
+     */
+    private String hash;
+    private Long height;
 }

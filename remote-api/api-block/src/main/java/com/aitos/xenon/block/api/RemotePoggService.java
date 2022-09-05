@@ -19,5 +19,5 @@ public interface RemotePoggService {
     Result<HashMap<String,String>> poggHitPerBlocks();
 
     @GetMapping("/pogg/report/avgPower")
-    Result<Double> avgPower(@RequestParam("ownerAddress") String ownerAddress);
+    Result<Double> avgPower(@RequestParam("address") String address);
 }

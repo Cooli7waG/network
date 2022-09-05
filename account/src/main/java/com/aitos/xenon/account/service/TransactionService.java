@@ -3,11 +3,8 @@ package com.aitos.xenon.account.service;
 import com.aitos.xenon.account.api.domain.dto.PoggRewardDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionSearchDto;
 import com.aitos.xenon.account.api.domain.dto.TransferDto;
-import com.aitos.xenon.account.domain.PoggReportMiner;
-import com.aitos.xenon.account.domain.PoggRewardMiner;
 import com.aitos.xenon.account.domain.Transaction;
 import com.aitos.xenon.account.domain.TransactionReport;
-import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
 import com.aitos.xenon.core.model.QueryParams;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
@@ -25,22 +22,6 @@ public interface TransactionService {
     IPage<Transaction> listOld(QueryParams queryParams);
 
     IPage<TransactionReport> list(TransactionSearchDto queryParams);
-
-    /**
-     * 根据Miner address 获取Report列表
-     * @param address
-     * @return
-     */
-    IPage<PoggReportMiner> getReportByMinerAddress(PoggReportDto address);
-
-    /**
-     * 根据Miner address 获取Reward列表
-     * @param address
-     * @return
-     */
-    IPage<PoggRewardMiner> getRewardByMinerAddress(PoggReportDto address);
-
-    public void abstractTransaction(Transaction transaction);
 
     List<Transaction> getAll();
 

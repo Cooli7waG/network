@@ -9,8 +9,8 @@
     <insert id="batchSave" useGeneratedKeys="true" keyProperty="id">
         insert into <include refid="tableName"/> (address,account_type,owner_address,amount,hash,height,reward_percent,create_time)
         value
-            <foreach collection="accountRewardList" item="item" open="(" close=")" separator=",">
-                #{item.address},#{item.accountType},#{item.ownerAddress},#{item.amount},#{item.hash},#{item.height},#{item.rewardPercent},#{item.createTime}
+            <foreach collection="accountRewardList" item="item"  separator=",">
+                (#{item.address},#{item.accountType},#{item.ownerAddress},#{item.amount},#{item.hash},#{item.height},#{item.rewardPercent},#{item.createTime})
             </foreach>
     </insert>
 
@@ -20,5 +20,10 @@
     <select id="statisticsTotalRewards"
             resultType="com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsVo">
         select IFNULL(sum(amount),0) as totalReward,IFNULL(avg(amount),0) as avgReward from  <include refid="tableName"/> where address=#{address}
+    </select>
+    <select id="findListByPage" resultType="com.aitos.xenon.account.api.domain.vo.AccountRewardVo">
+        select * from <include refid="tableName"/>
+        where address=#{queryParams.address}
+        order by create_time desc
     </select>
 </mapper>

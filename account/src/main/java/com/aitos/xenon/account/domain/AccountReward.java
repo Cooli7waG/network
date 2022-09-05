@@ -34,5 +34,5 @@ public class AccountReward extends BaseModel {
     /**
      * 获奖百分比
      */
-    private String rewardPercent;
+    private BigDecimal rewardPercent;
 }

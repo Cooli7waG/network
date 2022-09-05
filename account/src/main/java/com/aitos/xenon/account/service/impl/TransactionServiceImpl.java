@@ -60,8 +60,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setStatus(1);
         //TODO 提取数据分别保存
         if(!"[]".equals(transaction.getData())) {
-            abstractTransaction(transaction);
-            abstractTransactionReport(transaction);
+            //abstractTransactionReport(transaction);
         }
         transaction.setCreateTime(LocalDateTime.now());
         transactionMapper.save(transaction);
@@ -113,57 +112,6 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void abstractTransaction(Transaction transaction) {
-        try{
-            if (BusinessConstants.TXType.TX_REPORT_POGG == transaction.getTxType()) {
-                log.info("transaction type:{} = {}", transaction.getTxType(), "TX_REPORT_POGG");
-                //
-                PoggReportDto poggReportDto = JSON.parseObject(transaction.getData(), PoggReportDto.class);
-                List<PoggGreenDataDto> decode = PoggGreenDataDto.decode(poggReportDto.getDataList());
-                PoggReportMiner report = new PoggReportMiner();
-                report.setHeight(transaction.getHeight());
-                report.setHash(transaction.getHash());
-                for (PoggGreenDataDto poggGreenDataDto : decode) {
-                    if (report.getTimestamp() == null || poggGreenDataDto.getTimestamp() > report.getTimestamp()) {
-                        report.setPower(poggGreenDataDto.getPower());
-                        report.setTotal(poggGreenDataDto.getTotal());
-                        report.setTimestamp(poggGreenDataDto.getTimestamp());
-                        report.setAddress(poggReportDto.getAddress());
-                    }
-                }
-                report.setCreateTime(new Date());
-                transactionMapper.saveReport(report);
-            } else if (BusinessConstants.TXType.TX_REWARD_POGG == transaction.getTxType()) {
-                log.info("transaction type:{} = {}", transaction.getTxType(), "TX_REWARD_POGG");
-                List<PoggRewardMiner> rewardList = new ArrayList<>();
-                PoggRewardDto poggRewardDto = JSON.parseObject(transaction.getData(), PoggRewardDto.class);
-                BigDecimal totalAmount = new BigDecimal("0");
-                for (PoggRewardDetailDto poggRewardDtoReward : poggRewardDto.getRewards()) {
-                    PoggRewardMiner reward = new PoggRewardMiner();
-                    reward.setHeight(transaction.getHeight());
-                    reward.setHash(transaction.getHash());
-                    reward.setAddress(poggRewardDtoReward.getAddress());
-                    reward.setAmount(poggRewardDtoReward.getAmount());
-                    totalAmount = totalAmount.add(poggRewardDtoReward.getAmount());
-                    reward.setOwnerAddress(poggRewardDtoReward.getOwnerAddress());
-                    rewardList.add(reward);
-                }
-                //计算百分比并入库
-                for (PoggRewardMiner rewardMiner : rewardList) {
-                    BigDecimal divide = rewardMiner.getAmount().divide(totalAmount, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
-                    rewardMiner.setRewardPercent(divide.toString());
-                    rewardMiner.setCreateTime(new Date());
-                    transactionMapper.saveReward(rewardMiner);
-                }
-            } else {
-                log.info("transaction type:{} = ?", transaction.getTxType());
-            }
-        }catch (Exception e){
-            log.error("abstractTransaction error:{}",e.getMessage());
-        }
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public void transfer(TransferDto transferDto) {
 
@@ -204,7 +152,8 @@ public class TransactionServiceImpl implements TransactionService {
 
             if(poggRewardDto.getRewards().size()>0){
                 List<AccountReward>  accountRewardList=new ArrayList<>();
-
+                BigDecimal totalAmount = poggRewardDto.getRewards().stream().map(PoggRewardDetailDto::getAmount).reduce(BigDecimal.ZERO,BigDecimal::add);
+                
                 Map<String, List<PoggRewardDetailDto>> groupBy = poggRewardDto.getRewards().stream().collect(Collectors.groupingBy(PoggRewardDetailDto::getOwnerAddress));
                 for (Map.Entry<String, List<PoggRewardDetailDto>> entry : groupBy.entrySet()) {
                     String ownerAddress = entry.getKey();
@@ -223,6 +172,10 @@ public class TransactionServiceImpl implements TransactionService {
                     accountReward.setCreateTime(LocalDateTime.now());
                     accountReward.setHash(txHash);
                     accountReward.setHeight(poggRewardDto.getHeight());
+
+                    BigDecimal rewardPercent = ownerAmount.divide(totalAmount, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
+                    accountReward.setRewardPercent(rewardPercent);
+
                     accountRewardList.add(accountReward);
                 }
                 //调用合约发送奖励
@@ -241,6 +194,8 @@ public class TransactionServiceImpl implements TransactionService {
                     accountReward.setCreateTime(LocalDateTime.now());
                     accountReward.setHash(txHash);
                     accountReward.setHeight(poggRewardDto.getHeight());
+                    BigDecimal rewardPercent = item.getAmount().divide(totalAmount, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
+                    accountReward.setRewardPercent(rewardPercent);
                     accountRewardList.add(accountReward);
                 });
                 accountRewardService.batchSave(accountRewardList);
@@ -275,20 +230,6 @@ public class TransactionServiceImpl implements TransactionService {
     public IPage<TransactionReport> list(TransactionSearchDto queryParams) {
         Page<TransactionReport> page = new Page<TransactionReport>(queryParams.getOffset(), queryParams.getLimit());
         IPage<TransactionReport> pageResult = transactionMapper.list(page, queryParams);
-        return pageResult;
-    }
-
-    @Override
-    public IPage<PoggReportMiner> getReportByMinerAddress(PoggReportDto queryParams) {
-        Page<PoggReportMiner> page = new Page<PoggReportMiner>(queryParams.getOffset(), queryParams.getLimit());
-        IPage<PoggReportMiner> pageResult = transactionMapper.getReportByMinerAddress(page, queryParams);
-        return pageResult;
-    }
-
-    @Override
-    public IPage<PoggRewardMiner> getRewardByMinerAddress(PoggReportDto queryParams) {
-        Page<PoggRewardMiner> page = new Page<PoggRewardMiner>(queryParams.getOffset(), queryParams.getLimit());
-        IPage<PoggRewardMiner> pageResult = transactionMapper.getRewardByMinerAddress(page, queryParams);
         return pageResult;
     }
 

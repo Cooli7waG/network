@@ -5,10 +5,13 @@ import com.aitos.common.crypto.coder.DataCoder;
 import com.aitos.common.crypto.ecdsa.Ecdsa;
 import com.aitos.xenon.block.api.domain.dto.PoggGreenDataDto;
 import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
+import com.aitos.xenon.block.api.domain.dto.PoggReportSearchDto;
+import com.aitos.xenon.block.api.domain.vo.PoggReportDataVo;
 import com.aitos.xenon.block.domain.PoggCommit;
 import com.aitos.xenon.block.service.PoggReportService;
 import com.aitos.xenon.block.service.PoggService;
 import com.aitos.xenon.core.constant.ApiStatus;
+import com.aitos.xenon.core.model.Page;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.ValidatorUtils;
 import com.aitos.xenon.device.api.RemoteDeviceService;
@@ -16,6 +19,7 @@ import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -92,9 +96,17 @@ public class PoggController {
         return Result.ok(txHash);
     }
 
+    @PostMapping("/reportDataList")
+    public Result<Page<PoggReportDataVo>> reportDataList(@RequestBody PoggReportSearchDto queryParams){
+        log.info("reportDataList.params:{}",JSON.toJSONString(queryParams));
+        IPage<PoggReportDataVo> listPage= poggReportService.findReportDataListByPage(queryParams);
+        Page<PoggReportDataVo> poggReportPage=new Page<PoggReportDataVo>(listPage.getTotal(),listPage.getRecords());
+        return Result.ok(poggReportPage);
+    }
+
     @GetMapping("/report/avgPower")
-    public Result<Double> avgPower(String ownerAddress){
-        double avgPower = poggReportService.avgPower(ownerAddress);
+    public Result<Double> avgPower(String address){
+        double avgPower = poggReportService.avgPower(address);
         return Result.ok(avgPower);
     }
 }

@@ -135,7 +135,7 @@ export default {
       } else if (data.query.select == "2") {
         params['height'] = data.query.keyword
       } else if (data.query.select == "3") {
-        params['fromAddress'] = data.query.keyword
+        params['address'] = data.query.keyword
       }
       transactionList(params).then((result) => {
         data.query.page.total = result.data.total

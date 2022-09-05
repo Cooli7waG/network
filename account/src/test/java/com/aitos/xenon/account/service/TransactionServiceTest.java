@@ -25,7 +25,6 @@ public class TransactionServiceTest {
     public void test_get_tx(){
         List<Transaction> all = transactionService.getAll();
         for (Transaction transaction : all) {
-            transactionService.abstractTransaction(transaction);
         }
     }
 }

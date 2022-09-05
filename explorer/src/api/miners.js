@@ -31,21 +31,14 @@ export function onboard(data){
     })
 }
 
-export function getReport(data){
+export function reportDataList(data){
     return request({
-        url: '/account/transaction/getReport',
+        url: '/block/pogg/reportDataList',
         method: 'post',
         data:data
     })
 }
 
-export function getReward(data){
-    return request({
-        url: '/account/transaction/getReward',
-        method: 'post',
-        data:data
-    })
-}
 
 export function getApplyActiveInfo(){
     return request({

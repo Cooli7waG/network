@@ -1,28 +1,29 @@
-package com.aitos.xenon.account.domain;
+package com.aitos.xenon.account.api.domain.vo;
 
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
-public class PoggRewardMiner {
+public class AccountRewardVo  {
 
     private Long id;
 
     private String address;
+    /**
+     * 账户类型
+     */
+    private Integer accountType;
 
     /**
      *  owner address
      */
     private String ownerAddress;
-
     /**
      * 奖励数量
      */
     private BigDecimal amount;
-
-    private Date createTime;
     /**
      * 交易hash
      */
@@ -34,5 +35,8 @@ public class PoggRewardMiner {
     /**
      * 获奖百分比
      */
-    private String rewardPercent;
+    private BigDecimal rewardPercent;
+
+    private LocalDateTime createTime;
+
 }

@@ -89,7 +89,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="timestamp" label="Timestamp">
-            <template #default="scope">{{formatDate(new Date(scope.row.timestamp*1000), "yyyy-MM-dd hh:mm:ss")}}</template>
+            <template #default="scope">{{formatDate(new Date(scope.row.timestamp), "yyyy-MM-dd hh:mm:ss")}}</template>
           </el-table-column>
         </el-table>
       </el-tab-pane>
@@ -147,7 +147,8 @@
 <script>
 import "@/assets/css/iconfont.css"
 import Constant from '@/utils/constant.js'
-import {queryByMiner,getReport,getReward} from '@/api/miners.js'
+import {queryByMiner,getReport,reportDataList} from '@/api/miners.js'
+import {getRewardList} from '@/api/account_reward.js'
 import {onMounted, reactive} from "vue";
 import {useRoute} from 'vue-router'
 import {formatDate,formatPower,formatNumber,formatElectricity,formatToken} from "@/utils/data_format";
@@ -227,7 +228,7 @@ export default {
     },
     handleGetReport(){
       this.data.page.address = this.$route.params.address;
-      getReport(this.data.page).then(rsp =>{
+      reportDataList(this.data.page).then(rsp =>{
         this.data.page.total = rsp.data.total;
         this.data.reportData = rsp.data.items
         this.data.reportLoading = false;
@@ -235,7 +236,7 @@ export default {
     },
     handleGetReward(){
       this.data.page.address = this.$route.params.address;
-      getReward(this.data.page).then(rsp =>{
+      getRewardList(this.data.page).then(rsp =>{
         this.data.page.total = rsp.data.total;
         this.data.rewardData = rsp.data.items
         this.data.rewardLoading = false;
