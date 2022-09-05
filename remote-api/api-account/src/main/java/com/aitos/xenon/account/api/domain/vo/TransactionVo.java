@@ -1,6 +1,5 @@
 package com.aitos.xenon.account.api.domain.vo;
 
-import com.aitos.xenon.core.model.BaseModel;
 import lombok.Data;
 
 import java.time.LocalDateTime;

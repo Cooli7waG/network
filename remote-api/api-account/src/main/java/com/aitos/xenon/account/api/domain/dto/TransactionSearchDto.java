@@ -12,9 +12,11 @@ public class TransactionSearchDto extends QueryParams {
 
     private String address;
 
-    private String owner;
-
     private String hash;
 
     private Integer txType;
+
+    private String startTime;
+
+    private String endTime;
 }

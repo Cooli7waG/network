@@ -65,19 +65,11 @@ public class TransactionController {
         return Result.ok(transactionVo);
     }
 
-    @GetMapping("/listOld")
-    public Result<Page<TransactionVo>> listOld(TransactionSearchDto queryParams){
-        IPage<Transaction> listPage= transactionService.listOld(queryParams);
+    @GetMapping("/list")
+    public Result<Page<TransactionVo>> list(TransactionSearchDto queryParams){
+        IPage<TransactionVo> listPage= transactionService.list(queryParams);
         List<TransactionVo>  listVo=BeanConvertor.toList(listPage.getRecords(),TransactionVo.class);
         Page<TransactionVo> page=new Page<>(listPage.getTotal(),listVo);
-        return Result.ok(page);
-    }
-
-    @GetMapping("/list")
-    public Result<Page<TransactionReport>> list(TransactionSearchDto queryParams){
-        IPage<TransactionReport> listPage= transactionService.list(queryParams);
-        List<TransactionReport>  listVo=BeanConvertor.toList(listPage.getRecords(),TransactionReport.class);
-        Page<TransactionReport> page=new Page<>(listPage.getTotal(),listVo);
         return Result.ok(page);
     }
 
