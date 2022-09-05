@@ -28,7 +28,7 @@
     <select id="findReportDataListByPage" resultType="com.aitos.xenon.block.api.domain.vo.PoggReportDataVo">
         select * from <include refid="tableName"/>
         where address=#{queryParams.address}
-        order by create_time desc
+        order by timestamp desc
     </select>
 
 
