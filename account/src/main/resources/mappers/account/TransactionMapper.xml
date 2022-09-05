@@ -33,7 +33,7 @@
     </select>
 
     <select id="list" resultType="com.aitos.xenon.account.domain.TransactionReport">
-        select * from transaction_report
+        select * from transaction
         <where>
             <if test="queryParams.height!=null">
                 height=#{queryParams.height}
@@ -44,8 +44,8 @@
             <if test="queryParams.txType!=null and queryParams.txType!=''">
                 and tx_type=#{queryParams.txType}
             </if>
-            <if test="queryParams.fromAddress!=null and queryParams.fromAddress!=''">
-                and (miner=#{queryParams.fromAddress} or owner=#{queryParams.fromAddress})
+            <if test="queryParams.address!=null and queryParams.address!=''">
+                and JSON_SEARCH(data, 'one', #{queryParams.address})
             </if>
         </where>
         order by create_time desc
