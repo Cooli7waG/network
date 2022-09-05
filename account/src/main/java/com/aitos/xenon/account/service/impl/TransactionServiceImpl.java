@@ -60,7 +60,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setStatus(1);
         //TODO 提取数据分别保存
         if(!"[]".equals(transaction.getData())) {
-            abstractTransactionReport(transaction);
+            //abstractTransactionReport(transaction);
         }
         transaction.setCreateTime(LocalDateTime.now());
         transactionMapper.save(transaction);
