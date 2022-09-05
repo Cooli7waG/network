@@ -35,7 +35,7 @@ public class AccountRewardVo  {
     /**
      * 获奖百分比
      */
-    private String rewardPercent;
+    private BigDecimal rewardPercent;
 
     private LocalDateTime createTime;
 

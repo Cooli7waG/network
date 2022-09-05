@@ -1,8 +1,11 @@
 package com.aitos.xenon.block.service;
 
 import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
+import com.aitos.xenon.block.api.domain.dto.PoggReportSearchDto;
+import com.aitos.xenon.block.api.domain.vo.PoggReportDataVo;
 import com.aitos.xenon.block.domain.PoggReportSubtotal;
 import com.aitos.xenon.block.domain.PoggReportSubtotalStatistics;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import java.util.List;
 
@@ -14,6 +17,13 @@ public interface PoggReportService {
 
 
     void saveOrUpdate(PoggReportSubtotal poggReportSubtotal);
+
+    /**
+     * 分页查询设备上报的数据记录
+     * @param queryParams
+     * @return
+     */
+    IPage<PoggReportDataVo> findReportDataListByPage(PoggReportSearchDto queryParams);
 
     /**
      * 统计指定范围内的miner 上报记录数
@@ -28,4 +38,6 @@ public interface PoggReportService {
      * @return
      */
     double avgPower(String ownerAddress);
+
+
 }

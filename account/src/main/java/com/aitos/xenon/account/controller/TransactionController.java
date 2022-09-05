@@ -1,16 +1,15 @@
 package com.aitos.xenon.account.controller;
 
-import com.aitos.common.crypto.coder.Base58;
 import com.aitos.common.crypto.coder.DataCoder;
 import com.aitos.common.crypto.ecdsa.Ecdsa;
-import com.aitos.xenon.account.api.domain.dto.*;
+import com.aitos.xenon.account.api.domain.dto.PoggRewardDto;
+import com.aitos.xenon.account.api.domain.dto.TransactionDto;
+import com.aitos.xenon.account.api.domain.dto.TransactionSearchDto;
+import com.aitos.xenon.account.api.domain.dto.TransferDto;
 import com.aitos.xenon.account.api.domain.vo.TransactionVo;
-import com.aitos.xenon.account.domain.PoggReportMiner;
-import com.aitos.xenon.account.domain.PoggRewardMiner;
 import com.aitos.xenon.account.domain.Transaction;
 import com.aitos.xenon.account.domain.TransactionReport;
 import com.aitos.xenon.account.service.TransactionService;
-import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.model.Page;
 import com.aitos.xenon.core.model.Result;
@@ -18,7 +17,6 @@ import com.aitos.xenon.core.utils.BeanConvertor;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -83,18 +81,4 @@ public class TransactionController {
         return Result.ok(page);
     }
 
-    @PostMapping("/getReport")
-    public Result<Page<PoggReportMiner>> getReportByMinerAddress(@RequestBody PoggReportDto queryParams){
-        log.info("getReport PoggReportDto:{}",JSON.toJSONString(queryParams));
-        IPage<PoggReportMiner> listPage= transactionService.getReportByMinerAddress(queryParams);
-        Page<PoggReportMiner> poggReportPage=new Page<PoggReportMiner>(listPage.getTotal(),listPage.getRecords());
-        return Result.ok(poggReportPage);
-    }
-
-    @PostMapping("/getReward")
-    public Result<Page<PoggRewardMiner>> getRewardByMinerAddress(@RequestBody PoggReportDto queryParams){
-        IPage<PoggRewardMiner> listPage= transactionService.getRewardByMinerAddress(queryParams);
-        Page<PoggRewardMiner> poggRewardMinerPage=new Page<PoggRewardMiner>(listPage.getTotal(),listPage.getRecords());
-        return Result.ok(poggRewardMinerPage);
-    }
 }

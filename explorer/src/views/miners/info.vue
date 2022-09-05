@@ -147,7 +147,7 @@
 <script>
 import "@/assets/css/iconfont.css"
 import Constant from '@/utils/constant.js'
-import {queryByMiner,getReport,getReward} from '@/api/miners.js'
+import {queryByMiner,getReport,reportDataList} from '@/api/miners.js'
 import {getRewardList} from '@/api/account_reward.js'
 import {onMounted, reactive} from "vue";
 import {useRoute} from 'vue-router'
@@ -228,7 +228,7 @@ export default {
     },
     handleGetReport(){
       this.data.page.address = this.$route.params.address;
-      getReport(this.data.page).then(rsp =>{
+      reportDataList(this.data.page).then(rsp =>{
         this.data.page.total = rsp.data.total;
         this.data.reportData = rsp.data.items
         this.data.reportLoading = false;

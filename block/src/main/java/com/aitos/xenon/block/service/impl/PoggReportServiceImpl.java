@@ -4,6 +4,9 @@ import com.aitos.xenon.account.api.RemoteTransactionService;
 import com.aitos.xenon.account.api.domain.dto.TransactionDto;
 import com.aitos.xenon.block.api.domain.dto.PoggGreenDataDto;
 import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
+import com.aitos.xenon.block.api.domain.dto.PoggReportSearchDto;
+import com.aitos.xenon.block.api.domain.vo.BlockVo;
+import com.aitos.xenon.block.api.domain.vo.PoggReportDataVo;
 import com.aitos.xenon.block.domain.Block;
 import com.aitos.xenon.block.domain.PoggReportSubtotal;
 import com.aitos.xenon.block.domain.PoggReportSubtotalStatistics;
@@ -16,6 +19,8 @@ import com.aitos.xenon.core.exceptions.ServiceException;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.device.api.RemoteDeviceService;
 import com.aitos.xenon.device.api.domain.dto.DeviceDto;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +46,10 @@ public class PoggReportServiceImpl implements PoggReportService {
     @Transactional(rollbackFor = Exception.class)
     public String reportSave(PoggReportDto poggReportDto) {
         Block currentBlock = blockService.getCurrentBlock();
+
+        String txHash = DigestUtils.sha256Hex(poggReportDto.getRawDataJSON());
+        poggReportDto.setHash(txHash);
+        poggReportDto.setHeight(currentBlock.getHeight());
         poggReportMapper.batchSave(poggReportDto);
 
         //更新设备数据
@@ -54,8 +63,6 @@ public class PoggReportServiceImpl implements PoggReportService {
             throw new ServiceException(updateResult.getMsg());
         }
 
-
-        String txHash = DigestUtils.sha256Hex(poggReportDto.getRawDataJSON());
         TransactionDto transactionDto = new TransactionDto();
         transactionDto.setHeight(currentBlock.getHeight());
         transactionDto.setData(poggReportDto.getRawDataJSON());
@@ -79,6 +86,13 @@ public class PoggReportServiceImpl implements PoggReportService {
         return txHash;
     }
 
+    @Override
+    public IPage<PoggReportDataVo> findReportDataListByPage(PoggReportSearchDto queryParams) {
+        Page<PoggReportDataVo> page=new Page<PoggReportDataVo>(queryParams.getOffset(),queryParams.getLimit());
+        IPage<PoggReportDataVo> pageResult=poggReportMapper.findReportDataListByPage(page,queryParams);
+        return pageResult;
+    }
+
 
     @Override
     public void saveOrUpdate(PoggReportSubtotal poggReportSubtotal) {
@@ -95,6 +109,8 @@ public class PoggReportServiceImpl implements PoggReportService {
             poggReportMapper.updateSubtotal(poggReportSubtotal);
         }
     }
+
+
 
     @Override
     public List<PoggReportSubtotalStatistics> findSubtotalStatisticsList(long startEpoch, long endEpoch) {

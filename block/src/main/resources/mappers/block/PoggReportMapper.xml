@@ -9,10 +9,10 @@
     <insert id="batchSave">
         insert into
         <include refid="tableName"/>
-        (address,epoch,power,total,timestamp,create_time)
+        (address,owner_address,hash,height,epoch,power,total,timestamp,create_time)
         value
         <foreach collection="greenDataList" item="item" separator=",">
-            (#{address},#{epoch},#{item.power},#{item.total},#{item.timestamp},#{item.createTime})
+            (#{address},#{ownerAddress},#{hash},#{height},#{epoch},#{item.power},#{item.total},#{item.timestamp},#{item.createTime})
         </foreach>
     </insert>
 
@@ -23,6 +23,12 @@
             order by epoch desc
             limit 168
         ) t
+    </select>
+
+    <select id="findReportDataListByPage" resultType="com.aitos.xenon.block.api.domain.vo.PoggReportDataVo">
+        select * from <include refid="tableName"/>
+        where address=#{queryParams.address}
+        order by create_time desc
     </select>
 
 
@@ -61,5 +67,6 @@
                 where epoch &gt;= #{startEpoch} and epoch &lt;= #{endEpoch} and record_num &gt; 0)
         group by address, owner_address, miner_type
     </select>
+
 
 </mapper>
