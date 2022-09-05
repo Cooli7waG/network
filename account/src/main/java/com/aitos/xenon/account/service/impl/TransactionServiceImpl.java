@@ -204,7 +204,8 @@ public class TransactionServiceImpl implements TransactionService {
 
             if(poggRewardDto.getRewards().size()>0){
                 List<AccountReward>  accountRewardList=new ArrayList<>();
-
+                BigDecimal totalAmount = poggRewardDto.getRewards().stream().map(PoggRewardDetailDto::getAmount).reduce(BigDecimal.ZERO,BigDecimal::add);
+                
                 Map<String, List<PoggRewardDetailDto>> groupBy = poggRewardDto.getRewards().stream().collect(Collectors.groupingBy(PoggRewardDetailDto::getOwnerAddress));
                 for (Map.Entry<String, List<PoggRewardDetailDto>> entry : groupBy.entrySet()) {
                     String ownerAddress = entry.getKey();
@@ -223,6 +224,10 @@ public class TransactionServiceImpl implements TransactionService {
                     accountReward.setCreateTime(LocalDateTime.now());
                     accountReward.setHash(txHash);
                     accountReward.setHeight(poggRewardDto.getHeight());
+
+                    BigDecimal rewardPercent = ownerAmount.divide(totalAmount, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
+                    accountReward.setRewardPercent(rewardPercent);
+
                     accountRewardList.add(accountReward);
                 }
                 //调用合约发送奖励
@@ -241,6 +246,8 @@ public class TransactionServiceImpl implements TransactionService {
                     accountReward.setCreateTime(LocalDateTime.now());
                     accountReward.setHash(txHash);
                     accountReward.setHeight(poggRewardDto.getHeight());
+                    BigDecimal rewardPercent = item.getAmount().divide(totalAmount, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
+                    accountReward.setRewardPercent(rewardPercent);
                     accountRewardList.add(accountReward);
                 });
                 accountRewardService.batchSave(accountRewardList);

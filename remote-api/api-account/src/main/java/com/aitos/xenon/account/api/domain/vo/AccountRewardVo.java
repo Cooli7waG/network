@@ -1,13 +1,14 @@
-package com.aitos.xenon.account.domain;
+package com.aitos.xenon.account.api.domain.vo;
 
-import com.aitos.xenon.core.model.BaseModel;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
-public class AccountReward extends BaseModel {
+public class AccountRewardVo  {
+
+    private Long id;
 
     private String address;
     /**
@@ -34,5 +35,8 @@ public class AccountReward extends BaseModel {
     /**
      * 获奖百分比
      */
-    private BigDecimal rewardPercent;
+    private String rewardPercent;
+
+    private LocalDateTime createTime;
+
 }

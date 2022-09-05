@@ -148,6 +148,7 @@
 import "@/assets/css/iconfont.css"
 import Constant from '@/utils/constant.js'
 import {queryByMiner,getReport,getReward} from '@/api/miners.js'
+import {getRewardList} from '@/api/account_reward.js'
 import {onMounted, reactive} from "vue";
 import {useRoute} from 'vue-router'
 import {formatDate,formatPower,formatNumber,formatElectricity,formatToken} from "@/utils/data_format";
@@ -235,7 +236,7 @@ export default {
     },
     handleGetReward(){
       this.data.page.address = this.$route.params.address;
-      getReward(this.data.page).then(rsp =>{
+      getRewardList(this.data.page).then(rsp =>{
         this.data.page.total = rsp.data.total;
         this.data.rewardData = rsp.data.items
         this.data.rewardLoading = false;
