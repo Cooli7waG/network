@@ -118,7 +118,7 @@ public class PoggReportServiceImpl implements PoggReportService {
     }
 
     @Override
-    public double avgPower(String ownerAddress) {
-        return poggReportMapper.avgPower(ownerAddress);
+    public double avgPower(String address) {
+        return poggReportMapper.avgPower(address);
     }
 }

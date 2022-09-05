@@ -227,6 +227,13 @@ public class DeviceServiceImpl implements DeviceService {
     public DeviceVo queryByMiner(String minerAddress) {
         DeviceVo device=deviceMapper.queryByMiner(minerAddress);
         if (device != null) {
+            Result<Double> avgPowerResult = remotePoggService.avgPower(minerAddress);
+            log.info("queryByMiner.avgPowerResult={}",JSON.toJSONString(avgPowerResult));
+            if(avgPowerResult.getCode()==ApiStatus.SUCCESS.getCode()){
+                device.setAvgPower(avgPowerResult.getData());
+            }else{
+                device.setAvgPower(0D);
+            }
             Result<AccountRewardStatisticsVo> accountStatistics = remoteAccountRewardService.statistics(device.getAddress());
             log.info("queryByMiner.result={}",JSON.toJSONString(accountStatistics));
             if(accountStatistics.getCode()==ApiStatus.SUCCESS.getCode()){
@@ -236,7 +243,10 @@ public class DeviceServiceImpl implements DeviceService {
                 device.setTodayReward(accountRewardStatisticsVo.getTodayReward());
                 device.setYesterdayReward(accountRewardStatisticsVo.getYesterdayReward());
             }else{
-                device.setAvgPower(0D);
+                device.setTotalReward(BigDecimal.valueOf(0));
+                device.setAvgReward(BigDecimal.valueOf(0));
+                device.setTodayReward(BigDecimal.valueOf(0));
+                device.setYesterdayReward(BigDecimal.valueOf(0));
             }
         }
         return device;

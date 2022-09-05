@@ -19,7 +19,7 @@
     <select id="avgPower" resultType="java.lang.Double">
         select IFNULL(avg(power),0) from
         (   select power from
-            <include refid="tableName"/> where address =#{ownerAddress}
+            <include refid="tableName"/> where address =#{address}
             order by epoch desc
             limit 168
         ) t

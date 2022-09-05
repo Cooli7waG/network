@@ -105,8 +105,8 @@ public class PoggController {
     }
 
     @GetMapping("/report/avgPower")
-    public Result<Double> avgPower(String ownerAddress){
-        double avgPower = poggReportService.avgPower(ownerAddress);
+    public Result<Double> avgPower(String address){
+        double avgPower = poggReportService.avgPower(address);
         return Result.ok(avgPower);
     }
 }

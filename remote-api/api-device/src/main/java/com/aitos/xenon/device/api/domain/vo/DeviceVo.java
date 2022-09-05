@@ -41,11 +41,11 @@ public class DeviceVo  {
     /**
      * 总挖矿收入
      */
-    private String earningMint;
+    private BigDecimal earningMint;
     /**
      * 总服务收入
      */
-    private String earningService;
+    private BigDecimal earningService;
 
     /**
      * 电力来源：
@@ -68,7 +68,7 @@ public class DeviceVo  {
     /**
      * 发电功率
      */
-    private String power;
+    private Long power;
     /**
      * 平均发电功率
      */
@@ -76,11 +76,11 @@ public class DeviceVo  {
     /**
      * 总发电量（千瓦时）
      */
-    private String totalEnergyGeneration;
+    private Long totalEnergyGeneration;
     /**
      * 奖励收益
      */
-    private BigDecimal balance;
+    private String balance;
 
 
     /**

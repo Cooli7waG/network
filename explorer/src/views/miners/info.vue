@@ -89,7 +89,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="timestamp" label="Timestamp">
-            <template #default="scope">{{formatDate(new Date(scope.row.timestamp*1000), "yyyy-MM-dd hh:mm:ss")}}</template>
+            <template #default="scope">{{formatDate(new Date(scope.row.timestamp), "yyyy-MM-dd hh:mm:ss")}}</template>
           </el-table-column>
         </el-table>
       </el-tab-pane>

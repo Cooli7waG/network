@@ -31,5 +31,5 @@ public interface PoggReportMapper {
 
     List<PoggReportSubtotalStatistics> findSubtotalStatisticsList(@Param("startEpoch")long startEpoch,@Param("endEpoch") long endEpoch);
 
-    double avgPower(@Param("ownerAddress")String ownerAddress);
+    double avgPower(@Param("address")String address);
 }
