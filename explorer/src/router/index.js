@@ -58,14 +58,39 @@ const routes = [
         component: WalletLayout,
         children: [
             {
-                path: "user",
+                path: "",
+                name: "Index",
+                component: import('@/views/wallet/miners/index.vue'),
+            },
+            {
+                path: "apply",
                 name: "Arkreen",
-                component: import('@/views/wallet/user/Arkreen.vue'),
+                component: import('@/views/wallet/airdorp/apply.vue'),
             },
             {
                 path: "claim/:address",
                 name: "Claim Game Miner",
-                component: import('@/views/wallet/user/claim.vue'),
+                component: import('@/views/wallet/airdorp/claim.vue'),
+            },
+            {
+                path: "miners",
+                name: "My Miners",
+                component: import('@/views/wallet/miners/index.vue'),
+            },
+            {
+                path: "miner/:address",
+                name: "Miner Info",
+                component: import('@/views/wallet/miners/info.vue'),
+            },
+            {
+                path: "txs",
+                name: "Transaction List",
+                component: import('@/views/wallet/transaction/index.vue'),
+            },
+            {
+                path: "tx/:hash",
+                name: "Transaction Info",
+                component: import('@/views/wallet/transaction/info.vue'),
             },
         ]
     },

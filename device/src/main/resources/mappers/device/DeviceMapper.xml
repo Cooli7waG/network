@@ -17,6 +17,10 @@
         where address=#{address}
     </select>
 
+    <select id="getMinerListByOwner" resultType="com.aitos.xenon.device.domain.Device">
+        select id,address from <include refid="tableName"/> where owner_address=#{address}
+    </select>
+
     <select id="getAllMinerLocation" resultType="com.aitos.xenon.device.api.domain.vo.DeviceVo">
         select address,latitude,longitude from <include refid="tableName"/>
     </select>

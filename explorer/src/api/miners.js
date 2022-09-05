@@ -78,4 +78,11 @@ export function claimGameMiner(data){
     })
 }
 
+export function getMinerListByOwner(data){
+    return request({
+        url: '/device/device/getMinerListByOwner/'+data,
+        method: 'get'
+    })
+}
+
 

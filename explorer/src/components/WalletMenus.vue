@@ -1,7 +1,6 @@
 <template>
   <el-row style="background-color: #545c64">
     <el-col :span="20">
-
       <el-menu
           :default-active="autoActive()"
           class="el-menu-demo"
@@ -14,7 +13,6 @@
           <img src="../assets/logo-arkreen.png" style="width: 40px;height: 40px;margin-top: 8px;margin-inline-end: 15px;">
         </div>
         <el-menu-item index="/wallet/miners">{{ $t('menus.miners') }}</el-menu-item>
-        <el-menu-item index="/wallet/blocks">{{ $t('menus.blocks') }}</el-menu-item>
         <el-menu-item index="/wallet/txs">{{ $t('menus.txs') }}</el-menu-item>
       </el-menu>
     </el-col>
@@ -91,6 +89,11 @@
       </div>
     </div>
   </div>
+  <div v-if="userAddress==undefined" style="width: 100%;height: 800px;background-color: #FFFFFF">
+    <el-empty description="Please login to your wallet first">
+      <el-button type="primary" @click="drawer = true">Login Wallet</el-button>
+    </el-empty>
+  </div>
 </template>
 
 <script>
@@ -102,7 +105,7 @@ import {
 } from "@/api/metamask_utils";
 
 export default {
-  name: 'Menus',
+  name: 'WalletMenus',
   props: {
     msg: String
   },
@@ -141,27 +144,30 @@ export default {
     },
     autoActive() {
       let path = this.$route.path;
-      if (path.startsWith("/miner/")) {
-        return "/miners"
+      if (path.startsWith("/wallet/miner/")) {
+        return "/wallet/miners"
       }
-      if (path.startsWith("/account/")) {
-        return "/accounts"
+      if (path.startsWith("/wallet/account/")) {
+        return "/wallet/accounts"
       }
-      if (path.startsWith("/tx/")) {
-        return "/txs"
+      if (path.startsWith("/wallet/tx/")) {
+        return "/wallet/txs"
+      }
+      if (path == "/wallet") {
+        return "/wallet/miners"
       }
       return path;
     },
     gotoMyMiner() {
       this.closeDrawer()
-      this.$router.push("/account/" + this.userAddress)
+      this.$router.push("/wallet/miners")
     },
     gotoBrowser() {
       this.closeDrawer()
       this.$router.push("/")
     },
     gotoApplyGameMiner(){
-      this.$router.push("/user");
+      this.$router.push("/wallet/apply");
       this.closeDrawer();
     },
     Logout() {
@@ -187,19 +193,19 @@ export default {
     },
     async loginApp() {
       if (this.userAddress != undefined) {
-        this.$router.push("/user");
+        this.$router.push("/wallet");
       }
       try {
         if (window.ethereum) {
           this.userAddress = await loginWithMetaMask();
           this.closeDrawer();
           let path = this.$route.path;
-          if (path == "/user") {
+          if (path == "/wallet") {
             this.$router.go(0);
           } else if (path.startsWith("/claim/")) {
             this.$router.go(0);
           } else {
-            this.$router.push("/user");
+            this.$router.push("/wallet");
           }
         } else {
           this.$message.error(this.$t('common.msg.metaMaskNotFound'));

@@ -56,4 +56,11 @@ public interface DeviceService {
     HashMap getMinerLocation();
 
     List<DeviceVo> loadMinersInfo(ArrayList<String> addressList);
+
+    /**
+     * 根据owner查询miner列表
+     * @param address
+     * @return
+     */
+    List<DeviceVo> getMinerListByOwner(String address);
 }

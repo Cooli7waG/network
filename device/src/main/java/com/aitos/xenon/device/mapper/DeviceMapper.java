@@ -43,4 +43,11 @@ public interface DeviceMapper {
      * @return
      */
     List<DeviceVo> getAllMinerLocation();
+
+    /**
+     * 根据owner查询miner列表
+     * @param address
+     * @return
+     */
+    List<DeviceVo> getMinerListByOwner(@Param("address")String address);
 }

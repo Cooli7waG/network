@@ -433,4 +433,14 @@ public class DeviceServiceImpl implements DeviceService {
         }
         return deviceList;
     }
+
+    /**
+     * 根据owner查询miner列表
+     * @param address
+     * @return
+     */
+    @Override
+    public List<DeviceVo> getMinerListByOwner(String address) {
+        return deviceMapper.getMinerListByOwner(address);
+    }
 }

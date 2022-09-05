@@ -1,40 +1,43 @@
 <template>
   <el-row :gutter="24">
-    <el-col :span="12">
-      <el-card class="box-card" >
-        <div class="text item">
-          <div class="label">{{ $t('dashboard.miners') }}</div>
-          <div class="content">{{ data.minerStatistics.miners }}</div>
-        </div>
-        <div class="text item">
-          <div class="label">{{ $t('dashboard.totalPowerLow') }}</div>
-          <div class="content">{{ formatPower(data.minerStatistics.totalPowerLow) }}</div>
-        </div>
-        <div class="text item">
-          <div class="label">{{ $t('dashboard.totalChargeVol') }}</div>
-          <div class="content">{{ data.minerStatistics.totalChargeVol }}</div>
-        </div>
-      </el-card>
+    <el-col :span="6">
+      <el-col :span="24">
+        <el-card class="box-card" >
+          <div class="text item">
+            <div class="label">{{ $t('dashboard.miners') }}</div>
+            <div class="content">{{ data.minerStatistics.miners }}</div>
+          </div>
+          <div class="text item">
+            <div class="label">{{ $t('dashboard.totalPowerLow') }}</div>
+            <div class="content">{{ formatPower(data.minerStatistics.totalPowerLow) }}</div>
+          </div>
+          <div class="text item">
+            <div class="label">{{ $t('dashboard.totalChargeVol') }}</div>
+            <div class="content">{{ data.minerStatistics.totalChargeVol }}</div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="24" style="margin-top: 15px">
+        <el-card class="box-card">
+          <div class="text item">
+            <div class="label">{{ $t('dashboard.uSDBmtMarketPrice') }}</div>
+            <div class="content">${{ Number(data.blockchainstats.usdbmtMarketPrice).toFixed(2) }}</div>
+          </div>
+          <div class="text item">
+            <div class="label">{{ $t('dashboard.totalBMTMarket') }}</div>
+            <div class="content">${{ data.blockchainstats.totalBMTMarket }}</div>
+          </div>
+          <div class="text item">
+            <div class="label">{{ $t('dashboard.tokenSupply') }}</div>
+            <div class="content">{{ data.blockchainstats.tokenSupply }}/{{ data.blockchainstats.totalBMTMarket }}</div>
+          </div>
+        </el-card>
+      </el-col>
     </el-col>
-    <el-col :span="12">
-      <el-card class="box-card">
-        <div class="text item">
-          <div class="label">{{ $t('dashboard.uSDBmtMarketPrice') }}</div>
-          <div class="content">${{ Number(data.blockchainstats.usdbmtMarketPrice).toFixed(2) }}</div>
-        </div>
-        <div class="text item">
-          <div class="label">{{ $t('dashboard.totalBMTMarket') }}</div>
-          <div class="content">${{ data.blockchainstats.totalBMTMarket }}</div>
-        </div>
-        <div class="text item">
-          <div class="label">{{ $t('dashboard.tokenSupply') }}</div>
-          <div class="content">{{ data.blockchainstats.tokenSupply }}/{{ data.blockchainstats.totalBMTMarket }}</div>
-        </div>
-      </el-card>
+    <el-col :span="18">
+      <div id="map" class="map"></div>
     </el-col>
-  </el-row>
-  <el-row>
-    <div id="map" class="map"></div>
+
   </el-row>
   <div v-show="data.minersDrawer" tabindex="-1" class="el-drawer__wrapper" style="z-index: 9999;">
     <div role="document" tabindex="-1" class="el-drawer__container el-drawer__open">
@@ -108,7 +111,6 @@ import {formatPower, formatElectricity, getTokenFixed, getAddress, formatDate,fo
 import Constant from '@/utils/constant.js'
 import "ol/ol.css"
 import Map from "ol/Map"
-import OSM from "ol/source/OSM"
 import TileLayer from "ol/layer/Tile"
 import VectorLayer from "ol/layer/Vector"
 import VectorSource from "ol/source/Vector"
@@ -515,19 +517,16 @@ export default {
 }
 .box-card {
   .item {
-    margin-bottom: 20px;
-
+    margin-bottom: 10px;
     .label {
       font-weight: bold;
       margin-bottom: 6px;
     }
   }
-
 }
 
 .map {
   width: 100%;
-  height: 800px;
-  margin-top: 20px;
+  height: 100%;
 }
 </style>

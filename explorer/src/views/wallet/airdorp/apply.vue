@@ -53,7 +53,7 @@ import {applyGameMiner,getApplyActiveInfo} from "@/api/miners";
 import {getMetaMaskLoginUserAddress, personalSign} from "@/api/metamask_utils";
 
 export default {
-  name: 'Arkreen',
+  name: 'apply',
   data() {
     return {
       loading: false,
@@ -123,7 +123,7 @@ export default {
       }
     },
     gotoMinerList() {
-      this.$router.push("/account/" + this.userAddress)
+      this.$router.push("/wallet/miners")
     },
     getUserAddress() {
       this.userAddress = getMetaMaskLoginUserAddress()

@@ -83,6 +83,14 @@ public class TransactionController {
         return Result.ok(page);
     }
 
+    @GetMapping("/getTransactionListByOwner")
+    public Result<Page<TransactionReport>> getTransactionListByOwner(TransactionSearchDto queryParams){
+        IPage<TransactionReport> listPage= transactionService.list(queryParams);
+        List<TransactionReport>  listVo=BeanConvertor.toList(listPage.getRecords(),TransactionReport.class);
+        Page<TransactionReport> page=new Page<>(listPage.getTotal(),listVo);
+        return Result.ok(page);
+    }
+
     @PostMapping("/getReport")
     public Result<Page<PoggReportMiner>> getReportByMinerAddress(@RequestBody PoggReportDto queryParams){
         log.info("getReport PoggReportDto:{}",JSON.toJSONString(queryParams));

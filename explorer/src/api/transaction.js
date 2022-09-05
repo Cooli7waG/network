@@ -7,6 +7,14 @@ export function transactionList(data){
         params: data
     })
 }
+
+export function getOwnerTransactionList(data){
+    return request({
+        url: '/account/transaction/getTransactionListByOwner',
+        method: 'get',
+        params: data
+    })
+}
 export function findByHash(txHash){
     return request({
         url: '/account/transaction/query?txHash='+txHash,

@@ -14,10 +14,10 @@
 <script>
 import {claimGameMiner} from "@/api/miners";
 import {Base64} from "js-base64";
-import {getMetaMaskLoginUserAddress, personalSign,personalEcRecover} from "@/api/metamask_utils";
+import {getMetaMaskLoginUserAddress, personalSign} from "@/api/metamask_utils";
 
 export default {
-  name: 'Arkreen',
+  name: 'claim',
   data() {
     return {
       loading:false,
@@ -53,7 +53,7 @@ export default {
           this.minerForm.signature = undefined;
           if(rsp.code == 0){
             this.$message.success("game miner claim success!");
-            this.$router.push("/account/" + this.minerForm.ownerAddress)
+            this.$router.push("/wallet/miners")
           }else {
             this.$message.error(rsp.msg);
           }
