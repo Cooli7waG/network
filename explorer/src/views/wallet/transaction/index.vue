@@ -2,20 +2,20 @@
   <el-row :gutter="24">
     <el-form :model="data.query" ref="queryForm" :inline="true">
       <el-form-item label="TxHash" prop="txHash">
-        <el-input style="width: 240px" v-model="data.query.txHash" placeholder="Please input transaction hash" clearable @keyup.enter.native="handleQuery"/>
+        <el-input style="width: 240px" v-model="data.query.txHash" placeholder="Please input transaction hash" clearable @keyup.enter.native="loadTransactionList"/>
       </el-form-item>
       <el-form-item label="Miner" prop="minerAddress">
-        <el-select style="width: 300px" v-model="data.query.minerAddress" placeholder="Please select miner address" clearable @change="handleQuery">
+        <el-select style="width: 300px" v-model="data.query.minerAddress" placeholder="Please select miner address" clearable @change="loadTransactionList">
           <el-option v-for="item in data.minerOptions" :key="item.value" :label="item.label" :value="item.value"/>
         </el-select>
       </el-form-item>
       <el-form-item label="TxType" prop="txType">
-        <el-select style="width: 260px" v-model="data.query.txType" placeholder="Please select transaction type" clearable @change="handleQuery">
+        <el-select style="width: 260px" v-model="data.query.txType" placeholder="Please select transaction type" clearable @change="loadTransactionList">
           <el-option v-for="item in data.txTypeOptions" :key="item.value" :label="item.label" :value="item.value"/>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button type="primary" size="mini" @click="loadTransactionList">搜索</el-button>
         <el-button size="mini" >重置</el-button>
       </el-form-item>
     </el-form>
@@ -90,8 +90,10 @@ export default {
 
     const data = reactive({
       query: {
-        txTypeList:[],
+        owner:undefined,
         txHash: '',
+        txType: '',
+        minerAddress: '',
         page: {
           currentPage: 1,
           pageSize: 20,
@@ -146,16 +148,14 @@ export default {
       if(MateMaskAddress==undefined || MateMaskAddress == null){
         return;
       }
+      data.query.owner = MateMaskAddress;
       const params = {
+        owner: data.query.owner,
+        txType: data.query.txType,
+        txHash: data.query.txHash,
+        address: data.query.minerAddress,
         offset: data.query.page.currentPage,
         limit: data.query.page.pageSize
-      }
-      if (data.query.select == "1") {
-        params['hash'] = data.query.keyword
-      } else if (data.query.select == "2") {
-        params['height'] = data.query.keyword
-      } else if (data.query.select == "3") {
-        params['fromAddress'] = data.query.keyword
       }
       getOwnerTransactionList(params).then((result) => {
         data.query.page.total = result.data.total

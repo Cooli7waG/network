@@ -25,5 +25,5 @@ public interface TransactionService {
 
     List<Transaction> getAll();
 
-
+    IPage<TransactionReport> getTransactionListByOwner(TransactionSearchDto queryParams);
 }

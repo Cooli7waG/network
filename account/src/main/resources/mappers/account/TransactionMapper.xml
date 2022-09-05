@@ -51,10 +51,29 @@
         order by create_time desc
     </select>
 
-    <!--<insert id="saveTransactionReport" useGeneratedKeys="true" keyProperty="id" parameterType="com.aitos.xenon.account.domain.PoggReportMiner">
+    <select id="getTransactionListByOwner" resultType="com.aitos.xenon.account.domain.TransactionReport">
+        select * from transaction_report
+        <where>
+            <if test="queryParams.hash!=null and queryParams.hash!=''">
+                and hash=#{queryParams.hash}
+            </if>
+            <if test="queryParams.txType!=null and queryParams.txType!=''">
+                and tx_type=#{queryParams.txType}
+            </if>
+            <if test="queryParams.owner!=null and queryParams.owner!=''">
+                and owner=#{queryParams.owner}
+            </if>
+            <if test="queryParams.address!=null and queryParams.address!=''">
+                and miner=#{queryParams.address}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <insert id="saveTransactionReport" useGeneratedKeys="true" keyProperty="id">
         insert into transaction_report(hash,tx_type,height,miner,owner,create_time)
         value (#{hash},#{txType},#{height},#{miner},#{owner},#{createTime})
-    </insert>-->
+    </insert>
 
     <select id="getAll" resultType="com.aitos.xenon.account.domain.Transaction">
         SELECT * FROM transaction WHERE tx_type in(8,9)ORDER BY id;

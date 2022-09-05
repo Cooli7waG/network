@@ -83,24 +83,10 @@ public class TransactionController {
 
     @GetMapping("/getTransactionListByOwner")
     public Result<Page<TransactionReport>> getTransactionListByOwner(TransactionSearchDto queryParams){
-        IPage<TransactionReport> listPage= transactionService.list(queryParams);
+        log.info("getTransactionListByOwner p:{}",JSON.toJSONString(queryParams));
+        IPage<TransactionReport> listPage= transactionService.getTransactionListByOwner(queryParams);
         List<TransactionReport>  listVo=BeanConvertor.toList(listPage.getRecords(),TransactionReport.class);
         Page<TransactionReport> page=new Page<>(listPage.getTotal(),listVo);
         return Result.ok(page);
-    }
-
-    @PostMapping("/getReport")
-    public Result<Page<PoggReportMiner>> getReportByMinerAddress(@RequestBody PoggReportDto queryParams){
-        log.info("getReport PoggReportDto:{}",JSON.toJSONString(queryParams));
-        IPage<PoggReportMiner> listPage= transactionService.getReportByMinerAddress(queryParams);
-        Page<PoggReportMiner> poggReportPage=new Page<PoggReportMiner>(listPage.getTotal(),listPage.getRecords());
-        return Result.ok(poggReportPage);
-    }
-
-    @PostMapping("/getReward")
-    public Result<Page<PoggRewardMiner>> getRewardByMinerAddress(@RequestBody PoggReportDto queryParams){
-        IPage<PoggRewardMiner> listPage= transactionService.getRewardByMinerAddress(queryParams);
-        Page<PoggRewardMiner> poggRewardMinerPage=new Page<PoggRewardMiner>(listPage.getTotal(),listPage.getRecords());
-        return Result.ok(poggRewardMinerPage);
     }
 }

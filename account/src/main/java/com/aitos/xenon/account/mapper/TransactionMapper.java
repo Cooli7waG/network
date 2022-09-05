@@ -27,4 +27,6 @@ public interface TransactionMapper {
     List<Transaction> getAll();
 
     void saveTransactionReport(TransactionReport transactionReport);
+
+    IPage<TransactionReport> getTransactionListByOwner(Page<TransactionReport> page, @Param("queryParams") TransactionSearchDto queryParams);
 }

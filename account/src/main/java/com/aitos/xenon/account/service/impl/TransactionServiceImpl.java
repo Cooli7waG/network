@@ -60,7 +60,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setStatus(1);
         //TODO 提取数据分别保存
         if(!"[]".equals(transaction.getData())) {
-            //abstractTransactionReport(transaction);
+            abstractTransactionReport(transaction);
         }
         transaction.setCreateTime(LocalDateTime.now());
         transactionMapper.save(transaction);
@@ -153,7 +153,7 @@ public class TransactionServiceImpl implements TransactionService {
             if(poggRewardDto.getRewards().size()>0){
                 List<AccountReward>  accountRewardList=new ArrayList<>();
                 BigDecimal totalAmount = poggRewardDto.getRewards().stream().map(PoggRewardDetailDto::getAmount).reduce(BigDecimal.ZERO,BigDecimal::add);
-                
+
                 Map<String, List<PoggRewardDetailDto>> groupBy = poggRewardDto.getRewards().stream().collect(Collectors.groupingBy(PoggRewardDetailDto::getOwnerAddress));
                 for (Map.Entry<String, List<PoggRewardDetailDto>> entry : groupBy.entrySet()) {
                     String ownerAddress = entry.getKey();
@@ -236,5 +236,12 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public List<Transaction> getAll() {
         return transactionMapper.getAll();
+    }
+
+    @Override
+    public IPage<TransactionReport> getTransactionListByOwner(TransactionSearchDto queryParams) {
+        Page<TransactionReport> page = new Page<TransactionReport>(queryParams.getOffset(), queryParams.getLimit());
+        IPage<TransactionReport> pageResult = transactionMapper.getTransactionListByOwner(page, queryParams);
+        return pageResult;
     }
 }
