@@ -147,7 +147,7 @@
 <script>
 import "@/assets/css/iconfont.css"
 import Constant from '@/utils/constant.js'
-import {queryByMiner,getReport,reportDataList} from '@/api/miners.js'
+import {queryByMiner,reportDataList} from '@/api/miners.js'
 import {getRewardList} from '@/api/account_reward.js'
 import {onMounted, reactive} from "vue";
 import {useRoute} from 'vue-router'

@@ -3,6 +3,7 @@ package com.aitos.xenon.account.service;
 import com.aitos.xenon.account.api.domain.dto.PoggRewardDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionSearchDto;
 import com.aitos.xenon.account.api.domain.dto.TransferDto;
+import com.aitos.xenon.account.api.domain.vo.TransactionVo;
 import com.aitos.xenon.account.domain.Transaction;
 import com.aitos.xenon.account.domain.TransactionReport;
 import com.aitos.xenon.core.model.QueryParams;

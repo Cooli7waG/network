@@ -6,6 +6,7 @@ import com.aitos.xenon.account.api.domain.dto.PoggRewardDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionSearchDto;
 import com.aitos.xenon.account.api.domain.dto.TransferDto;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
+import com.aitos.xenon.account.api.domain.vo.TransactionVo;
 import com.aitos.xenon.account.domain.*;
 import com.aitos.xenon.account.mapper.TransactionMapper;
 import com.aitos.xenon.account.service.AccountRewardService;

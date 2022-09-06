@@ -4,11 +4,6 @@
       <el-form-item label="TxHash" prop="txHash">
         <el-input style="width: 240px" v-model="data.query.txHash" placeholder="Please input transaction hash" clearable @keyup.enter.native="loadTransactionList"/>
       </el-form-item>
-      <el-form-item label="Miner" prop="minerAddress">
-        <el-select style="width: 300px" v-model="data.query.minerAddress" placeholder="Please select miner address" clearable @change="loadTransactionList">
-          <el-option v-for="item in data.minerOptions" :key="item.value" :label="item.label" :value="item.value"/>
-        </el-select>
-      </el-form-item>
       <el-form-item label="TxType" prop="txType">
         <el-select style="width: 260px" v-model="data.query.txType" placeholder="Please select transaction type" clearable @change="loadTransactionList">
           <el-option v-for="item in data.txTypeOptions" :key="item.value" :label="item.label" :value="item.value"/>
@@ -101,16 +96,6 @@ export default {
         }
       },
       minerOptions:[
-        {value:1,label:"TX_Register_miner"},
-        {value:2,label:"TX_Onboard_Miner"},
-        {value:3,label:"TX_Transfer_Miner"},
-        {value:4,label:"TX_Terminate_Miner"},
-        {value:5,label:"TX_Airdrop_Miner"},
-        {value:6,label:"TX_Claim_Miner"},
-        {value:7,label:"TX_Commit_PoGG"},
-        {value:8,label:"TX_Report_PoGG"},
-        {value:9,label:"TX_Reward_PoGG"},
-        {value:10,label:"TX_Transfer"}
       ],
       txTypeOptions:[
         {value:1,label:"TX_Register_miner"},
@@ -119,10 +104,7 @@ export default {
         {value:4,label:"TX_Terminate_Miner"},
         {value:5,label:"TX_Airdrop_Miner"},
         {value:6,label:"TX_Claim_Miner"},
-        {value:7,label:"TX_Commit_PoGG"},
-        {value:8,label:"TX_Report_PoGG"},
         {value:9,label:"TX_Reward_PoGG"},
-        {value:10,label:"TX_Transfer"}
       ],
       tableList: []
     })
@@ -153,7 +135,6 @@ export default {
         owner: data.query.owner,
         txType: data.query.txType,
         txHash: data.query.txHash,
-        address: data.query.minerAddress,
         offset: data.query.page.currentPage,
         limit: data.query.page.pageSize
       }
@@ -188,7 +169,6 @@ export default {
       if (route.query.keyword) {
         data.query.keyword = route.query.keyword
       }
-      loadMinerListByOwner();
       loadTransactionList();
     })
 
@@ -198,7 +178,6 @@ export default {
       pageCurrentChange,
       search,
       loadTransactionList,
-      loadMinerListByOwner,
     }
   }
 }

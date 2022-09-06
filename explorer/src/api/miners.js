@@ -39,6 +39,14 @@ export function reportDataList(data){
     })
 }
 
+export function getTransaction(data){
+    return request({
+        url: '/block/pogg/getTransaction',
+        method: 'post',
+        data:data
+    })
+}
+
 
 export function getApplyActiveInfo(){
     return request({

@@ -52,7 +52,7 @@
     </select>
 
     <select id="getTransactionListByOwner" resultType="com.aitos.xenon.account.domain.TransactionReport">
-        select * from transaction_report
+        select * from transaction
         <where>
             <if test="queryParams.hash!=null and queryParams.hash!=''">
                 and hash=#{queryParams.hash}
@@ -61,10 +61,7 @@
                 and tx_type=#{queryParams.txType}
             </if>
             <if test="queryParams.owner!=null and queryParams.owner!=''">
-                and owner=#{queryParams.owner}
-            </if>
-            <if test="queryParams.address!=null and queryParams.address!=''">
-                and miner=#{queryParams.address}
+                and JSON_SEARCH(data, 'one', #{queryParams.owner})
             </if>
         </where>
         order by create_time desc
