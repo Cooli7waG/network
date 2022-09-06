@@ -98,18 +98,6 @@ public class DeviceServiceImpl implements DeviceService {
         device.setEarningService(BigDecimal.valueOf(0));
         device.setCreateTime(LocalDateTime.now());
         deviceMapper.save(device);
-        //更新缓存的miner地理位置
-        try{
-            List<DeviceVo> deviceList = deviceMapper.getAllMinerLocation();
-            for (DeviceVo deviceVo : deviceList) {
-                Location location = new Location();
-                location.setLatitude(deviceVo.getLatitude());
-                location.setLongitude(deviceVo.getLongitude());
-                MINER_LOCATION_CACHE.put(deviceVo.getAddress(),location);
-            }
-        }catch (Exception e){
-            log.error("更新地理位置失败：{}",e.getMessage());
-        }
         //
         AccountRegisterDto accountRegisterDto =new AccountRegisterDto();
         accountRegisterDto.setAddress(device.getAddress());
@@ -424,11 +412,12 @@ public class DeviceServiceImpl implements DeviceService {
         if(MINER_LOCATION_CACHE.size()==0){
             List<DeviceVo> deviceList = deviceMapper.getAllMinerLocation();
             for (DeviceVo deviceVo : deviceList) {
-                //Location location = LocationTransformUtils.transformTo3857(deviceVo.getLongitude(), deviceVo.getLatitude());
                 Location location = new Location();
                 location.setLatitude(deviceVo.getLatitude());
                 location.setLongitude(deviceVo.getLongitude());
-                MINER_LOCATION_CACHE.put(deviceVo.getAddress(),location);
+                if(deviceVo.getLatitude()!=null && deviceVo.getLongitude()!=null){
+                    MINER_LOCATION_CACHE.put(deviceVo.getAddress(),location);
+                }
             }
         }
         return MINER_LOCATION_CACHE;

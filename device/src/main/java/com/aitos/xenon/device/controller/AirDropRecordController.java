@@ -6,9 +6,11 @@ import com.aitos.xenon.block.api.RemoteBlockService;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.model.Result;
+import com.aitos.xenon.core.utils.Location;
 import com.aitos.xenon.core.utils.MetaMaskUtils;
 import com.aitos.xenon.device.api.domain.dto.AirDropDto;
 import com.aitos.xenon.device.api.domain.dto.ClaimDto;
+import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.aitos.xenon.device.domain.AirDropRecord;
 import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.service.AirDropRecordService;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @RestController
 @RequestMapping("/airdroprecord")
@@ -49,7 +52,6 @@ public class AirDropRecordController {
     @PostMapping("/airdrop")
     public Result airDrop(@RequestBody String body){
         log.info("airdrop.body:{}",body);
-
         JSONObject jsonObject=JSONObject.parseObject(body, Feature.OrderedField);
         String signature=jsonObject.getString("signature");
         jsonObject.remove("signature");
@@ -68,7 +70,6 @@ public class AirDropRecordController {
         }else if(StringUtils.hasText(device.getOwnerAddress())){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_BOUND);
         }
-
         //检查空投状态
         AirDropRecord airDropRecordTemp=airDropRecordService.findNotClaimedByMinerAddress(airDropDto.getMinerAddress());
         if(airDropRecordTemp!=null && airDropRecordTemp.getStatus()== BusinessConstants.DeviceAirdropStatus.NOT_CLAIM){
@@ -81,9 +82,14 @@ public class AirDropRecordController {
             return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_CLAIM_EXPIRED);
         }*/
         airDropRecordService.save(airDropDto);
+        //更新缓存的miner地理位置
+        try{
+            deviceService.getMinerLocation();
+        }catch (Exception e){
+            log.error("更新地理位置失败：{}",e.getMessage());
+        }
         return Result.ok();
     }
-
 
     @PostMapping("/claim")
     public Result claim(@RequestBody String body) throws Exception {
