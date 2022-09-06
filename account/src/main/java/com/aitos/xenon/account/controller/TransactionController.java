@@ -75,7 +75,6 @@ public class TransactionController {
 
     @GetMapping("/getTransactionListByOwner")
     public Result<Page<TransactionReport>> getTransactionListByOwner(TransactionSearchDto queryParams){
-        log.info("getTransactionListByOwner p:{}",JSON.toJSONString(queryParams));
         IPage<TransactionReport> listPage= transactionService.getTransactionListByOwner(queryParams);
         List<TransactionReport>  listVo=BeanConvertor.toList(listPage.getRecords(),TransactionReport.class);
         Page<TransactionReport> page=new Page<>(listPage.getTotal(),listVo);

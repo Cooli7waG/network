@@ -146,18 +146,21 @@
               <router-link :to="'/wallet/tx/'+scope.row.hash">{{scope.row.hash}}</router-link>
             </template>
           </el-table-column>
-          <el-table-column prop="address" label="Miner Address" width="220" :show-overflow-tooltip=true>
+          <el-table-column prop="txType" :label="$t('txs.table.txType')" width="180">
+            <template #default="scope">
+              {{ scope.row.txType ? Constant.TXType[scope.row.txType] : '' }}
+            </template>
           </el-table-column>
-          <el-table-column prop="height" label="Block Height">
-          </el-table-column>
+          <el-table-column prop="height" label="Block Height"/>
           <el-table-column prop="amount" label="Amount" width="180">
             <template #default="scope">
               {{formatToken(scope.row.amount)}}
             </template>
           </el-table-column>
-          <el-table-column prop="rewardPercent" label="Reward Percent">
+          <el-table-column prop="status" label="Status" width="100">
             <template #default="scope">
-              {{ Number(scope.row.rewardPercent).toFixed(2)}}%
+              <el-tag v-if="scope.row.status == 1" class="ml-2" type="success">Success</el-tag>
+              <el-tag v-else class="ml-2" type="danger">Failed</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="createTime" label="Timestamp">
@@ -182,7 +185,8 @@
 <script>
 import "@/assets/css/iconfont.css"
 import Constant from '@/utils/constant.js'
-import {queryByMiner,reportDataList,getTransaction} from '@/api/miners.js'
+import {queryByMiner,reportDataList} from '@/api/miners.js'
+import {transactionList} from '@/api/transaction.js'
 import {onMounted, reactive} from "vue";
 import {useRoute} from 'vue-router'
 import {formatDate,formatPower,formatNumber,formatElectricity,formatToken} from "@/utils/data_format";
@@ -266,7 +270,7 @@ export default {
       if (tab.props.name == 'transaction') {
         this.data.page.tag = 3;
         this.data.rewardLoading = true;
-        this.handleGetReward();
+        this.handleGetTransaction();
         let url = window.location.href;
         let urlArr = url.split("#");
         url = urlArr[0]+"#transaction"
@@ -291,7 +295,7 @@ export default {
     },
     handleGetTransaction(){
       this.data.page.address = this.$route.params.address;
-      getTransaction(this.data.page).then(rsp =>{
+      transactionList(this.data.page).then(rsp =>{
         this.data.page.total = rsp.data.total;
         this.data.transactionData = rsp.data.items
         this.data.transactionLoading = false;

@@ -59,7 +59,7 @@ export default {
           }
         })
       }catch (err){
-        this.$message.error("claim failed, please try again!");
+        this.$message.error("claim failed, please check the metamask is unlocked and try again!");
       }
       this.loading = false;
     },
