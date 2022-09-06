@@ -127,6 +127,7 @@ public class PoggServiceImpl implements PoggService {
          */
         List<PoggReportSubtotalStatistics> subtotalStatisticsList = poggReportService.findSubtotalStatisticsList(startEpoch, endEpoch);
         if (subtotalStatisticsList.size() > 0){
+            log.info("subtotalStatisticsList.size={}",subtotalStatisticsList.size());
             //获得有资格的miner
             List<PoggReportSubtotalStatistics> qualifiedMinerList = subtotalStatisticsList.parallelStream()
                     .filter(item -> processAwardEligibility(poggCommit.getPrivateKey(), item.getAddress(), item.getTotal()))
