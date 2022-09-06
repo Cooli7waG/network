@@ -13,4 +13,18 @@ public interface AirDropRecordService {
     AirDropRecord  findNotClaimedByMinerAddress(String minerAddress);
 
     AirDropRecord findByMinerAddress(String minerAddress);
+
+    /**
+     * 解析公钥并生成其他数据
+     * @param applyGameMiner
+     * @return
+     */
+    String applyGameMiner(String applyGameMiner);
+
+    /**
+     * 申领gaming miner
+     * @param claimGameMiner
+     * @return
+     */
+    String claimGameMiner(String claimGameMiner);
 }

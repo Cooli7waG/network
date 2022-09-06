@@ -35,10 +35,6 @@ public class DeviceController {
     private DeviceService deviceService;
     @Value("${foundation.publicKey}")
     private String foundationPublicKey;
-    @Value("${xenon.airdrop.apply.active}")
-    private Boolean applyActive;
-    @Value("${xenon.airdrop.apply.personalSign}")
-    private Boolean applyPersonalSign;
 
     /**
      * 设备注册接口
@@ -205,31 +201,6 @@ public class DeviceController {
     @PostMapping("/getMinerLocation")
     public Result<HashMap> getMinerLocation(){
         HashMap map = deviceService.getMinerLocation();
-        return Result.ok(map);
-    }
-
-    @PostMapping("/apply")
-    public Result applyGameMiner(@RequestBody String applyGameMiner){
-        if(!applyActive){
-            return Result.failed(ApiStatus.BUSINESS_AIRDROP_NOT_ACTIVE.getMsg());
-        }
-        log.info("applyGameMiner:{}",applyGameMiner);
-        String result = deviceService.applyGameMiner(applyGameMiner);
-        return Result.ok(result);
-    }
-
-    @PostMapping("/claim")
-    public Result claimGameMiner(@RequestBody String claimGameMiner){
-        log.info("DeviceController.claimGameMiner:{}",claimGameMiner);
-        String result = deviceService.claimGameMiner(claimGameMiner);
-        return Result.ok(result);
-    }
-
-    @PostMapping("/applyAirdrop")
-    public Result getApplyActiveInfo(){
-        HashMap<String,Boolean> map=new HashMap();
-        map.put("applyActive",applyActive);
-        map.put("applyPersonalSign",applyPersonalSign);
         return Result.ok(map);
     }
 

@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -42,12 +43,15 @@ public class AirDropRecordController {
     private AirDropRecordService airDropRecordService;
     @Autowired
     private DeviceService deviceService;
-
     @Autowired
     private RemoteBlockService blockService;
 
     @Value("${foundation.publicKey}")
     private String foundationPublicKey;
+    @Value("${xenon.airdrop.apply.active}")
+    private Boolean applyActive;
+    @Value("${xenon.airdrop.apply.personalSign}")
+    private Boolean applyPersonalSign;
 
     @PostMapping("/airdrop")
     public Result airDrop(@RequestBody String body){
@@ -129,4 +133,28 @@ public class AirDropRecordController {
         return Result.ok();
     }
 
+    @PostMapping("/gameminer/apply")
+    public Result applyGameMiner(@RequestBody String applyGameMiner){
+        if(!applyActive){
+            return Result.failed(ApiStatus.BUSINESS_AIRDROP_NOT_ACTIVE.getMsg());
+        }
+        log.info("applyGameMiner:{}",applyGameMiner);
+        String result = airDropRecordService.applyGameMiner(applyGameMiner);
+        return Result.ok(result);
+    }
+
+    @PostMapping("/gameminer/claim")
+    public Result claimGameMiner(@RequestBody String claimGameMiner){
+        log.info("DeviceController.claimGameMiner:{}",claimGameMiner);
+        String result = airDropRecordService.claimGameMiner(claimGameMiner);
+        return Result.ok(result);
+    }
+
+    @PostMapping("/applyAirdrop")
+    public Result getApplyActiveInfo(){
+        HashMap<String,Boolean> map=new HashMap();
+        map.put("applyActive",applyActive);
+        map.put("applyPersonalSign",applyPersonalSign);
+        return Result.ok(map);
+    }
 }

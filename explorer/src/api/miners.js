@@ -42,7 +42,7 @@ export function reportDataList(data){
 
 export function getApplyActiveInfo(){
     return request({
-        url: '/device/device/applyAirdrop',
+        url: '/device/airdroprecord/applyAirdrop',
         method: 'post'
     })
 }
@@ -57,7 +57,7 @@ export function getMinersByOwnerAddress(data){
 
 export function applyGameMiner(data){
     return request({
-        url: '/device/device/apply',
+        url: '/device/airdroprecord/gameminer/apply',
         method: 'post',
         data:data
     })
@@ -65,7 +65,7 @@ export function applyGameMiner(data){
 
 export function claimGameMiner(data){
     return request({
-        url: '/device/device/claim',
+        url: '/device/airdroprecord/gameminer/claim',
         method: 'post',
         data:data
     })

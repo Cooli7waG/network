@@ -29,20 +29,6 @@ public interface DeviceService {
     void terminate(DeviceTerminateMinerDto deviceTerminateMinerDto);
 
     /**
-     * 解析公钥并生成其他数据
-     * @param applyGameMiner
-     * @return
-     */
-    String applyGameMiner(String applyGameMiner);
-
-    /**
-     * 申领gaming miner
-     * @param claimGameMiner
-     * @return
-     */
-    String claimGameMiner(String claimGameMiner);
-
-    /**
      * 根据owner地址查询miner列表
      * @param deviceSearchDto
      * @return
