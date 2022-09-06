@@ -10,6 +10,7 @@ public class DeviceVo  {
 
     private Long id;
     private String address;
+    private String name;
     private String ownerAddress;
     /**
      * Miner类型

@@ -59,6 +59,7 @@
     <update id="bind">
         update <include refid="tableName"/>
             <set>
+                name=#{name},
                 location_type=#{locationType},
                 latitude=#{latitude},
                 longitude=#{longitude},
