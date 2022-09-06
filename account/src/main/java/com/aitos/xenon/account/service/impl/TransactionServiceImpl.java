@@ -59,57 +59,8 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(rollbackFor = Exception.class)
     public void transaction(Transaction transaction) {
         transaction.setStatus(1);
-        //TODO 提取数据分别保存
-        if(!"[]".equals(transaction.getData())) {
-            abstractTransactionReport(transaction);
-        }
         transaction.setCreateTime(LocalDateTime.now());
         transactionMapper.save(transaction);
-    }
-
-    private void abstractTransactionReport(Transaction transaction){
-        try{
-            TransactionReport transactionReport = new TransactionReport();
-            transactionReport.setHash(transaction.getHash());
-            transactionReport.setTxType(transaction.getTxType());
-            transactionReport.setHeight(transaction.getHeight());
-            transactionReport.setCreateTime(new Date());
-            JSONObject jsonObject = JSON.parseObject(transaction.getData());
-            if (BusinessConstants.TXType.TX_REGISTER_MINER == transaction.getTxType()) {
-                transactionReport.setMiner(jsonObject.getString(BusinessConstants.TxAddressType.ADDRESS));
-            }else if(BusinessConstants.TXType.TX_ONBOARD_MINER == transaction.getTxType()){
-                transactionReport.setMiner(jsonObject.getString(BusinessConstants.TxAddressType.MINER_ADDRESS));
-                transactionReport.setOwner(jsonObject.getString(BusinessConstants.TxAddressType.OWNER_ADDRESS));
-            }else if(BusinessConstants.TXType.TX_TRANSFER_MINER == transaction.getTxType()){
-                transactionReport.setMiner(jsonObject.getString(BusinessConstants.TxAddressType.MINER));
-                transactionReport.setOwner(jsonObject.getString(BusinessConstants.TxAddressType.OWNER));
-            }else if(BusinessConstants.TXType.TX_TERMINATE_MINER == transaction.getTxType()){
-                transactionReport.setMiner(jsonObject.getString(BusinessConstants.TxAddressType.MINER));
-            }else if(BusinessConstants.TXType.TX_AIRDROP_MINER == transaction.getTxType()){
-                transactionReport.setMiner(jsonObject.getString(BusinessConstants.TxAddressType.MINER_ADDRESS));
-                transactionReport.setOwner(jsonObject.getString(BusinessConstants.TxAddressType.OWNER_ADDRESS));
-            }else if(BusinessConstants.TXType.TX_CLAIM_MINER == transaction.getTxType()){
-                transactionReport.setMiner(jsonObject.getString(BusinessConstants.TxAddressType.MINER_ADDRESS));
-                transactionReport.setOwner(jsonObject.getString(BusinessConstants.TxAddressType.OWNER_ADDRESS));
-            }else if(BusinessConstants.TXType.TX_COMMIT_POGG == transaction.getTxType()){
-
-            }else if(BusinessConstants.TXType.TX_REPORT_POGG == transaction.getTxType()){
-                transactionReport.setMiner(jsonObject.getString(BusinessConstants.TxAddressType.ADDRESS));
-            }else if(BusinessConstants.TXType.TX_REWARD_POGG == transaction.getTxType()){
-                PoggRewardDto poggRewardDto = JSON.parseObject(transaction.getData(), PoggRewardDto.class);
-                for (PoggRewardDetailDto poggRewardDtoReward : poggRewardDto.getRewards()) {
-                    transactionReport.setMiner(poggRewardDtoReward.getAddress());
-                    transactionReport.setOwner(poggRewardDtoReward.getOwnerAddress());
-                }
-            }
-            //TODO 是否需要通过miner address查询出owner address
-
-            //数据入库
-            transactionReport.setCreateTime(new Date());
-            transactionMapper.saveTransactionReport(transactionReport);
-        }catch (Exception e){
-            log.error("abstractTransactionReport error:{}",e.getMessage());
-        }
     }
 
     @Override
@@ -220,17 +171,11 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionMapper.query(txHash);
     }
 
-    @Override
-    public IPage<Transaction> listOld(QueryParams queryParams) {
-        Page<Transaction> page = new Page<Transaction>(queryParams.getOffset(), queryParams.getLimit());
-        IPage<Transaction> pageResult = transactionMapper.listOld(page, queryParams);
-        return pageResult;
-    }
 
     @Override
-    public IPage<TransactionReport> list(TransactionSearchDto queryParams) {
-        Page<TransactionReport> page = new Page<TransactionReport>(queryParams.getOffset(), queryParams.getLimit());
-        IPage<TransactionReport> pageResult = transactionMapper.list(page, queryParams);
+    public IPage<TransactionVo> list(TransactionSearchDto queryParams) {
+        Page<TransactionVo> page = new Page<TransactionVo>(queryParams.getOffset(), queryParams.getLimit());
+        IPage<TransactionVo> pageResult = transactionMapper.list(page, queryParams);
         return pageResult;
     }
 

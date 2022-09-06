@@ -7,8 +7,8 @@
     <sql id="tableName">transaction</sql>
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        insert into <include refid="tableName"/> (from_address,account_id,height,hash,tx_type,status,data,create_time)
-        value (#{fromAddress},#{accountId},#{height},#{hash},#{txType},#{status},#{data},#{createTime})
+        insert into <include refid="tableName"/> (from_address,height,hash,tx_type,status,data,create_time)
+        value (#{fromAddress},#{height},#{hash},#{txType},#{status},#{data},#{createTime})
     </insert>
     <select id="findByAddress" resultType="com.aitos.xenon.account.domain.Transaction">
         select * from <include refid="tableName"/> where address=#{address}
@@ -16,23 +16,8 @@
     <select id="query" resultType="com.aitos.xenon.account.domain.Transaction">
         select * from <include refid="tableName"/> where hash=#{txHash}
     </select>
-    <select id="listOld" resultType="com.aitos.xenon.account.domain.Transaction">
-        select * from <include refid="tableName"/>
-        <where>
-            <if test="queryParams.height!=null">
-                height=#{queryParams.height}
-            </if>
-            <if test="queryParams.hash!=null and queryParams.hash!=''">
-                and hash=#{queryParams.hash}
-            </if>
-            <if test="queryParams.fromAddress!=null and queryParams.fromAddress!=''">
-                and from_address=#{queryParams.fromAddress}
-            </if>
-        </where>
-        order by create_time desc
-    </select>
 
-    <select id="list" resultType="com.aitos.xenon.account.domain.TransactionReport">
+    <select id="list" resultType="com.aitos.xenon.account.api.domain.vo.TransactionVo">
         select * from transaction
         <where>
             <if test="queryParams.height!=null">
@@ -46,6 +31,9 @@
             </if>
             <if test="queryParams.address!=null and queryParams.address!=''">
                 and JSON_SEARCH(data, 'one', #{queryParams.address})
+            </if>
+            <if test="queryParams.startTime!=null and queryParams.endTime!=''">
+                and create_time &gt;= #{queryParams.startTime} and create_time &lt;= #{queryParams.endTime}
             </if>
         </where>
         order by create_time desc

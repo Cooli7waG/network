@@ -20,9 +20,7 @@ public interface TransactionService {
 
     Transaction query(String txHash);
 
-    IPage<Transaction> listOld(QueryParams queryParams);
-
-    IPage<TransactionReport> list(TransactionSearchDto queryParams);
+    IPage<TransactionVo> list(TransactionSearchDto queryParams);
 
     List<Transaction> getAll();
 

@@ -1,6 +1,7 @@
 package com.aitos.xenon.account.mapper;
 
 import com.aitos.xenon.account.api.domain.dto.TransactionSearchDto;
+import com.aitos.xenon.account.api.domain.vo.TransactionVo;
 import com.aitos.xenon.account.domain.Transaction;
 import com.aitos.xenon.account.domain.TransactionReport;
 import com.aitos.xenon.core.model.QueryParams;
@@ -20,9 +21,7 @@ public interface TransactionMapper {
 
     Transaction query(@Param("txHash") String txHash);
 
-    IPage<Transaction> listOld(Page<Transaction> page, @Param("queryParams") QueryParams queryParams);
-
-    IPage<TransactionReport> list(Page<TransactionReport> page, @Param("queryParams") TransactionSearchDto queryParams);
+    IPage<TransactionVo> list(Page<TransactionVo> page, @Param("queryParams") TransactionSearchDto queryParams);
 
     List<Transaction> getAll();
 

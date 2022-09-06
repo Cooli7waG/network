@@ -26,14 +26,6 @@ public class TransactionReport {
      */
     private Long height;
     /**
-     * miner地址
-     */
-    private String miner;
-    /**
-     * owner地址
-     */
-    private String owner;
-    /**
      * 交易时间
      */
     private Date createTime;
