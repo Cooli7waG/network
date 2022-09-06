@@ -6,6 +6,7 @@ import com.aitos.xenon.account.api.domain.dto.PoggRewardDetailDto;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
 import com.aitos.xenon.account.api.domain.vo.BmtStatisticsVo;
 import com.aitos.xenon.account.domain.Account;
+import com.aitos.xenon.account.domain.AccountReward;
 import com.aitos.xenon.account.mapper.AccountMapper;
 import com.aitos.xenon.account.service.AccountService;
 import com.aitos.xenon.core.constant.BusinessConstants;
@@ -116,7 +117,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void updateEarning(List<PoggRewardDetailDto> rewards) {
-        accountMapper.updateEarning(rewards,LocalDateTime.now());
+    public void updateEarning(List<AccountReward>  accountRewardList) {
+        accountMapper.updateEarning(accountRewardList,LocalDateTime.now());
     }
 }

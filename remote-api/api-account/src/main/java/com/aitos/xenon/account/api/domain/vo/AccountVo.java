@@ -25,11 +25,11 @@ public class AccountVo {
     /**
      * 总挖矿收入
      */
-    private long earningMint;
+    private BigDecimal earningMint;
     /**
      * 总服务收入
      */
-    private long earningService;
+    private BigDecimal earningService;
     /**
      * miner数量
      */

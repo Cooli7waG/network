@@ -36,14 +36,6 @@
         where id=#{id}
     </update>
     <update id="updateEarning">
-       <!-- <foreach collection="rewards" item="item" separator=";">
-            update <include refid="tableName"/>
-            <set>
-                earning_mint=earning_mint+#{item.amount},
-                update_time=#{updateTime}
-            </set>
-            where address=#{item.address}
-        </foreach>-->
         update <include refid="tableName"/>
         <trim prefix="set" suffixOverrides=",">
             <trim prefix="earning_mint =case" suffix="end,">

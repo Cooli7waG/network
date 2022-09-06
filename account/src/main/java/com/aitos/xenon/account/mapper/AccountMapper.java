@@ -4,6 +4,7 @@ import com.aitos.xenon.account.api.domain.dto.AccountSearchDto;
 import com.aitos.xenon.account.api.domain.dto.PoggRewardDetailDto;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
 import com.aitos.xenon.account.domain.Account;
+import com.aitos.xenon.account.domain.AccountReward;
 import com.aitos.xenon.core.model.QueryParams;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -26,5 +27,5 @@ public interface AccountMapper {
 
     List<Account> findListByIds(@Param("idsList")List<Long> idsList);
 
-    void updateEarning(@Param("rewards")List<PoggRewardDetailDto> rewards,@Param("updateTime") LocalDateTime updateTime);
+    void updateEarning(@Param("rewards")List<AccountReward>  accountRewardList,@Param("updateTime") LocalDateTime updateTime);
 }

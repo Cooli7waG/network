@@ -19,4 +19,13 @@ public class Account extends BaseModel {
      * 1.owner账户；2miner账户
      */
     private Integer  accountType;
+
+    /**
+     * 总挖矿收入
+     */
+    private BigDecimal earningMint;
+    /**
+     * 总服务收入
+     */
+    private BigDecimal earningService;
 }
