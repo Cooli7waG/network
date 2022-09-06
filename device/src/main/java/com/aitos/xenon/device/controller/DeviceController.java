@@ -40,6 +40,11 @@ public class DeviceController {
     @Value("${xenon.airdrop.apply.personalSign}")
     private Boolean applyPersonalSign;
 
+    /**
+     * 设备注册接口
+     * @param deviceRegister
+     * @return
+     */
     @PostMapping("/register")
     public Result register(@RequestBody DeviceRegisterDto deviceRegister){
         //TODO 此处不能只验证一个字段
@@ -66,6 +71,11 @@ public class DeviceController {
         return Result.ok();
     }
 
+    /**
+     * 设备绑定接口
+     * @param params
+     * @return
+     */
     @PostMapping("/onboard")
     public Result onboard(@RequestBody String params){
         log.info("onboard.params:{}",params);
@@ -117,6 +127,11 @@ public class DeviceController {
         return Result.ok(txHash);
     }
 
+    /**
+     * 设备终止接口
+     * @param deviceTerminateMinerDto
+     * @return
+     */
     @PostMapping("/terminate")
     public Result terminate(@RequestBody DeviceTerminateMinerDto deviceTerminateMinerDto){
         log.info("terminate.params:{}",JSON.toJSONString(deviceTerminateMinerDto));
@@ -128,12 +143,34 @@ public class DeviceController {
         return Result.ok();
     }
 
+    /**
+     * 根据miner address 查询miner 信息
+     * @param minerAddress
+     * @return
+     */
+    @GetMapping("/{minerAddress}")
+    public Result<DeviceVo> findByAddress(@RequestParam("minerAddress")String minerAddress){
+        DeviceVo deviceVo= deviceService.queryByMiner(minerAddress);
+        return Result.ok(deviceVo);
+    }
+
+    /**
+     * todo 该接口后续可能会删掉,改用 findByAddress
+     * @param minerAddress
+     * @return
+     */
+    @Deprecated
     @GetMapping("/queryByMiner")
     public Result<DeviceVo> queryByMiner(@RequestParam("minerAddress")String minerAddress){
         DeviceVo deviceVo= deviceService.queryByMiner(minerAddress);
         return Result.ok(deviceVo);
     }
 
+    /**
+     * 分页查询miner信息接口
+     * @param queryParams
+     * @return
+     */
     @GetMapping("/list")
     public Result<Page<DeviceVo>> list(DeviceSearchDto queryParams){
         IPage<DeviceVo> listPage= deviceService.list(queryParams);
@@ -141,6 +178,11 @@ public class DeviceController {
         return Result.ok(deviceVoPage);
     }
 
+    /**
+     * 内部调用接口
+     * @param deviceDto
+     * @return
+     */
     @PutMapping("/update")
     public Result update(@RequestBody DeviceDto deviceDto){
         Device device=BeanConvertor.toBean(deviceDto,Device.class);

@@ -33,10 +33,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -133,8 +130,6 @@ public class TransactionServiceImpl implements TransactionService {
                 //调用合约发送奖励
                 TransactionReceipt transactionReceipt = erc20Service.rewardMiner_multi(addressList, rewardList).send();
                 log.info("erc20.transactionReceipt={}",transactionReceipt.getTransactionHash());
-                // 更新miner账户余额
-                accountService.updateEarning(poggRewardDto.getRewards());
 
                 //奖励明细记录
                 poggRewardDto.getRewards().forEach(item->{
@@ -151,6 +146,9 @@ public class TransactionServiceImpl implements TransactionService {
                     accountRewardList.add(accountReward);
                 });
                 accountRewardService.batchSave(accountRewardList);
+
+                // 累计到账户字段上，方便快速查询
+                accountService.updateEarning(accountRewardList);
             }
             //记录交易
             Transaction transaction = new Transaction();

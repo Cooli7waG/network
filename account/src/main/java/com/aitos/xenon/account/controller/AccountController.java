@@ -26,6 +26,11 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
+    /**
+     * 账户注册接口
+     * @param accountRegister
+     * @return
+     */
     @PostMapping("/register")
     public Result<Long> register(@RequestBody AccountRegisterDto accountRegister){
         AccountVo accountTemp=accountService.findByAddress(accountRegister.getAddress());
@@ -37,18 +42,45 @@ public class AccountController {
         return Result.ok(account.getId());
     }
 
-    @GetMapping("/findByAddress/{address}")
+    /**
+     * 根据账户地址查询账户信息
+     * @param address
+     * @return
+     */
+    @GetMapping("/{address}")
     public Result<AccountVo> findByAddress(@PathVariable("address") String address){
         AccountVo accountTemp=accountService.findByAddress(address);
         return Result.ok(accountTemp);
     }
 
+    /**
+     * todo  该接口后续会被删除,请使用findByAddress
+     * @param address
+     * @return
+     */
+    @Deprecated
+    @GetMapping("/findByAddress/{address}")
+    public Result<AccountVo> findByAddress2(@PathVariable("address") String address){
+        AccountVo accountTemp=accountService.findByAddress(address);
+        return Result.ok(accountTemp);
+    }
+
+    /**
+     * 根据账户地址查询余额信息
+     * @param address
+     * @return
+     */
     @GetMapping("/balance/{address}")
     public Result<String> getBalance(@PathVariable("address") String address){
         AccountVo accountTemp=accountService.findByAddress(address);
         return Result.ok(accountTemp.getBalance());
     }
 
+    /**
+     * 根据账户地址查询nonce信息
+     * @param address
+     * @return
+     */
     @GetMapping("/nonce/{address}")
     public Result<Long> getNonce(@PathVariable("address") String address){
         AccountVo accountTemp=accountService.findByAddress(address);
@@ -58,6 +90,11 @@ public class AccountController {
         return Result.ok(accountTemp.getNonce());
     }
 
+    /**
+     * 分页查询账户列表
+     * @param accountSearchDto
+     * @return
+     */
     @GetMapping("/list")
     public Result<Page<AccountVo>> list(AccountSearchDto accountSearchDto){
         IPage<AccountVo> listPage= accountService.list(accountSearchDto);

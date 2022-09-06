@@ -5,9 +5,11 @@ import com.aitos.xenon.account.api.domain.dto.PoggRewardDetailDto;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
 import com.aitos.xenon.account.api.domain.vo.BmtStatisticsVo;
 import com.aitos.xenon.account.domain.Account;
+import com.aitos.xenon.account.domain.AccountReward;
 import com.aitos.xenon.core.model.Page;
 import com.aitos.xenon.core.model.QueryParams;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -30,5 +32,5 @@ public interface AccountService {
 
     BmtStatisticsVo bmtStatistics();
 
-    void updateEarning(List<PoggRewardDetailDto> rewards);
+    void updateEarning(List<AccountReward>  accountRewardList);
 }
