@@ -33,7 +33,8 @@
                 and JSON_SEARCH(data, 'one', #{queryParams.address})
             </if>
             <if test="queryParams.startTime!=null and queryParams.endTime!=''">
-                and create_time &gt;= #{queryParams.startTime} and create_time &lt;= #{queryParams.endTime}
+                and date_format(create_time,'%y%m%d') &gt;= date_format(#{queryParams.startTime},'%y%m%d')
+                and date_format(create_time,'%y%m%d')  &lt;= date_format(#{queryParams.endTime},'%y%m%d')
             </if>
         </where>
         order by create_time desc

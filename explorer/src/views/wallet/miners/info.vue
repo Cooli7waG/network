@@ -129,6 +129,35 @@
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="Transaction" name="transaction">
+        <el-row :gutter="24">
+          <el-form ref="queryForm" :inline="true">
+            <el-form-item label="TxHash" prop="txHash">
+              <el-input style="width: 240px" v-model="data.page.txHash" placeholder="Please input transaction hash" clearable @keyup.enter.native="handleGetTransaction"/>
+            </el-form-item>
+            <el-form-item label="TxType" prop="txType">
+              <el-select style="width: 260px" v-model="data.page.txType" placeholder="Please select transaction type" clearable @change="handleGetTransaction">
+                <el-option v-for="item in data.txTypeOptions" :key="item.value" :label="item.label" :value="item.value"/>
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-date-picker
+                  v-model="data.dateRangeValue"
+                  type="daterange"
+                  unlink-panels
+                  range-separator="To"
+                  start-placeholder="Start date"
+                  end-placeholder="End date"
+                  :shortcuts="shortcuts"
+                  format="YYYY-MM-DD"
+                  value-format="YYYY-MM-DD"
+                  @change="handleGetTransaction"
+              />
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="handleGetTransaction">搜索</el-button>
+            </el-form-item>
+          </el-form>
+        </el-row>
         <el-pagination
             v-model:currentPage="data.page.offset"
             v-model:page-size="data.page.limit"
@@ -209,12 +238,12 @@ export default {
       if(url.endsWith("#reward")){
         this.data.activeName = "reward"
         this.handleGetReward();
-      }else if(url.endsWith("#report")){
-        this.data.activeName = "report"
-        this.handleGetReport();
-      }else {
+      }else if(url.endsWith("#transaction")){
         this.data.activeName = "transaction"
         this.handleGetTransaction();
+      }else {
+        this.data.activeName = "report"
+        this.handleGetReport();
       }
     },
     pageSizeChange(pageSize) {
@@ -295,12 +324,19 @@ export default {
     },
     handleGetTransaction(){
       this.data.page.address = this.$route.params.address;
+      if(this.data.dateRangeValue){
+        this.data.page.startTime = this.data.dateRangeValue[0]
+        this.data.page.endTime = this.data.dateRangeValue[1]
+      }else {
+        this.data.page.startTime = undefined
+        this.data.page.endTime = undefined
+      }
       transactionList(this.data.page).then(rsp =>{
         this.data.page.total = rsp.data.total;
         this.data.transactionData = rsp.data.items
         this.data.transactionLoading = false;
       })
-    }
+    },
   },
   computed: {
     formatDate() {
@@ -328,9 +364,26 @@ export default {
       query: {
         minerAddress: ''
       },
+      txTypeOptions:[
+        {value:1,label:"TX_Register_miner"},
+        {value:2,label:"TX_Onboard_Miner"},
+        {value:3,label:"TX_Transfer_Miner"},
+        {value:4,label:"TX_Terminate_Miner"},
+        {value:5,label:"TX_Airdrop_Miner"},
+        {value:6,label:"TX_Claim_Miner"},
+        {value:6,label:"TX_Claim_Miner"},
+        {value:7,label:"TX_Commit_PoGG"},
+        {value:8,label:"TX_Report_PoGG"},
+        {value:9,label:"TX_Reward_PoGG"},
+        {value:10,label:"TX_Transfer"},
+      ],
+      dateRangeValue: [],
       page:{
         hidePage:true,
         address:null,
+        txType:null,
+        startTime:null,
+        endTime:null,
         offset:1,
         limit:25,
         total:0,
@@ -346,6 +399,35 @@ export default {
       transactionLoading:true,
       transactionData:undefined,
     })
+    const shortcuts = [
+      {
+        text: 'Last week',
+        value: () => {
+          const end = new Date()
+          const start = new Date()
+          start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+          return [start, end]
+        },
+      },
+      {
+        text: 'Last month',
+        value: () => {
+          const end = new Date()
+          const start = new Date()
+          start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+          return [start, end]
+        },
+      },
+      {
+        text: 'Last 3 months',
+        value: () => {
+          const end = new Date()
+          const start = new Date()
+          start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+          return [start, end]
+        },
+      },
+    ]
     const loadQueryByMiner = () => {
       queryByMiner(data.query.minerAddress).then((result) => {
         if (result.data == null) {
@@ -362,7 +444,8 @@ export default {
       loadQueryByMiner()
     })
     return {
-      data
+      data,
+      shortcuts
     }
   }
 }
