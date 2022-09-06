@@ -1,6 +1,7 @@
 package com.aitos.xenon.account.service;
 
 import com.aitos.xenon.account.api.domain.dto.AccountRewardSearchDto;
+import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsDayVo;
 import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsVo;
 import com.aitos.xenon.account.api.domain.vo.AccountRewardVo;
 import com.aitos.xenon.account.domain.AccountReward;
@@ -31,4 +32,13 @@ public interface AccountRewardService {
      * @return
      */
     IPage<AccountRewardVo> findListByPage(AccountRewardSearchDto queryParams);
+
+    /**
+     * 按天统计账户的奖励数
+     * @param address
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    List<AccountRewardStatisticsDayVo> statisticsRewardByDay(String address, LocalDateTime startTime, LocalDateTime endTime);
 }

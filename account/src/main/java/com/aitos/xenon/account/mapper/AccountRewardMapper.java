@@ -1,6 +1,7 @@
 package com.aitos.xenon.account.mapper;
 
 import com.aitos.xenon.account.api.domain.dto.AccountRewardSearchDto;
+import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsDayVo;
 import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsVo;
 import com.aitos.xenon.account.api.domain.vo.AccountRewardVo;
 import com.aitos.xenon.account.domain.AccountReward;
@@ -29,4 +30,6 @@ public interface AccountRewardMapper {
     BigDecimal statisticsRewards(@Param("address") String address,@Param("startTime") LocalDateTime startTime,@Param("endTime") LocalDateTime endTime);
 
     IPage<AccountRewardVo> findListByPage(@Param("page")Page<AccountRewardVo> page, @Param("queryParams") AccountRewardSearchDto queryParams);
+
+    List<AccountRewardStatisticsDayVo> statisticsRewardByDay(@Param("address")String address,@Param("startTime") LocalDateTime startTime,@Param("endTime") LocalDateTime endTime);
 }
