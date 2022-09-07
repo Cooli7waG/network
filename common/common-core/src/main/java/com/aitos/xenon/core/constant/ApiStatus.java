@@ -71,6 +71,7 @@ public enum ApiStatus implements ConstantsCode {
     BUSINESS_TRANSACTION_SIGN_ERROR(4006,"transaction signature error"),
     BUSINESS_OWNER_ACCOUNT_NOT_EXIST(4007,"owner account is not exist"),
     BUSINESS_FOUNDATION_SIGN_ERROR(4008,"foundation signature error"),
+    BUSINESS_ACCOUNT_REWARD_SEARCH_DAY_RANGE_ERROR(4009,"account reward days range error"),
 
 
     // pogg相关

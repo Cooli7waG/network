@@ -1,6 +1,7 @@
 package com.aitos.xenon.account.service.impl;
 
 import com.aitos.xenon.account.api.domain.dto.AccountRewardSearchDto;
+import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsDayVo;
 import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsVo;
 import com.aitos.xenon.account.api.domain.vo.AccountRewardVo;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
@@ -42,6 +43,11 @@ public class AccountRewardServiceImpl implements AccountRewardService {
         Page<AccountRewardVo> page = new Page<AccountRewardVo>(queryParams.getOffset(), queryParams.getLimit());
         IPage<AccountRewardVo> pageResult = accountRewardMapper.findListByPage(page, queryParams);
         return pageResult;
+    }
+
+    @Override
+    public List<AccountRewardStatisticsDayVo> statisticsRewardByDay(String address, LocalDateTime startTime, LocalDateTime endTime) {
+        return accountRewardMapper.statisticsRewardByDay(address,startTime,endTime);
     }
 
 

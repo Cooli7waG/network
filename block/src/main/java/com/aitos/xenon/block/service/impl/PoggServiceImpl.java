@@ -30,6 +30,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -273,8 +275,10 @@ public class PoggServiceImpl implements PoggService {
             List<PoggRewardDetailDto> poggRewardDetailDtos = JSON.parseArray(item.getRewardsJson(), PoggRewardDetailDto.class);
             poggRewardDto.setRewards(poggRewardDetailDtos);
 
+            long startTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
             Result<String> result = remoteTransactionService.poggReward(poggRewardDto);
-            log.info("giveOutRewards.result={}", JSON.toJSONString(result));
+            long endTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            log.info("giveOutRewards.result={},times={}", JSON.toJSONString(result),endTime-startTime);
             if (result.getCode() != ApiStatus.SUCCESS.getCode()) {
                 msg = result.getMsg();
                 status = BusinessConstants.POGGRewardStatus.ISSUED_FAILED;
