@@ -14,6 +14,10 @@ public class GameMiner {
 
     private String foundationSignature;
 
+    private Double latitude;
+
+    private Double longitude;
+
     private LocalDateTime createTime;
 
 }

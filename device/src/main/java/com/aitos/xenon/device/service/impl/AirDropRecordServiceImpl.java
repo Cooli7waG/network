@@ -24,6 +24,7 @@ import com.aitos.xenon.core.utils.MetaMaskUtils;
 import com.aitos.xenon.device.api.RemoteDeviceService;
 import com.aitos.xenon.device.api.RemoteGameMinerService;
 import com.aitos.xenon.device.api.domain.dto.*;
+import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.aitos.xenon.device.api.domain.vo.GameMiner;
 import com.aitos.xenon.device.domain.AirDropRecord;
 import com.aitos.xenon.device.domain.Device;
@@ -332,6 +333,11 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
         ClaimDto claimDto=JSON.parseObject(claimGameMiner,ClaimDto.class);
         GameMiner gameMiner = new GameMiner();
         gameMiner.setAddress(claimDto.getMinerAddress());
+        //
+        DeviceVo deviceVo = deviceMapper.queryByMiner(claimDto.getMinerAddress());
+        gameMiner.setLatitude(deviceVo.getLatitude());
+        gameMiner.setLongitude(deviceVo.getLongitude());
+        //
         Result start = remoteGameMinerService.start(gameMiner);
         log.info("remoteGameMinerService.start:{}",JSON.toJSONString(start));
         if(start.getCode() != ApiStatus.SUCCESS.getCode()){
