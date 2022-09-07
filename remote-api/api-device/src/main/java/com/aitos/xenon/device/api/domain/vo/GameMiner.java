@@ -4,6 +4,10 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+/**
+ * apply和claim使用的参数
+ * @author xymoc
+ */
 @Data
 public class GameMiner {
     private String address;

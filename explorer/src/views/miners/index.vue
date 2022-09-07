@@ -44,7 +44,11 @@
         </el-table-column>
         <el-table-column prop="earningMint" :label="$t('miners.table.earningMint')"/>
         <el-table-column prop="earningService" :label="$t('miners.table.earningService')"  />
-        <el-table-column prop="power" :label="$t('miners.table.power')"  />
+        <el-table-column prop="power" :label="$t('miners.table.power')">
+          <template #default="scope">
+            {{(scope.row.power/1000).toFixed(3)}}
+          </template>
+        </el-table-column>
         <el-table-column prop="totalEnergyGeneration" :label="$t('miners.table.totalEnergyGeneration')">
           <template #default="scope">
             {{(scope.row.totalEnergyGeneration/1000/1000).toFixed(3)}}

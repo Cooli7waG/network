@@ -94,6 +94,23 @@
       <el-button type="primary" @click="drawer = true">Login Wallet</el-button>
     </el-empty>
   </div>
+  <el-dialog v-model="dialogVisible" :show-close=false title="" width="30%" center style="z-index: 99999">
+    <div style="text-align: center;margin-top: -20px">
+      <h1>Welcome to ARKREEN</h1>
+    </div>
+    <div style="text-align: center">
+      <img src="../assets/img/acb78eda-89b9-4e9d-a20d-46ba09b8e612.png" style="width: 200px;">
+    </div>
+    <div style="margin-top: 15px;font-weight: bold">
+      By connecting your wallet and using ARKREEN,you agree to our <span class="privacySpan">Terms of Service</span> and <span class="privacySpan">Privacy Policy</span>
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogVisible = false" :disabled="loading">Cancel</el-button>
+        <el-button type="primary" @click="loginMetaMask" :disabled="loading">Acccpt and sign</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script>
@@ -111,6 +128,8 @@ export default {
   },
   data() {
     return {
+      loading:false,
+      dialogVisible:false,
       drawer: false,
       direction: 'rtl',
       isShow: true,
@@ -192,6 +211,19 @@ export default {
       return formatString(str, 15);
     },
     async loginApp() {
+      //首次使用弹出确认对话框
+      let isPrivacyPolicy = window.localStorage.getItem('isPrivacyPolicy')
+      console.log("缓存的isPrivacyPolicy："+isPrivacyPolicy)
+      if(isPrivacyPolicy == "true" ){
+        await this.loginMetaMask();
+      }else {
+        this.dialogVisible = true;
+        this.closeDrawer();
+      }
+    },
+    async loginMetaMask() {
+      this.loading = true;
+      window.localStorage.setItem('isPrivacyPolicy', "true");
       if (this.userAddress != undefined) {
         this.$router.push("/wallet");
       }
@@ -210,7 +242,9 @@ export default {
         } else {
           this.$message.error(this.$t('common.msg.metaMaskNotFound'));
         }
+        this.loading = false;
       } catch (err) {
+        this.loading = false;
         this.$message.error(this.$t('common.msg.LoginWithMetaMaskFailed'));
       }
     }
@@ -218,6 +252,10 @@ export default {
 }
 </script>
 <style scoped>
+.privacySpan{
+  color: #409EFF;
+  cursor: pointer
+}
 .btn_xenon {
   text-align: center;
   cursor: pointer;
