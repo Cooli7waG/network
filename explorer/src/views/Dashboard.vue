@@ -1,8 +1,8 @@
 <template>
-  <el-row :gutter="24">
+  <el-row :gutter="24" style="height: 100%">
     <el-col :span="6">
-      <el-col :span="24">
-        <el-card class="box-card" >
+      <el-col :span="24" style="height: calc((100% / 2) - 50px )">
+        <el-card class="box-card" style="height: 100%">
           <div class="text item">
             <div class="label">{{ $t('dashboard.miners') }}</div>
             <div class="content">{{ data.minerStatistics.miners }}</div>
@@ -17,8 +17,8 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="24" style="margin-top: 15px">
-        <el-card class="box-card">
+      <el-col :span="24" style="margin-top: 15px;height: calc((100% / 2) - 65px )">
+        <el-card class="box-card" style="height: 100%">
           <div class="text item">
             <div class="label">{{ $t('dashboard.uSDBmtMarketPrice') }}</div>
             <div class="content">${{ Number(data.blockchainstats.usdbmtMarketPrice).toFixed(2) }}</div>
@@ -37,7 +37,6 @@
     <el-col :span="18">
       <div id="map" class="map"></div>
     </el-col>
-
   </el-row>
   <div v-show="data.minersDrawer" tabindex="-1" class="el-drawer__wrapper" style="z-index: 9999;">
     <div role="document" tabindex="-1" class="el-drawer__container el-drawer__open">
@@ -527,6 +526,6 @@ export default {
 
 .map {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 100px);
 }
 </style>
