@@ -21,6 +21,6 @@ spring:
     client:
       config:
         default:
-          connectTimeout: 600000
-          readTimeout: 600000
+          connectTimeout: 1200000
+          readTimeout: 1200000
           loggerLevel: full

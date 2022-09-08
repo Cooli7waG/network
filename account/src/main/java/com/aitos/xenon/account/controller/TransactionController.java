@@ -54,6 +54,7 @@ public class TransactionController {
 
     @PostMapping("/poggReward")
     public Result<String> poggReward(@RequestBody PoggRewardDto poggRewardDto){
+        log.info("poggReward.params={}",JSON.toJSONString(poggRewardDto));
         String txHash=transactionService.poggReward(poggRewardDto);
         return Result.ok(txHash);
     }
