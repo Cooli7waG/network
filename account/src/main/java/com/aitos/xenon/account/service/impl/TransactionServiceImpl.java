@@ -55,6 +55,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void transaction(Transaction transaction) {
+
         transaction.setStatus(1);
         transaction.setCreateTime(LocalDateTime.now());
         transactionMapper.save(transaction);
@@ -98,6 +99,11 @@ public class TransactionServiceImpl implements TransactionService {
             //生成交易数据
             String data = JSON.toJSONString(poggRewardDto);
             String txHash = DigestUtils.sha256Hex(data);
+            Transaction transactionTemp = query(txHash);
+            if(transactionTemp!=null){
+                log.info("poggReward.hash.exist={}",txHash);
+                return txHash;
+            }
 
             if(poggRewardDto.getRewards().size()>0){
                 List<AccountReward>  accountRewardList=new ArrayList<>();
