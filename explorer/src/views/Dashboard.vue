@@ -1,41 +1,60 @@
 <template>
-  <el-row :gutter="24" style="height: 100%">
-    <el-col :span="6">
-      <el-col :span="24" style="height: calc((100% / 2) - 50px )">
-        <el-card class="box-card" style="height: 100%">
-          <div class="text item">
-            <div class="label">{{ $t('dashboard.miners') }}</div>
-            <div class="content">{{ data.minerStatistics.miners }}</div>
-          </div>
-          <div class="text item">
-            <div class="label">{{ $t('dashboard.totalPowerLow') }}</div>
-            <div class="content">{{ formatPower(data.minerStatistics.totalPowerLow) }}</div>
-          </div>
-          <div class="text item">
-            <div class="label">{{ $t('dashboard.totalChargeVol') }}</div>
-            <div class="content">{{ data.minerStatistics.totalChargeVol }}</div>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :span="24" style="margin-top: 15px;height: calc((100% / 2) - 65px )">
-        <el-card class="box-card" style="height: 100%">
-          <div class="text item">
-            <div class="label">{{ $t('dashboard.uSDBmtMarketPrice') }}</div>
-            <div class="content">${{ Number(data.blockchainstats.usdbmtMarketPrice).toFixed(2) }}</div>
-          </div>
-          <div class="text item">
-            <div class="label">{{ $t('dashboard.totalBMTMarket') }}</div>
-            <div class="content">${{ data.blockchainstats.totalBMTMarket }}</div>
-          </div>
-          <div class="text item">
-            <div class="label">{{ $t('dashboard.tokenSupply') }}</div>
-            <div class="content">{{ data.blockchainstats.tokenSupply }}/{{ data.blockchainstats.totalBMTMarket }}</div>
-          </div>
-        </el-card>
-      </el-col>
-    </el-col>
-    <el-col :span="18">
+  <el-row :gutter="24" style="height: 100%;margin-top: -20px;margin-left: -32px;margin-right: -32px;margin-bottom: 40px">
+    <el-col :span="24" style="margin-bottom: -20px">
       <div id="map" class="map"></div>
+      <div class="leftView">
+        <el-row style="height: 100%">
+          <el-col v-show="data.leftShow" :span="23" class="leftContext">
+            <div style="color: #FFFFFF;padding: 10px">
+              <h3>Welcome to</h3>
+              <h2>Arkreen Explorer</h2>
+              Arkreen Explorer is a Block Explorer and Analytics Platform for Arkreen, a decentralized wireless connectivity platform.
+            </div>
+            <div style="height: 100%;background-color: #FFFFFF;padding-inline-end: 20px;">
+              <el-col style="padding-top: 10px;padding-left: 15px">
+                <el-col :span="24" style="height: calc((100% / 2) - 50px );margin-top: 20px">
+                  <el-card class="box-card">
+                    <div class="text item">
+                      <div class="label">{{ $t('dashboard.miners') }}</div>
+                      <div class="content">{{ data.minerStatistics.miners }}</div>
+                    </div>
+                    <div class="text item">
+                      <div class="label">{{ $t('dashboard.totalPowerLow') }}</div>
+                      <div class="content">{{ formatPower(data.minerStatistics.totalPowerLow) }}</div>
+                    </div>
+                    <div class="text item">
+                      <div class="label">{{ $t('dashboard.totalChargeVol') }}</div>
+                      <div class="content">{{ data.minerStatistics.totalChargeVol }}</div>
+                    </div>
+                  </el-card>
+                </el-col>
+                <el-col :span="24" style="margin-top: 15px;height: calc((100% / 2) - 65px )">
+                  <el-card class="box-card">
+                    <div class="text item">
+                      <div class="label">{{ $t('dashboard.uSDBmtMarketPrice') }}</div>
+                      <div class="content">${{ Number(data.blockchainstats.usdbmtMarketPrice).toFixed(2) }}</div>
+                    </div>
+                    <div class="text item">
+                      <div class="label">{{ $t('dashboard.totalBMTMarket') }}</div>
+                      <div class="content">${{ data.blockchainstats.totalBMTMarket }}</div>
+                    </div>
+                    <div class="text item">
+                      <div class="label">{{ $t('dashboard.tokenSupply') }}</div>
+                      <div class="content">{{ data.blockchainstats.tokenSupply }}/{{ data.blockchainstats.totalBMTMarket }}</div>
+                    </div>
+                  </el-card>
+                </el-col>
+              </el-col>
+            </div>
+          </el-col>
+          <el-col :span="1" style="margin-top: 120px">
+            <div class="leftViewChange">
+              <el-icon v-if="data.leftShow" @click="closeOrOpen" style="height: 90%;"><DArrowLeft /></el-icon>
+              <el-icon v-else @click="closeOrOpen" style="height: 90%;"><DArrowRight /></el-icon>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
     </el-col>
   </el-row>
   <div v-show="data.minersDrawer" tabindex="-1" class="el-drawer__wrapper" style="z-index: 9999;">
@@ -121,7 +140,6 @@ import Feature from "ol/Feature"
 import Style from "ol/style/Style"
 import Fill from "ol/style/Fill"
 import Circle from "ol/style/Circle"
-import Stroke from "ol/style/Stroke"
 import Select from "ol/interaction/Select"
 import View from "ol/View"
 export default {
@@ -152,9 +170,24 @@ export default {
       return Constant
     }
   },
-  setup() {
+  setup: function () {
+
+    const closeOrOpen = () => {
+      if (data.leftShow) {
+        data.leftShow = false;
+        data.rightIndex = 24;
+      } else {
+        data.leftShow = true;
+        data.leftIndex = 6;
+        data.rightIndex = 18;
+      }
+      this.$forceUpdate();
+    }
 
     const data = reactive({
+      leftShow: true,
+      leftIndex: 6,
+      rightIndex: 18,
       minersDrawer: false,
       minerInfoLoad: true,
       direction: 'rtl',
@@ -190,7 +223,7 @@ export default {
       getMinerStatistics().then((result) => {
         console.log(result)
         data.minerStatistics = result.data;
-        data.minerStatistics.totalChargeVol = (data.minerStatistics.totalChargeVol/1000 / 1000).toFixed(3)+" kWh"
+        data.minerStatistics.totalChargeVol = (data.minerStatistics.totalChargeVol / 1000 / 1000).toFixed(3) + " kWh"
       }).catch((err) => {
         console.log(err);
       });
@@ -254,16 +287,16 @@ export default {
 
     //创建日照图层
     const createDayNightLayer = () => {
-      var dayNightSource = new DayNight({ });
-      var dayNightLayer=new VectorLayer({
+      var dayNightSource = new DayNight({});
+      var dayNightLayer = new VectorLayer({
         source: dayNightSource,
         style: new Style({
           image: new Circle({
             radius: 5,
-            fill: new Fill({ color: 'red' })
+            fill: new Fill({color: 'red'})
           }),
           fill: new Fill({
-            color: [0,0,50,.5]
+            color: [0, 0, 50, .5]
           })
         })
       })
@@ -272,29 +305,13 @@ export default {
     }
 
     //创建底图
-    const createBaseLayer=()=>{
-      var layers=[]
-      var esriLayer=new TileLayer({
-        source: new XYZSource({
-          attributions:
-              'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/' +
-              'rest/services/World_Topo_Map/MapServer">ArcGIS</a>',
-          url:
-              /*'https://server.arcgisonline.com/ArcGIS/rest/services/' +
-              'World_Topo_Map/MapServer/tile/{z}/{y}/{x}',*/
-              'https://wayback.maptiles.arcgis.com/arcgis/rest/services/world_imagery/wmts/1.0.0/default028mm/mapserver/tile/32645/{z}/{y}/{x}'
-        }),
-      })
-      //layers.push(esriLayer)
+    const createBaseLayer = () => {
+      var layers = []
 
-      var world_Street_MapLayer=new TileLayer({
+      var world_Street_MapLayer = new TileLayer({
         source: new XYZSource({
-          attributions:
-              'Tiles © <a href="https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer">ArcGIS</a>',
-          url:
-          /*'https://server.arcgisonline.com/ArcGIS/rest/services/' +
-          'World_Topo_Map/MapServer/tile/{z}/{y}/{x}',*/
-              'https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
+          attributions: 'Tiles © <a href="https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer">ArcGIS</a>',
+          url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
         }),
       })
       layers.push(world_Street_MapLayer)
@@ -302,41 +319,23 @@ export default {
     }
 
     const initMap = () => {
-      var defaultStyle = new Style({
-        //边框样式
-        stroke: new Stroke({
-          color: 'rgba(30,144,255)',
-          width: 2,
-        }),
-        //填充样式
-        fill: new Fill({
-          color: 'rgba(0, 0, 255, 0.1)',
-        }),
-        image: new Circle({
-          radius: 5,
-          fill: new Fill({
-            color: 'white',
-          })
-        })
-      })
+      let elementById = document.getElementById("map");
+      for (const childNode of elementById.childNodes) {
+        childNode.remove();
+      }
+      elementById.innerHTML = "";
+      data.map = undefined;
 
+      const baseLayers = createBaseLayer()
 
-      const baseLayers=createBaseLayer()
       data.map = new Map({
         layers: baseLayers,
         target: "map",
         view: new View({
           center: [0, 0],
           zoom: 2,
-          /*projection: "EPSG:4326",
-          center: [115.67724700667199, 37.73879478106912],
-          zoom: 6,
-          //maxZoom: 18,
-          //minZoom: 1,*/
         })
       })
-
-
 
       //日照图层
       const dayNightLayer = createDayNightLayer();
@@ -350,9 +349,8 @@ export default {
       const hexBinLayerLayer = createHexBinLayer(markerLayer.getSource());
       data.map.addLayer(hexBinLayerLayer);
 
-
       //创建feature选择器
-      var select = new Select({layers:[markerLayer,hexBinLayerLayer]});
+      var select = new Select({layers: [markerLayer, hexBinLayerLayer]});
       data.map.addInteraction(select);
       select.on('select', function (e) {
         if (e.selected.length) {
@@ -360,29 +358,27 @@ export default {
           if (features) {
             let minerAddressList = [];
             console.log(features)
-            for (let i=0;i<features.length;i++){
+            for (let i = 0; i < features.length; i++) {
               minerAddressList.push(features[i].values_.id);
             }
             //
             showMinerList(minerAddressList);
           } else {
-            console.log("f---->"+features)
+            console.log("f---->" + features)
           }
         }
       });
     }
 
     const showMinerList = (minerAddressList) => {
-      if(!data.minersDrawer){
+      if (!data.minersDrawer) {
         data.minersDrawer = true;
       }
       //
       data.minerInfoLoad = true;
       loadMinersInfo(minerAddressList).then((result) => {
-        if(result.code == 0){
+        if (result.code == 0) {
           data.minersList = result.data;
-        }else {
-
         }
         data.minerInfoLoad = false
       }).catch((err) => {
@@ -425,11 +421,35 @@ export default {
     })
     return {
       data,
+      closeOrOpen,
     }
   }
 }
 </script>
 <style lang="scss" scoped>
+.leftContext{
+  background-color: rgba(0,0,0,0.7);
+  width: 380px;
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+.leftView{
+  z-index: 9999;
+  position:absolute;
+  top: 0px;
+  height: 100%;
+}
+.leftViewChange{
+  width: 20px;
+  height: 50px;
+  background-color: rgba(0,0,0,.45);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  cursor: pointer;
+  line-height: 50px;
+}
 .btn_xenon {
   text-align: center;
   cursor: pointer;
@@ -515,6 +535,8 @@ export default {
   color: silver;
 }
 .box-card {
+  height: 100%;
+  background-color: #F8F8FB;
   .item {
     margin-bottom: 10px;
     .label {
@@ -523,9 +545,8 @@ export default {
     }
   }
 }
-
 .map {
   width: 100%;
-  height: calc(100% - 100px);
+  height: 100%;
 }
 </style>

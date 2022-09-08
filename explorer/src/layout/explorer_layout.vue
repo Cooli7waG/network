@@ -3,8 +3,8 @@
     <el-header style="z-index: 999">
       <Menus/>
     </el-header>
-    <el-container>
-      <el-main>
+    <el-container style="margin-top:-1px;">
+      <el-main style="overflow: hidden;">
         <router-view />
       </el-main>
       <el-footer>

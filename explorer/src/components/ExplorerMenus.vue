@@ -59,102 +59,6 @@ export default {
 }
 </script>
 <style scoped>
-.btn_xenon {
-  text-align: center;
-  cursor: pointer;
-  background-color: aliceblue !important;
-}
-.btn_xenon:hover {
-  background-color: rgb(83, 168, 255) !important;
-}
-.login_select {
-  height: 45px;
-  line-height: 45px;
-  background-color: aliceblue;
-  padding-right: 20px;
-  padding-left: 6px;
-  border-radius: 5px;
-  margin-top: 10px;
-  z-index: 99;
-}
-
-.el-drawer__open .el-drawer.rtl {
-  animation: rtl-drawer-in .4s 0ms;
-}
-
-@keyframes rtl-drawer-out {
-  0% {
-    transform: translate(0)
-  }
-  to {
-    transform: translate(100%)
-  }
-}
-
-@keyframes rtl-drawer-in {
-  0% {
-    transform: translate(100%)
-  }
-  to {
-    transform: translate(0)
-  }
-}
-
-.el-drawer {
-  position: absolute;
-  box-sizing: border-box;
-  background-color: #fff;
-  display: flex;
-}
-
-.el-drawer__container {
-  position: relative;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  height: 100%;
-  width: 100%;
-}
-
-.el-drawer__header {
-  align-items: center;
-  color: #72767b;
-  display: flex;
-  margin-bottom: 2px !important;
-  padding: var(--el-drawer-padding-primary);
-  padding-bottom: 0;
-}
-
-.el-drawer__wrapper {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  overflow: hidden;
-  margin: 0;
-  background-color: rgba(0, 0, 0, 0.3);
-}
-
-.wallet-img {
-  font-size: 26px;
-}
-
-.wallet-img:hover {
-  color: silver;
-}
-
-.box {
-  list-style: none;
-  width: 150px;
-}
-
-.down-menu {
-  list-style: none;
-  padding: 5px 0px;
-}
-
 a {
   text-decoration: none;
   color: #000000;
@@ -209,15 +113,4 @@ ul.box > li > .down-menu > li:hover {
   background-color: silver;
 }
 
-.login {
-  background-color: #545c64;
-  border-bottom: solid 1px var(--el-menu-border-color);
-}
-.el-dropdown-link {
-  cursor: pointer;
-  color: #409EFF;
-}
-.el-icon-arrow-down {
-  font-size: 12px;
-}
 </style>
