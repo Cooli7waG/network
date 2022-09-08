@@ -19,6 +19,7 @@ import com.aitos.xenon.core.exceptions.ServiceException;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
 import com.alibaba.fastjson.JSON;
+import feign.RetryableException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.util.encoders.Hex;
@@ -270,18 +271,25 @@ public class PoggServiceImpl implements PoggService {
         unIssuedPoggRewardList.forEach(item -> {
             int status = BusinessConstants.POGGRewardStatus.ISSUED;
             String msg = "";
+            try{
+                PoggRewardDto poggRewardDto = BeanConvertor.toBean(item, PoggRewardDto.class);
+                List<PoggRewardDetailDto> poggRewardDetailDtos = JSON.parseArray(item.getRewardsJson(), PoggRewardDetailDto.class);
+                poggRewardDto.setRewards(poggRewardDetailDtos);
 
-            PoggRewardDto poggRewardDto = BeanConvertor.toBean(item, PoggRewardDto.class);
-            List<PoggRewardDetailDto> poggRewardDetailDtos = JSON.parseArray(item.getRewardsJson(), PoggRewardDetailDto.class);
-            poggRewardDto.setRewards(poggRewardDetailDtos);
-
-            long startTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-            Result<String> result = remoteTransactionService.poggReward(poggRewardDto);
-            long endTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-            log.info("giveOutRewards.result={},times={}", JSON.toJSONString(result),endTime-startTime);
-            if (result.getCode() != ApiStatus.SUCCESS.getCode()) {
-                msg = result.getMsg();
+                long startTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+                Result<String> result = remoteTransactionService.poggReward(poggRewardDto);
+                long endTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+                log.info("giveOutRewards.result={},times={}", JSON.toJSONString(result),endTime-startTime);
+                if (result.getCode() != ApiStatus.SUCCESS.getCode()) {
+                    msg = result.getMsg();
+                    status = BusinessConstants.POGGRewardStatus.ISSUED_FAILED;
+                }
+            }catch (RetryableException e){
+                msg = "Read timed out";
                 status = BusinessConstants.POGGRewardStatus.ISSUED_FAILED;
+                log.error("giveOutRewards.id={},error={}",item.getId(),e);
+            }catch (Exception e){
+                log.error("giveOutRewards.id={},error={}",item.getId(),e);
             }
             poggRewardMapper.updateStatus(item.getId(), status, msg, LocalDateTime.now());
         });
