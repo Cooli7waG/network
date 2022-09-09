@@ -29,7 +29,7 @@
       <el-table :data="data.tableList" stripe border   style="width: 100%;margin-top: 5px">
         <el-table-column prop="address" :label="$t('miners.table.address')" width="210px" :show-overflow-tooltip=true>
           <template #default="scope">
-            <router-link :to="'/miner/'+scope.row.address">{{scope.row.address}}</router-link>
+            <el-icon style="cursor: pointer" @click="copyAddress(scope.row.address)"><DocumentCopy /></el-icon> <router-link :to="'/miner/'+scope.row.address">{{scope.row.address}}</router-link>
           </template>
         </el-table-column>
         <el-table-column prop="minerType" :label="$t('miners.table.minerType')" width="180" >
@@ -39,7 +39,7 @@
         </el-table-column>
         <el-table-column prop="ownerAddress" :label="$t('miners.table.ownerAddress')" width="210px" :show-overflow-tooltip="true">
           <template #default="scope">
-            <router-link :to="'/account/'+scope.row.ownerAddress">{{scope.row.ownerAddress}}</router-link>
+            <el-icon v-if="scope.row.ownerAddress" style="cursor: pointer" @click="copyAddress(scope.row.ownerAddress)"><DocumentCopy /></el-icon> <router-link :to="'/account/'+scope.row.ownerAddress">{{scope.row.ownerAddress}}</router-link>
           </template>
         </el-table-column>
         <el-table-column prop="earningMint" :label="$t('miners.table.earningMint')"/>
@@ -71,6 +71,7 @@ import { formatDate,formatString } from '@/utils/data_format.js'
 import {deviceList} from '@/api/miners.js'
 import {onMounted, reactive} from "vue";
 import { useRoute  } from 'vue-router'
+
 export default {
   props: {
     msg: String
@@ -84,6 +85,18 @@ export default {
     },
     Constant() {
       return Constant
+    }
+  },
+  methods:{
+
+    copyAddress(address){
+      const input = document.createElement('input')
+      input.value = address;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("Copy");
+      document.body.removeChild(input);
+      this.$message.success("Copied!")
     }
   },
   setup(){
@@ -131,7 +144,6 @@ export default {
     }
 
     onMounted(() => {
-      console.log("onMounted")
       data.query.address=route.params.ownerAddress;
       loadDeviceList()
     })

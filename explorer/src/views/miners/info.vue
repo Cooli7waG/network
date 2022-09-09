@@ -56,7 +56,9 @@
         {{ (data.device.totalEnergyGeneration / 1000 / 1000).toFixed(3) }}
       </el-col>
     </el-row>
-
+    <div v-show="false" id="map" style="width: 400px;height: 300px">
+      <div id="popup"></div>
+    </div>
     <el-tabs v-model="data.activeName" @tab-click="handleClick" style="margin-top: 15px" type="border-card">
       <el-tab-pane label="Report" name="report">
         <el-pagination
@@ -131,7 +133,6 @@
         </el-table>
       </el-tab-pane>
     </el-tabs>
-
   </div>
   <div v-if="data.noData">
     <el-col :sm="12" :lg="6">
@@ -152,7 +153,13 @@ import {getRewardList} from '@/api/account_reward.js'
 import {onMounted, reactive} from "vue";
 import {useRoute} from 'vue-router'
 import {formatDate,formatPower,formatNumber,formatElectricity,formatToken} from "@/utils/data_format";
-
+//
+import { Feature,Map, View} from 'ol/index';
+import {Tile as TileLayer,Vector as VectorLayer} from 'ol/layer';
+import XYZSource from "ol/source/XYZ";
+import {Vector as VectorSource} from 'ol/source';
+import {Point} from 'ol/geom';
+//
 export default {
   components: {},
   props: {
@@ -164,6 +171,7 @@ export default {
   methods: {
     gotoMap(latitude,longitude){
       console.log("latitude:"+latitude+",longitude:"+longitude)
+      this.initMap(latitude,longitude)
     },
     handleGetList(){
       let url = window.location.href;
@@ -295,13 +303,52 @@ export default {
         console.log(err);
       });
     }
+
+    //创建底图
+    const createBaseLayer = (latitude,longitude) => {
+      const layers = [];
+      const world_Street_MapLayer = new TileLayer({
+        source: new XYZSource({
+          attributions: 'Tiles © <a href="https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer">ArcGIS</a>',
+          url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
+        }),
+      });
+      const place = [longitude, latitude];
+      const point = new Point(place);
+      const vectorLayer_MapLayer = new VectorLayer({
+        source: new VectorSource({
+          features: [new Feature(point)],
+        }),
+        style: {
+          'circle-radius': 9,
+          'circle-fill-color': 'red',
+        },
+      });
+      layers.push(world_Street_MapLayer)
+      layers.push(vectorLayer_MapLayer)
+      return layers
+    }
+
+    const initMap = (latitude,longitude) => {
+      console.log("==>"+latitude+","+longitude)
+      const baseLayers = createBaseLayer(longitude,latitude)
+      data.map = new Map({
+        layers: baseLayers,
+        target: "map",
+        view: new View({
+          center: [longitude,latitude],
+          zoom: 4,
+        })
+      })
+    }
     onMounted(() => {
       data.query.minerAddress = route.params.address;
       data.page.address = route.params.address;
       loadQueryByMiner()
     })
     return {
-      data
+      data,
+      initMap
     }
   }
 }

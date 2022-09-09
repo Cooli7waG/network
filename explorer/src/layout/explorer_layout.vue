@@ -4,7 +4,7 @@
       <Menus/>
     </el-header>
     <el-container style="margin-top:-1px;">
-      <el-main style="overflow: hidden;">
+      <el-main>
         <router-view />
       </el-main>
       <el-footer>

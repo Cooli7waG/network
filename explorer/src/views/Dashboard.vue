@@ -1,6 +1,6 @@
 <template>
-  <el-row :gutter="24" style="height: 100%;margin-top: -20px;margin-left: -32px;margin-right: -32px;margin-bottom: 40px">
-    <el-col :span="24" style="margin-bottom: -20px">
+  <el-row :gutter="24" class="main_div">
+    <el-col :span="24" style="margin-bottom: -20px;padding-right: 0px !important;">
       <div id="map" class="map"></div>
       <div class="leftView">
         <el-row style="height: 100%">
@@ -57,64 +57,46 @@
       </div>
     </el-col>
   </el-row>
-  <div v-show="data.minersDrawer" tabindex="-1" class="el-drawer__wrapper" style="z-index: 9999;">
+  <div v-show="data.minersDrawer" tabindex="-1" class="el-drawer__wrapper">
     <div role="document" tabindex="-1" class="el-drawer__container el-drawer__open">
-      <div tabindex="-1" class="el-drawer ltr" style="width: 450px;right: 0;margin-top: 58px">
+      <div tabindex="-1" class="el-drawer ltr">
         <header id="el-drawer__title" class="el-drawer__header">
-          <span><i class="iconfont icon-miner_" style="color: black"></i>  Miners</span>
-          <span style="cursor: pointer;" @click="data.minersDrawer = false"><i class="iconfont icon-shibai" style="color: black;color: #72767b;font-size: 30px"></i></span>
+          <span style="color: #FFFFFF"><i class="iconfont icon-miner_" style="color: white"></i>  Miners</span>
+          <span style="cursor: pointer;" @click="data.minersDrawer = false"><el-icon color="#ffffff"><Close /></el-icon></span>
         </header>
-        <div style="height: 1px;width: 100%;background-color: silver"></div>
-        <section class="el-drawer__body">
-          <el-collapse v-loading="data.minerInfoLoad" accordion>
-            <el-collapse-item v-for="(miner,index) in data.minersList" :title="miner.address" :name="index">
-              <el-row :gutter="20">
-                <el-col :xs="12" :sm="8">Address:</el-col>
-                <el-col :xs="12" :sm="16">
-                  <router-link :to="'/miner/'+miner.address">{{miner.address}}</router-link>
-                </el-col>
-              </el-row>
-              <el-row :gutter="20">
-                <el-col :xs="12" :sm="8">Miner Type:</el-col>
-                <el-col :xs="12" :sm="16">
-                  {{ miner.minerType ? Constant.MinerType[miner.minerType] : '' }}
-                </el-col>
-              </el-row>
-              <el-row :gutter="20">
-                <el-col :xs="12" :sm="8">Owner:</el-col>
-                <el-col :xs="12" :sm="16">{{ miner.ownerAddress }}</el-col>
-              </el-row>
-              <el-row :gutter="20">
-                <el-col :xs="12" :sm="8">Maker:</el-col>
-                <el-col :xs="12" :sm="16">{{ miner.maker }}</el-col>
-              </el-row>
-              <el-row :gutter="20">
-                <el-col :xs="12" :sm="8">Location:</el-col>
-                <el-col :xs="12" :sm="16">
-                  {{ miner.latitude + "," + miner.longitude }}
-                  <i class="iconfont icon-weizhi" style="color: deepskyblue;cursor: pointer" @click="gotoMap(data.device.latitude,data.device.longitude)"/>
-                </el-col>
-              </el-row>
-              <el-row :gutter="20">
-                <el-col :xs="12" :sm="8">Create Time:</el-col>
-                <el-col :xs="12" :sm="16">{{ formatDate(miner.createTime, "yyyy-MM-dd hh:mm:ss") }}</el-col>
-              </el-row>
-              <el-row :gutter="20">
-                <el-col :xl="24">Total Mining Revenue: {{ " "+formatToken(miner.earningMint) }}</el-col>
-              </el-row>
-              <el-row :gutter="20">
-                <el-col :xl="24">Total Service Revenue: {{ " "+formatToken(miner.earningService) }}</el-col>
-              </el-row>
-              <el-row :gutter="20">
-                <el-col :xl="24">Average power generation: {{ " "+formatPower(miner.power/1000) }}</el-col>
-              </el-row>
-              <el-row :gutter="20">
-                <el-col :xl="24">
-                  Total Power Generation: {{ " "+(miner.totalEnergyGeneration / 1000 / 1000).toFixed(3)+" kWh" }}
-                </el-col>
-              </el-row>
-            </el-collapse-item>
-          </el-collapse>
+        <section style="height: 100%">
+          <div v-show="false" style="color: #FFFFFF">
+            <h3>0x4dea3e19583117f7361a93c5cd462d837a846940</h3>
+            <h4>Miner Type: Game Miner</h4>
+            <h4>Maker: Arkreen</h4>
+            <h4>Owner: 0x4dea3e19583117f7361a93c5cd462d837a846940</h4>
+          </div>
+          <div style="height: 100%">
+            <el-collapse v-loading="data.minerInfoLoad" accordion style="background-color: #FFFFFF;height: 100%;padding-left: 10px">
+              <el-collapse-item v-for="(miner,index) in data.minersList" :title="miner.address" :name="index" @click="showInfo(miner)">
+                <el-row :gutter="20" style="padding: 10px">
+                  <el-col :xl="24">
+                    Address: <router-link :to="'/miner/'+miner.address">{{miner.address}}</router-link>
+                  </el-col>
+                  <el-col :xl="24">
+                    Miner Type: {{ miner.minerType ? Constant.MinerType[miner.minerType] : '' }}
+                  </el-col>
+                  <el-col :xl="24">Owner:{{ miner.ownerAddress }}</el-col>
+                  <el-col :xl="24">Maker:{{ miner.maker }}</el-col>
+                  <el-col :xl="24">Location:{{ miner.latitude + "," + miner.longitude }}
+                    <i class="iconfont icon-weizhi" style="color: deepskyblue;cursor: pointer" @click="gotoMap(data.device.latitude,data.device.longitude)"/>
+                  </el-col>
+                  <el-col :xl="24">Create Time:{{ formatDate(miner.createTime, "yyyy-MM-dd hh:mm:ss") }}</el-col>
+                  <el-col :xl="24">Total Mining Revenue: {{ " "+formatToken(miner.earningMint) }}</el-col>
+                  <el-col :xl="24">Total Service Revenue: {{ " "+formatToken(miner.earningService) }}</el-col>
+                  <el-col :xl="24">Average power generation: {{ " "+formatPower(miner.power/1000) }}</el-col>
+                  <el-col :xl="24">
+                    Total Power Generation: {{ " "+(miner.totalEnergyGeneration / 1000 / 1000).toFixed(3)+" kWh" }}
+                  </el-col>
+                </el-row>
+              </el-collapse-item>
+            </el-collapse>
+          </div>
         </section>
       </div>
     </div>
@@ -123,7 +105,7 @@
 
 <script>
 import {getBlockchainstats, getMinerStatistics,getMinerLocation,loadMinersInfo} from '@/api/statistics.js'
-import {onMounted, reactive} from "vue";
+import {onDeactivated, onMounted, reactive} from "vue";
 import {toEther} from '@/utils/utils.js'
 import {formatPower, formatElectricity, getTokenFixed, getAddress, formatDate,formatToken} from '@/utils/data_format.js'
 import Constant from '@/utils/constant.js'
@@ -171,6 +153,16 @@ export default {
     }
   },
   setup: function () {
+    const intervalLet = () => {
+      data.timer = setInterval(() => {
+        loadBlockchainstats()
+        loadMinerStatistics()
+        initMap();
+      }, 300000)
+    }
+    const showInfo = (miner) => {
+      console.log(JSON.stringify(miner))
+    }
 
     const closeOrOpen = () => {
       if (data.leftShow) {
@@ -185,6 +177,7 @@ export default {
     }
 
     const data = reactive({
+      timer:undefined,
       leftShow: true,
       leftIndex: 6,
       rightIndex: 18,
@@ -221,11 +214,10 @@ export default {
 
     const loadMinerStatistics = () => {
       getMinerStatistics().then((result) => {
-        console.log(result)
         data.minerStatistics = result.data;
         data.minerStatistics.totalChargeVol = (data.minerStatistics.totalChargeVol / 1000 / 1000).toFixed(3) + " kWh"
       }).catch((err) => {
-        console.log(err);
+        console.log("loadMinerStatistics error:"+err);
       });
     }
 
@@ -279,16 +271,15 @@ export default {
 
     //创建marker图层
     const createMarkerLayer = () => {
-      var markerSource = new VectorSource();
+      const markerSource = new VectorSource();
       addFeatures(markerSource);
-      var markerLayer = new VectorLayer({source: markerSource, visible: true})
-      return markerLayer;
+      return new VectorLayer({source: markerSource, visible: true});
     }
 
     //创建日照图层
     const createDayNightLayer = () => {
-      var dayNightSource = new DayNight({});
-      var dayNightLayer = new VectorLayer({
+      const dayNightSource = new DayNight({});
+      return new VectorLayer({
         source: dayNightSource,
         style: new Style({
           image: new Circle({
@@ -299,21 +290,18 @@ export default {
             color: [0, 0, 50, .5]
           })
         })
-      })
-
-      return dayNightLayer;
+      });
     }
 
     //创建底图
     const createBaseLayer = () => {
-      var layers = []
-
-      var world_Street_MapLayer = new TileLayer({
+      const layers = [];
+      const world_Street_MapLayer = new TileLayer({
         source: new XYZSource({
           attributions: 'Tiles © <a href="https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer">ArcGIS</a>',
           url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
         }),
-      })
+      });
       layers.push(world_Street_MapLayer)
       return layers
     }
@@ -342,7 +330,7 @@ export default {
       data.map.addLayer(dayNightLayer);
 
       //标注点图层
-      var markerLayer = createMarkerLayer();
+      const markerLayer = createMarkerLayer();
       data.map.addLayer(markerLayer);
 
       //六边形图层
@@ -350,7 +338,7 @@ export default {
       data.map.addLayer(hexBinLayerLayer);
 
       //创建feature选择器
-      var select = new Select({layers: [markerLayer, hexBinLayerLayer]});
+      const select = new Select({layers: [markerLayer, hexBinLayerLayer]});
       data.map.addInteraction(select);
       select.on('select', function (e) {
         if (e.selected.length) {
@@ -418,15 +406,28 @@ export default {
       loadBlockchainstats()
       loadMinerStatistics()
       initMap();
+      intervalLet();
+    })
+    onDeactivated(()=>{
+      //离开当前组件的生命周期执行的方法
+      window.clearInterval(data.timer);
     })
     return {
       data,
       closeOrOpen,
+      intervalLet,
+      showInfo,
     }
   }
 }
 </script>
 <style lang="scss" scoped>
+.main_div{
+  height: 100%;
+  margin-top: -20px !important;
+  margin-left: -32px !important;
+  margin-right: -20px !important;
+}
 .leftContext{
   background-color: rgba(0,0,0,0.7);
   width: 380px;
@@ -495,6 +496,12 @@ export default {
   box-sizing: border-box;
   background-color: #fff;
   display: flex;
+  width: 450px;
+  right: 0;
+  margin-top: 58px;
+  background-color: rgba(0,0,0,.45);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
 }
 
 .el-drawer__container {
@@ -525,6 +532,7 @@ export default {
   overflow: hidden;
   margin: 0;
   width: 450px;
+  z-index: 9999;
 }
 
 .wallet-img {
