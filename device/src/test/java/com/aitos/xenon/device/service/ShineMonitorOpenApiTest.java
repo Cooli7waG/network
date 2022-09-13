@@ -1,8 +1,13 @@
 package com.aitos.xenon.device.service;
 
+import com.aitos.xenon.core.utils.HttpClientUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.security.Key;
 import java.security.MessageDigest;
@@ -12,45 +17,68 @@ public class ShineMonitorOpenApiTest {
      * shinemonitor开放平台API访问地址.
      */
     private static String OPEN_API_URI = "http://api.shinemonitor.com/public/";
+    private static String usr = "vplant";
+    private static String pwd = "vplant";
+    private static String companyKey = "xUGjW7Cb7BDq6gWy";
+    private static String source = "0";
+    private static String _app_id_ = "com.demo.test";
+    private static String _app_version_ = "3.6.2.1";
+    private static String _app_client_ = "android";
 
-    private static void queryPlantActiveOuputPowerCurrent(){
-        String pwd = "vplant";
-        String source = "0";
-        String _app_id_ = "com.demo.test";
-        String _app_version_ = "3.6.2.1";
-        String _app_client_ = "android";
-        String salt = System.currentTimeMillis() + "";
-        String sha1Pwd = ShineMonitorOpenApiTest.sha1ToLowerCase(pwd.getBytes());
-        String token = "1";
-        String action = "&action=queryPlantActiveOuputPowerCurrent&source=" + source + "&_app_id_="
-                + _app_id_ + "&_app_version_=" + _app_version_ + "&_app_client_=" + _app_client_;
-        String sign = ShineMonitorOpenApiTest.sha1ToLowerCase((salt + sha1Pwd + action).getBytes()); /* SHA-1(slat + SHA-1(pwd) + action). */
-        String request = ShineMonitorOpenApiTest.OPEN_API_URI + "?sign=" + sign +"token=" +token+ "&salt=" + salt + action;
-        System.out.println(request);
+    public static void main(String[] args) throws IOException, InterruptedException {
+        //
+        String auth = HttpClientUtils.doGet(auth());
+        System.out.println("auth result:"+auth);
+        JSONObject jsonObject = JSON.parseObject(auth);
+        if(jsonObject.getInteger("err") != 0){
+            System.out.println("auth failed:"+jsonObject.getString("desc"));
+            return;
+        }
+        //
+        JSONObject dat = jsonObject.getJSONObject("dat");
+        String secret = dat.getString("secret");
+        Long expire = dat.getLong("expire");
+        String token = dat.getString("token");
+        //
+        String s = queryPlantActiveOuputPowerCurrent(token,secret);
+        System.out.println("url:"+s);
+        String queryPlantActiveOuputPowerCurrent = HttpClientUtils.doGet(s);
+        System.out.println("queryPlantActiveOuputPowerCurrent result:"+queryPlantActiveOuputPowerCurrent);//
+        //
+        String queryPlantEnergyTotal = queryPlantEnergyTotal(token,secret);
+        System.out.println("url:"+queryPlantEnergyTotal);
+        String queryPlantEnergyTotalResult = HttpClientUtils.doGet(queryPlantEnergyTotal);
+        System.out.println("queryPlantEnergyTotal result:"+queryPlantEnergyTotalResult);
     }
 
-    public static void main(String[] args) {
-        auth();
+    private static String queryPlantEnergyTotal(String token,String secret){
+        String salt = System.currentTimeMillis() + "";
+        String action = "&action=queryPlantEnergyTotal&plantid=1&source=" + source + "&_app_id_="
+                + _app_id_ + "&_app_version_=" + _app_version_
+                + "&_app_client_=" + _app_client_;
+        String sign = ShineMonitorOpenApiTest.sha1ToLowerCase((salt + secret + token + action).getBytes());
+        return ShineMonitorOpenApiTest.OPEN_API_URI + "?sign=" + sign + "&salt=" + salt +"&token="+token+ action;
+    }
+
+    private static String queryPlantActiveOuputPowerCurrent(String token,String secret){
+        String salt = System.currentTimeMillis() + "";
+        String action = "&action=queryPlantActiveOuputPowerCurrent&plantid=1&source=" + source + "&_app_id_="
+                + _app_id_ + "&_app_version_=" + _app_version_
+                + "&_app_client_=" + _app_client_;
+        String sign = ShineMonitorOpenApiTest.sha1ToLowerCase((salt + secret + token + action).getBytes());
+        return ShineMonitorOpenApiTest.OPEN_API_URI + "?sign=" + sign + "&salt=" + salt +"&token="+token+ action;
     }
 
     /**
      * 认证接口.
      */
-    private static final void auth() {
-        String usr = "vplant";
-        String pwd = "vplant";
-        String companyKey = "0123456789ABCDEF";
-        String source = "0";
-        String _app_id_ = "com.demo.test";
-        String _app_version_ = "3.6.2.1";
-        String _app_client_ = "android";
+    private static final String auth() {
         String salt = System.currentTimeMillis() + "";
         String sha1Pwd = ShineMonitorOpenApiTest.sha1ToLowerCase(pwd.getBytes());
         String action = "&action=auth&usr=" + usr  + "&company-key=" + companyKey
                 + "&source=" + source + "&_app_id_=" + _app_id_ + "&_app_version_=" + _app_version_ + "&_app_client_=" + _app_client_;
         String sign = ShineMonitorOpenApiTest.sha1ToLowerCase((salt + sha1Pwd + action).getBytes());
-        String request = ShineMonitorOpenApiTest.OPEN_API_URI + "?sign=" + sign + "&salt=" + salt + action;
-        System.out.println(request);
+        return ShineMonitorOpenApiTest.OPEN_API_URI + "?sign=" + sign + "&salt=" + salt + action;
     }
 
     /**

@@ -173,7 +173,6 @@ export default {
         data.leftIndex = 6;
         data.rightIndex = 18;
       }
-      this.$forceUpdate();
     }
 
     const data = reactive({

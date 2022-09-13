@@ -55,9 +55,10 @@ export function formatPower(value) {
         return "0 W";
     }
     if (value > 10000) {
-        return (value / 1000) + " kW";
+        let power = (value / 1000).toFixed(3);
+        return Number(power).toLocaleString() + " kW";
     } else {
-        return value + " W";
+        return value.toFixed(3) + " W";
     }
 }
 
@@ -66,9 +67,10 @@ export function formatElectricity(value) {
         return "0 Wh";
     }
     if (value > 10000) {
-        return (value / 1000) + " kWh";
+        let power = (value / 1000).toFixed(3);
+        return Number(power).toLocaleString() + " kWh";
     } else {
-        return value + " Wh";
+        return value.toFixed(3) + " Wh";
     }
 }
 

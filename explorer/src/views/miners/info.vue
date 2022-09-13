@@ -82,7 +82,7 @@
           </el-table-column>
           <el-table-column prop="power" label="Power" width="180">
             <template #default="scope">
-              {{formatPower((scope.row.power/1000).toFixed(3))}}
+              {{formatPower((scope.row.power/1000))}}
             </template>
           </el-table-column>
           <el-table-column prop="total" label="Total">
