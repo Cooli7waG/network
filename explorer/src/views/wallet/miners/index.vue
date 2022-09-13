@@ -33,12 +33,20 @@
             {{scope.row.minerType?Constant.MinerType[scope.row.minerType]:''}}
           </template>
         </el-table-column>
-        <el-table-column prop="earningMint" :label="$t('miners.table.earningMint')"/>
+        <el-table-column prop="earningMint" :label="$t('miners.table.earningMint')">
+          <template #default="scope">
+            {{formatElectricityNotUnit(scope.row.earningMint)}}
+          </template>
+        </el-table-column>
         <el-table-column prop="earningService" :label="$t('miners.table.earningService')"  />
-        <el-table-column prop="power" :label="$t('miners.table.power')"  />
+        <el-table-column prop="power" :label="$t('miners.table.power')">
+          <template #default="scope">
+            {{formatPowerNotUnit(scope.row.power)}}
+          </template>
+        </el-table-column>
         <el-table-column prop="totalEnergyGeneration" :label="$t('miners.table.totalEnergyGeneration')">
           <template #default="scope">
-            {{(scope.row.totalEnergyGeneration/1000/1000).toFixed(3)}}
+            {{formatPowerNotUnit(scope.row.totalEnergyGeneration)}}
           </template>
         </el-table-column>
         <el-table-column prop="createTime" :label="$t('miners.table.createTime')" width="180">
@@ -54,10 +62,9 @@
 
 <script>
 import Constant from '@/utils/constant.js'
-import { formatDate,formatString } from '@/utils/data_format.js'
+import { formatDate,formatString,formatPowerNotUnit,formatElectricityNotUnit } from '@/utils/data_format.js'
 import {deviceList} from '@/api/miners.js'
 import {onMounted, reactive} from "vue";
-import { useRoute  } from 'vue-router'
 import {getMetaMaskLoginUserAddress} from "@/api/metamask_utils";
 export default {
   props: {
@@ -69,6 +76,12 @@ export default {
     },
     formatString() {
       return formatString
+    },
+    formatPowerNotUnit() {
+      return formatPowerNotUnit
+    },
+    formatElectricityNotUnit() {
+      return formatElectricityNotUnit
     },
     Constant() {
       return Constant
@@ -87,7 +100,6 @@ export default {
       },
       tableList :[]
     })
-    const route = useRoute()
 
     const pageSizeChange = (pageSize) => {
       data.query.page.pageSize=pageSize

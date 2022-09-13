@@ -24,8 +24,7 @@
           :total="data.query.page.total"
           @size-change="pageSizeChange"
           @current-change="pageCurrentChange"
-          style="margin-top: 5px"
-      />
+          style="margin-top: 5px"/>
       <el-table :data="data.tableList" stripe border   style="width: 100%;margin-top: 5px">
         <el-table-column prop="address" :label="$t('account.table.address')" width="210px" :show-overflow-tooltip=true>
           <template #default="scope">

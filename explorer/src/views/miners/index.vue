@@ -42,16 +42,20 @@
             <el-icon v-if="scope.row.ownerAddress" style="cursor: pointer" @click="copyAddress(scope.row.ownerAddress)"><DocumentCopy /></el-icon> <router-link :to="'/account/'+scope.row.ownerAddress">{{scope.row.ownerAddress}}</router-link>
           </template>
         </el-table-column>
-        <el-table-column prop="earningMint" :label="$t('miners.table.earningMint')"/>
+        <el-table-column prop="earningMint" :label="$t('miners.table.earningMint')">
+          <template #default="scope">
+            {{Number(scope.row.earningMint).toLocaleString()}}
+          </template>
+        </el-table-column>
         <el-table-column prop="earningService" :label="$t('miners.table.earningService')"  />
         <el-table-column prop="power" :label="$t('miners.table.power')">
           <template #default="scope">
-            {{(scope.row.power/1000).toFixed(3)}}
+            {{formatPowerNotUnit(scope.row.power)}}
           </template>
         </el-table-column>
         <el-table-column prop="totalEnergyGeneration" :label="$t('miners.table.totalEnergyGeneration')">
           <template #default="scope">
-            {{(scope.row.totalEnergyGeneration/1000/1000).toFixed(3)}}
+            {{formatPowerNotUnit(scope.row.totalEnergyGeneration)}}
           </template>
         </el-table-column>
         <el-table-column prop="createTime" :label="$t('miners.table.createTime')" width="180">
@@ -67,7 +71,7 @@
 
 <script>
 import Constant from '@/utils/constant.js'
-import { formatDate,formatString } from '@/utils/data_format.js'
+import { formatDate,formatString,formatPowerNotUnit } from '@/utils/data_format.js'
 import {deviceList} from '@/api/miners.js'
 import {onMounted, reactive} from "vue";
 import { useRoute  } from 'vue-router'
@@ -82,6 +86,9 @@ export default {
     },
     formatString() {
       return formatString
+    },
+    formatPowerNotUnit() {
+      return formatPowerNotUnit
     },
     Constant() {
       return Constant

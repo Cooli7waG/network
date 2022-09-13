@@ -55,10 +55,9 @@ export function formatPower(value) {
         return "0 W";
     }
     if (value > 10000) {
-        let power = (value / 1000).toFixed(3);
-        return Number(power).toLocaleString() + " kW";
+        return Number((value / 1000).toFixed(3)).toLocaleString() + " kW";
     } else {
-        return value.toFixed(3) + " W";
+        return Number(Number(value).toFixed(3)).toLocaleString() + " W";
     }
 }
 
@@ -67,10 +66,10 @@ export function formatElectricity(value) {
         return "0 Wh";
     }
     if (value > 10000) {
-        let power = (value / 1000).toFixed(3);
+        let power = Number((value / 1000)).toFixed(3);
         return Number(power).toLocaleString() + " kWh";
     } else {
-        return value.toFixed(3) + " Wh";
+        return Number(Number(value).toFixed(3)).toLocaleString() + " Wh";
     }
 }
 
@@ -152,4 +151,27 @@ export function getTokenFixed(value) {
 
 export function getAddress(value) {
     return value.substring(0,6)+"..."+value.substring(value.length-4)
+}
+
+export function formatPowerNotUnit(value) {
+    if (value == null || value == undefined) {
+        return "0";
+    }
+    const power = value/1000/1000;
+    if (power > 10000) {
+        return Number((power / 1000).toFixed(3)).toLocaleString();
+    } else {
+        return Number(power.toFixed(3)).toLocaleString();
+    }
+}
+
+export function formatElectricityNotUnit(value) {
+    if (value == null || value == undefined) {
+        return "0";
+    }
+    if (value > 10000) {
+        return Number((value / 1000).toFixed(3)).toLocaleString();
+    } else {
+        return Number(value.toFixed(3)).toLocaleString();
+    }
 }

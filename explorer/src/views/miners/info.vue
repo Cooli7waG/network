@@ -47,13 +47,13 @@
 
     <el-row :gutter="20">
       <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.power') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ formatPower(data.device.avgPower/1000/ 1000) }}</el-col>
+      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ formatPower(data.device.avgPower/1000/1000) }}</el-col>
     </el-row>
 
     <el-row :gutter="20">
       <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.totalEnergyGeneration') }}:</el-col>
       <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
-        {{ (data.device.totalEnergyGeneration / 1000 / 1000).toFixed(3) }}
+        {{ formatPowerNotUnit(data.device.totalEnergyGeneration) }}
       </el-col>
     </el-row>
     <div v-show="false" id="map" style="width: 400px;height: 300px">
@@ -79,6 +79,9 @@
             </template>
           </el-table-column>
           <el-table-column prop="height" label="Block Height">
+            <template #default="scope">
+              {{Number(scope.row.height).toLocaleString()}}
+            </template>
           </el-table-column>
           <el-table-column prop="power" label="Power" width="180">
             <template #default="scope">
@@ -113,9 +116,11 @@
               <router-link :to="'/tx/'+scope.row.hash">{{scope.row.hash}}</router-link>
             </template>
           </el-table-column>
-          <el-table-column prop="address" label="Miner Address" width="220" :show-overflow-tooltip=true>
-          </el-table-column>
+          <!--<el-table-column prop="address" label="Miner Address" width="220" :show-overflow-tooltip=true></el-table-column>-->
           <el-table-column prop="height" label="Block Height">
+            <template #default="scope">
+              {{Number(scope.row.height).toLocaleString()}}
+            </template>
           </el-table-column>
           <el-table-column prop="amount" label="Amount" width="180">
             <template #default="scope">
@@ -152,7 +157,7 @@ import {queryByMiner,reportDataList} from '@/api/miners.js'
 import {getRewardList} from '@/api/account_reward.js'
 import {onMounted, reactive} from "vue";
 import {useRoute} from 'vue-router'
-import {formatDate,formatPower,formatNumber,formatElectricity,formatToken} from "@/utils/data_format";
+import {formatDate,formatPower,formatNumber,formatElectricity,formatToken,formatPowerNotUnit} from "@/utils/data_format";
 //
 import { Feature,Map, View} from 'ol/index';
 import {Tile as TileLayer,Vector as VectorLayer} from 'ol/layer';
@@ -266,6 +271,9 @@ export default {
     },
     formatToken() {
       return formatToken
+    },
+    formatPowerNotUnit() {
+      return formatPowerNotUnit
     },
     Constant() {
       return Constant

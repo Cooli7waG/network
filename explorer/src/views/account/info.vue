@@ -67,10 +67,14 @@
         <el-table-column prop="capabilities" label="Capabilities"/>
         <el-table-column prop="power" :label="$t('miners.table.power')">
           <template v-slot="scope">
-            {{formatPower(scope.row.power)}}
+            {{formatPower(scope.row.power/1000)}}
           </template>
         </el-table-column>
-        <el-table-column prop="totalEnergyGeneration" label="Total Energy Generation"/>
+        <el-table-column prop="totalEnergyGeneration" label="Total Energy Generation">
+          <template v-slot="scope">
+            {{formatElectricityNotUnit(scope.row.totalEnergyGeneration/1000)}}
+          </template>
+        </el-table-column>
         <el-table-column prop="location" label="Location" width="180">
           <template v-slot="scope">
             {{formatLocation(scope.row.locationType,scope.row.latitude,scope.row.longitude)}}
@@ -95,7 +99,7 @@
 
 <script>
 import {findByAddress} from '@/api/account.js'
-import {formatDate,formatPower,formatElectricity,formatLocation,formatToken,getTokenFixed} from "@/utils/data_format";
+import {formatDate,formatPower,formatElectricity,formatLocation,formatToken,getTokenFixed,formatElectricityNotUnit} from "@/utils/data_format";
 import {toEther} from '@/utils/utils.js'
 import {getMinersByOwnerAddress} from "@/api/miners";
 import Constant from '@/utils/constant.js'
@@ -178,6 +182,9 @@ export default {
     },
     getTokenFixed(value) {
       return getTokenFixed(value)
+    },
+    formatElectricityNotUnit(value) {
+      return formatElectricityNotUnit(value)
     }
   },
   created() {

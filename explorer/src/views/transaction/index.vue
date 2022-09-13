@@ -44,7 +44,7 @@
         </el-table-column>
         <el-table-column prop="height" :label="$t('txs.table.height')" width="180">
           <template #default="scope">
-            <el-link @click="()=>{data.query.keyword=scope.row.height;search();}">{{ scope.row.height }}</el-link>
+            <el-link @click="()=>{data.query.keyword=scope.row.height;search();}">{{ Number(scope.row.height).toLocaleString() }}</el-link>
           </template>
         </el-table-column>
         <el-table-column prop="txType" :label="$t('txs.table.txType')" width="180">
@@ -136,7 +136,6 @@ export default {
     }
 
     onMounted(() => {
-      console.log("onMounted")
       if (route.query.keyword) {
         data.query.keyword = route.query.keyword
       }

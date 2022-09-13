@@ -34,7 +34,7 @@
         </el-table-column>
         <el-table-column prop="height" :label="$t('txs.table.height')" width="180">
           <template #default="scope">
-            <el-link @click="()=>{data.query.keyword=scope.row.height;search();}">{{ scope.row.height }}</el-link>
+            <el-link @click="()=>{data.query.keyword=scope.row.height;search();}">{{ Number(scope.row.height).toLocaleString()}}</el-link>
           </template>
         </el-table-column>
         <el-table-column prop="miner" label="Miner Address" width="220" :show-overflow-tooltip=true>
@@ -61,7 +61,6 @@
 import Constant from '@/utils/constant.js'
 import {formatDate, formatString} from '@/utils/data_format.js'
 import {getOwnerTransactionList} from '@/api/transaction.js'
-import {getMinerListByOwner} from '@/api/miners.js'
 import {onMounted, reactive} from "vue";
 import {useRoute} from 'vue-router'
 import {getMetaMaskLoginUserAddress} from "@/api/metamask_utils";
@@ -141,25 +140,6 @@ export default {
       getOwnerTransactionList(params).then((result) => {
         data.query.page.total = result.data.total
         data.tableList = result.data.items
-      }).catch((err) => {
-        console.log(err);
-      });
-    }
-
-    const loadMinerListByOwner = () => {
-      let MateMaskAddress = getMetaMaskLoginUserAddress()
-      if(MateMaskAddress==undefined || MateMaskAddress == null){
-        return;
-      }
-      getMinerListByOwner(MateMaskAddress).then((result) => {
-        data.minerOptions = [];
-        for (let index in result.data){
-          let miner ={
-            value:result.data[index].id,
-            label:result.data[index].address
-          }
-          data.minerOptions.push(miner);
-        }
       }).catch((err) => {
         console.log(err);
       });

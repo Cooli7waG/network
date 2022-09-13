@@ -18,7 +18,7 @@
     <el-row :gutter="20" class="info-box">
       <el-col :span="4">{{ $t('txinfo.info.height') }}:</el-col>
       <el-col :span="16">
-        <router-link :to="{name:'Transaction',params:{height:data.transaction.height}}">{{ data.transaction.height }}
+        <router-link :to="{name:'Transaction',params:{height:data.transaction.height}}">{{ Number(data.transaction.height).toLocaleString() }}
         </router-link>
       </el-col>
     </el-row>

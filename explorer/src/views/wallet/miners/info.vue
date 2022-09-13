@@ -51,7 +51,7 @@
       <el-row :gutter="20">
         <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.totalEnergyGeneration') }}:</el-col>
         <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
-          {{ (data.device.totalEnergyGeneration / 1000 / 1000).toFixed(3) }}
+          {{ Number((data.device.totalEnergyGeneration / 1000 / 1000).toFixed(3)).toLocaleString() }}
         </el-col>
       </el-row>
     </div>
@@ -75,6 +75,9 @@
             </template>
           </el-table-column>
           <el-table-column prop="height" label="Block Height">
+            <template #default="scope">
+              {{Number(scope.row.height).toLocaleString()}}
+            </template>
           </el-table-column>
           <el-table-column prop="power" label="Power" width="180">
             <template #default="scope">
@@ -109,9 +112,11 @@
               <router-link :to="'/wallet/tx/'+scope.row.hash">{{scope.row.hash}}</router-link>
             </template>
           </el-table-column>
-          <el-table-column prop="address" label="Miner Address" width="220" :show-overflow-tooltip=true>
-          </el-table-column>
+          <!--<el-table-column prop="address" label="Miner Address" width="220" :show-overflow-tooltip=true></el-table-column>-->
           <el-table-column prop="height" label="Block Height">
+            <template #default="scope">
+              {{Number(scope.row.height).toLocaleString()}}
+            </template>
           </el-table-column>
           <el-table-column prop="amount" label="Amount" width="180">
             <template #default="scope">
@@ -180,7 +185,11 @@
               {{ scope.row.txType ? Constant.TXType[scope.row.txType] : '' }}
             </template>
           </el-table-column>
-          <el-table-column prop="height" label="Block Height"/>
+          <el-table-column prop="height" label="Block Height">
+            <template #default="scope">
+              {{Number(scope.row.height).toLocaleString()}}
+            </template>
+          </el-table-column>
           <el-table-column prop="amount" label="Amount" width="180">
             <template #default="scope">
               {{formatToken(scope.row.amount)}}

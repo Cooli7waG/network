@@ -29,7 +29,7 @@
       <el-table :data="data.tableList" stripe border   style="width: 100%;margin-top: 5px">
         <el-table-column prop="address" :label="$t('block.table.height')" width="450">
           <template #default="scope">
-            <router-link :to="{name:'Transaction',params:{height:scope.row.height}}">{{scope.row.height}}</router-link>
+            <router-link :to="{name:'Transaction',params:{height:scope.row.height}}">{{Number(scope.row.height).toLocaleString()}}</router-link>
           </template>
         </el-table-column>
         <el-table-column prop="amountTransaction" :label="$t('block.table.amountTransaction')" width="200">

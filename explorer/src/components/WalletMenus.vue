@@ -60,24 +60,27 @@
         </section>
         <section class="el-drawer__body" v-else>
           <div style="margin-top: 25px">
+
+          </div>
+          <div style="margin-top: 25px">
             <el-row class="login_select btn_xenon" @click="gotoApplyGameMiner">
               <el-col :span="24">
                 <i class="iconfont icon-liulanqi" style="color: black"></i>
-                <span style="margin-left: 5px"><b>Apply Game Miner</b></span>
+                <span style="margin-left: 5px"><b>Request a GameMiner</b></span>
               </el-col>
             </el-row>
             <el-row class="login_select btn_xenon" @click="gotoBrowser">
               <el-col :span="24">
                 <i class="iconfont icon-liulanqi" style="color: black"></i>
-                <span style="margin-left: 5px"><b>Browser</b></span>
+                <span style="margin-left: 5px"><b>Arkreen Explorer</b></span>
               </el-col>
             </el-row>
-            <el-row class="login_select btn_xenon" @click="gotoMyMiner">
+            <!--<el-row class="login_select btn_xenon" @click="gotoMyMiner">
               <el-col :span="24">
                 <i class="iconfont icon-miner_" style="color: black"></i>
                 <span style="margin-left: 10px"><b>My Miners</b></span>
               </el-col>
-            </el-row>
+            </el-row>-->
             <el-row class="login_select btn_xenon" @click="Logout">
               <el-col :span="24">
                 <i class="iconfont icon-tuichu" style="color: black"></i>

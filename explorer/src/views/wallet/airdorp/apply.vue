@@ -2,29 +2,28 @@
   <el-container v-loading="loading" style="height: auto">
     <div class="contentDiv">
       <div class="titleDiv">Arkreen Website</div>
-      <div class="btnDiv">You Account Address:</div>
+      <div class="btnDiv">Please confirm your account address:</div>
       <div class="btnDiv">{{ userAddress }}</div>
       <div v-show="!applyActive" class="btnDiv" style="color: red">{{ $t("common.msg.airdropEventNotStart") }}</div>
-      <div class="btnDiv">
-        <el-button type="primary" @click="handleApplyGameMiner" :disabled="userAddress==null||!applyActive">Apply Game
-          Miner
-        </el-button>
+      <div v-show="msgActive" class="btnDiv" style="color: red">{{ resultMsg }}</div>
+      <div class="btnDiv" style="color: green">{{ successMsg }}</div>
+      <div class="btnDiv" style="margin-top: 10px">
+        <el-button type="primary" @click="handleApplyGameMiner" :disabled="userAddress==null||!applyActive">Request</el-button>
       </div>
-      <div class="btnDiv">
+      <!--<div class="btnDiv">
         <el-button type="success" @click="gotoMinerList" :disabled="userAddress==null||!applyActive">View My Miners
         </el-button>
-      </div>
+      </div>-->
     </div>
   </el-container>
-  <div v-loading="loading" v-show="centerDialogVisible" class="el-dialog__wrapper"
-       style="z-index: 9999;background-color: rgba(0,0,0,0.5)">
+  <div v-loading="dialogLoading" v-show="centerDialogVisible" class="el-dialog__wrapper" style="background-color: rgba(0,0,0,0.5)">
     <div role="dialog" aria-modal="true" aria-label="提示" class="el-dialog el-dialog--center"
          style="margin-top: 15vh; width: 30%;">
       <div class="el-dialog__header">
         <span class="el-dialog__title">Apply Game Miner</span>
       </div>
       <div class="el-dialog__body">
-        <el-form :model="minerForm" :rules="rules" size="medium" :label-position="labelPosition" ref="minerForm"
+        <el-form :model="minerForm" :rules="rules" :label-position="labelPosition" ref="minerForm"
                  label-width="100px">
           <el-form-item prop="name">
             <el-input v-model="minerForm.name" placeholder="Please enter the username"></el-input>
@@ -50,13 +49,23 @@
 
 <script>
 import {applyGameMiner,getApplyActiveInfo} from "@/api/miners";
-import {getMetaMaskLoginUserAddress, personalSign} from "@/api/metamask_utils";
+import {
+  addNetwork,
+  getMetaMaskLoginUserAddress,
+  personalSign,
+  signTypedDataV3,
+  signTypedDataV4, switchNetwork
+} from "@/api/metamask_utils";
 
 export default {
   name: 'apply',
   data() {
     return {
       loading: false,
+      dialogLoading: false,
+      msgActive: false,
+      resultMsg: "Please add or switch to polygon mainnet network first!",
+      successMsg: undefined,
       applyActive: true,
       applyPersonalSign: false,
       labelPosition: 'top',
@@ -82,13 +91,25 @@ export default {
   created() {
     this.handleGetApplyActiveInfo();
     this.getUserAddress();
+    //this.handleSignTypedDataV3();
+    //this.handleSignTypedDataV4();
+    //this.handleAddNetwork();
+    //this.handleSwitchNetwork();
   },
   methods: {
     submitForm(formName) {
-      this.loading = true;
+      this.dialogLoading = true;
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
           try {
+            //判断是否添加目标网络
+            const result = await switchNetwork("0x89");
+            if(!result){
+              this.resultMsg = "Please add or switch to polygon mainnet network first!"
+              this.msgActive = true;
+              return ;
+            }
+            //
             this.minerForm.owner = this.userAddress;
             if(this.applyPersonalSign){
               let message = JSON.stringify(this.minerForm);
@@ -98,11 +119,13 @@ export default {
             applyGameMiner(JSON.stringify(this.minerForm)).then(rsp => {
               if (rsp.code == 0) {
                 this.centerDialogVisible = false
-                this.loading = false;
-                this.$message.success("apply successful, please wait for the mail patiently");
+                this.dialogLoading = false;
+                this.msgActive = false;
+                this.successMsg = "apply successful, please wait for the mail patiently!";
               } else {
-                this.loading = false;
-                this.$message.error(rsp.msg);
+                this.dialogLoading = false;
+                this.msgActive = true;
+                this.resultMsg = rsp.msg;
               }
             })
             this.minerForm.personalSign = undefined;
@@ -110,7 +133,7 @@ export default {
             this.$message.error("apply failed, please try again!");
           }
         } else {
-          this.loading = true;
+          this.dialogLoading = true;
           return false;
         }
       });
@@ -146,6 +169,22 @@ export default {
         }
       })
     },
+    async handleSignTypedDataV3() {
+      const sign = await signTypedDataV3();
+      console.log("metamask signTypedDataV3:" + sign)
+    },
+    async handleSignTypedDataV4() {
+      const sign = await signTypedDataV4();
+      console.log("metamask signTypedDataV4:" + sign)
+    },
+    async handleAddNetwork(){
+      const result = await addNetwork();
+      console.log("metamask addNetwork:" + result)
+    },
+    async handleSwitchNetwork(){
+      const result = await switchNetwork("0x89");
+      console.log("metamask switchNetwork:" + result)
+    }
   },
 }
 </script>
@@ -153,7 +192,7 @@ export default {
 .contentDiv {
   margin: 0 auto;
   background-color: #e7eaf3;
-  height: 350px;
+  height: 300px;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }
