@@ -71,7 +71,7 @@ public class AirDropRecordController {
         Device device = deviceService.findByAddress(airDropDto.getMinerAddress());
         if(device==null){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_NOT_EXISTED);
-        }else if(StringUtils.hasText(device.getOwnerAddress())){
+        }else if(device.getStatus()== BusinessConstants.DeviceStatus.BOUND){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_BOUND);
         }
         //检查空投状态
@@ -117,7 +117,7 @@ public class AirDropRecordController {
         Device device = deviceService.findByAddress(claimDto.getMinerAddress());
         if(device==null){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_NOT_EXISTED);
-        }else if(StringUtils.hasText(device.getOwnerAddress())){
+        }else if(device.getStatus()== BusinessConstants.DeviceStatus.BOUND){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_BOUND);
         }
         //检查空投状态

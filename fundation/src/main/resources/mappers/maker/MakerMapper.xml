@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.fundation.mapper.MakerMapper">
+
+    <sql id="tableName">maker</sql>
+
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into <include refid="tableName"/> (name,service_url,address,status,create_time)
+        value (#{name},#{serviceUrl},#{address},#{status},#{createTime})
+    </insert>
+
+    <select id="findById" resultType="com.aitos.xenon.fundation.model.Maker">
+        select * from <include refid="tableName"/>
+        where id=#{id}
+    </select>
+
+    <select id="findByAddress" resultType="com.aitos.xenon.fundation.model.Maker">
+        select * from <include refid="tableName"/>
+        where address=#{address}
+    </select>
+
+    <select id="findAll" resultType="com.aitos.xenon.fundation.model.Maker">
+        select * from <include refid="tableName"/>
+    </select>
+    <select id="findByMaker" resultType="com.aitos.xenon.fundation.model.Maker">
+        select * from <include refid="tableName"/> where name=#{makerName} limit 1
+    </select>
+
+</mapper>

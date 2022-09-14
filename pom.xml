@@ -152,6 +152,11 @@
             </dependency>
             <dependency>
                 <groupId>com.aitos</groupId>
+                <artifactId>api-3rd-party-maker</artifactId>
+                <version>${xenon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aitos</groupId>
                 <artifactId>api-block</artifactId>
                 <version>${xenon.version}</version>
             </dependency>

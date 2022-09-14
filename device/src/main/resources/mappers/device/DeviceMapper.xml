@@ -17,7 +17,7 @@
         where address=#{address}
     </select>
 
-    <select id="getMinerListByOwner" resultType="com.aitos.xenon.device.domain.Device">
+    <select id="getMinerListByOwner" resultType="com.aitos.xenon.device.api.domain.vo.DeviceVo">
         select id,address from <include refid="tableName"/> where owner_address=#{address}
     </select>
 
@@ -68,6 +68,7 @@
                 energy=#{energy},
                 power=#{power},
                 capabilities=#{capabilities},
+                status=#{status}
                 <if test="deviceModel!=null and deviceModel!=''">
                     device_model=#{deviceModel},
                 </if>

@@ -11,6 +11,7 @@ import com.aitos.xenon.block.domain.PoggCommit;
 import com.aitos.xenon.block.service.PoggReportService;
 import com.aitos.xenon.block.service.PoggService;
 import com.aitos.xenon.core.constant.ApiStatus;
+import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.model.Page;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.ValidatorUtils;
@@ -71,9 +72,9 @@ public class PoggController {
         Result<DeviceVo>  deviceVoResult= remoteDeviceService.queryByMiner(poggReportDto.getAddress());
         if(deviceVoResult.getCode()==ApiStatus.SUCCESS.getCode()&& deviceVoResult.getData()!=null){
             DeviceVo deviceVo= deviceVoResult.getData();
-            if(!StringUtils.hasText(deviceVo.getOwnerAddress())){
+            if(deviceVo.getStatus()== BusinessConstants.DeviceStatus.REGISTERED){
                 return Result.failed(ApiStatus.BUSINESS_DEVICE_NO_ONBOARD);
-            }else if(deviceVo.getTerminate()==1){
+            }else if(deviceVo.getStatus()== BusinessConstants.DeviceStatus.TERMINATE){
                 return Result.failed(ApiStatus.BUSINESS_DEVICE_TERMINATE);
             }else{
                 //设置miner类型

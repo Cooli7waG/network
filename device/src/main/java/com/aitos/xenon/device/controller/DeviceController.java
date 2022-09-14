@@ -3,6 +3,7 @@ package com.aitos.xenon.device.controller;
 import com.aitos.common.crypto.coder.DataCoder;
 import com.aitos.common.crypto.ecdsa.Ecdsa;
 import com.aitos.xenon.core.constant.ApiStatus;
+import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.model.Page;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
@@ -10,8 +11,11 @@ import com.aitos.xenon.device.api.domain.dto.*;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.service.DeviceService;
+import com.aitos.xenon.fundation.api.RemoteMakerService;
+import com.aitos.xenon.fundation.api.domain.vo.MakerVo;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.parser.Feature;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +23,13 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.util.StringUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +44,12 @@ public class DeviceController {
     private DeviceService deviceService;
     @Value("${foundation.publicKey}")
     private String foundationPublicKey;
+
+    @Autowired
+    private RemoteMakerService remoteMakerService;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     /**
      * 设备注册接口
@@ -113,8 +128,10 @@ public class DeviceController {
         Device deviceTemp=deviceService.findByAddress(deviceBindDto.getMinerAddress());
         if(deviceTemp==null){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_NOT_EXISTED);
-        }else if(deviceTemp!=null&& StringUtils.hasText(deviceTemp.getOwnerAddress())){
+        }else if(deviceTemp.getStatus()== BusinessConstants.DeviceStatus.BOUND){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_BOUND);
+        }else if(deviceTemp.getStatus()== BusinessConstants.DeviceStatus.TERMINATE){
+            return Result.failed(ApiStatus.BUSINESS_DEVICE_TERMINATE);
         }
         deviceBindDto.setDeviceId(deviceTemp.getId());
 
@@ -218,5 +235,31 @@ public class DeviceController {
     public Result getMinerListByOwner(@PathVariable("address") String address){
         List<DeviceVo> deviceList = deviceService.getMinerListByOwner(address);
         return Result.ok(deviceList);
+    }
+
+
+    @PostMapping("/ownerBindApply")
+    public Result ownerApplyBind(@Validated @RequestBody OwnerBindApplyDto ownerBindApplyDto){
+
+        Result<MakerVo> makerVoResult = remoteMakerService.findById(ownerBindApplyDto.getMakerId());
+        log.info("ownerApplyBind.makerVoResult={}",JSON.toJSONString(makerVoResult));
+        if(makerVoResult.getCode()!=ApiStatus.SUCCESS.getCode()){
+            return Result.failed(ApiStatus.BUSINESS_DEVICE_MAKER_INFO_ERROR);
+        }
+        MakerVo makerVo = makerVoResult.getData();
+        String serviceUrl = makerVo.getServiceUrl();
+        Result result = call3rdPartyMakerService(serviceUrl, ownerBindApplyDto);
+        return result;
+    }
+
+    private Result call3rdPartyMakerService(String serviceUrl,OwnerBindApplyDto ownerBindApplyDto) {
+        String jsonString = JSON.toJSONString(ownerBindApplyDto);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.valueOf("application/json;UTF-8"));
+        HttpEntity<String> strEntity = new HttpEntity<String>(jsonString,headers);
+        String resultJSON = restTemplate.postForObject(serviceUrl,strEntity,String.class);
+        log.info("call3rdPartyMakerService.result={}",resultJSON);
+        Result result =JSON.parseObject(resultJSON,new TypeReference<Result>(){});
+        return result;
     }
 }

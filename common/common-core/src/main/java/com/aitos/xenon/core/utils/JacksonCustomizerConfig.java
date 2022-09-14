@@ -62,7 +62,7 @@ public class JacksonCustomizerConfig {
             if (timestamp > 0) {
                 return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
             }else if(StringUtils.hasText(timstr)){
-                LocalDateTime dateTime=LocalDateTime.parse(timstr.replaceAll("T"," "), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                LocalDateTime dateTime=LocalDateTime.parse(timstr, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
                 return dateTime;
             } else {
                 return null;

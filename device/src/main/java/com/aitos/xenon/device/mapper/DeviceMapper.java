@@ -50,4 +50,5 @@ public interface DeviceMapper {
      * @return
      */
     List<DeviceVo> getMinerListByOwner(@Param("address")String address);
+
 }

@@ -1,8 +1,5 @@
 package com.aitos.xenon.device.service.impl;
 
-import com.aitos.common.crypto.ecdsa.Ecdsa;
-import com.aitos.message.push.api.RemotePushService;
-import com.aitos.message.push.api.domain.dto.PushMessageDto;
 import com.aitos.xenon.account.api.RemoteAccountRewardService;
 import com.aitos.xenon.account.api.RemoteAccountService;
 import com.aitos.xenon.account.api.RemoteTransactionService;
@@ -14,43 +11,27 @@ import com.aitos.xenon.block.api.RemoteBlockService;
 import com.aitos.xenon.block.api.RemotePoggService;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
-import com.aitos.xenon.core.constant.RandomLocation;
-import com.aitos.xenon.core.constant.RandomLocationUtils;
 import com.aitos.xenon.core.exceptions.ServiceException;
 import com.aitos.xenon.core.exceptions.account.OwnerAccountNotExistException;
 import com.aitos.xenon.core.exceptions.device.DeviceExistedException;
-import com.aitos.xenon.core.exceptions.device.MinerApplyException;
-import com.aitos.xenon.core.exceptions.device.MinerClaimVerifyException;
-import com.aitos.xenon.core.exceptions.device.RecoverPublicKeyException;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
 import com.aitos.xenon.core.utils.Location;
-import com.aitos.xenon.core.utils.LocationTransformUtils;
-import com.aitos.xenon.core.utils.MetaMaskUtils;
-import com.aitos.xenon.device.api.RemoteDeviceService;
-import com.aitos.xenon.device.api.RemoteGameMinerService;
 import com.aitos.xenon.device.api.domain.dto.*;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
-import com.aitos.xenon.device.api.domain.vo.GameMiner;
 import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.mapper.DeviceMapper;
 import com.aitos.xenon.device.service.DeviceService;
-import com.aitos.xenon.fundation.api.RemoteFundationService;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.parser.Feature;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Base64Utils;
 
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -159,6 +140,7 @@ public class DeviceServiceImpl implements DeviceService {
         device.setDeviceModel(minerInfo.getDeviceModel());
         device.setDeviceSerialNum(minerInfo.getDeviceSerialNum());
         device.setUpdateTime(LocalDateTime.now());
+        device.setStatus(BusinessConstants.DeviceStatus.BOUND);
         deviceMapper.bind(device);
 
         Result<Long> blockVoResult= remoteBlockService.getBlockHeight();
@@ -215,13 +197,9 @@ public class DeviceServiceImpl implements DeviceService {
                 AccountRewardStatisticsVo accountRewardStatisticsVo = accountStatistics.getData();
                 device.setTotalReward(accountRewardStatisticsVo.getTotalReward());
                 device.setAvgReward(accountRewardStatisticsVo.getAvgReward());
-                device.setTodayReward(accountRewardStatisticsVo.getTodayReward());
-                device.setYesterdayReward(accountRewardStatisticsVo.getYesterdayReward());
             }else{
                 device.setTotalReward(BigDecimal.valueOf(0));
                 device.setAvgReward(BigDecimal.valueOf(0));
-                device.setTodayReward(BigDecimal.valueOf(0));
-                device.setYesterdayReward(BigDecimal.valueOf(0));
             }
         }
         return device;

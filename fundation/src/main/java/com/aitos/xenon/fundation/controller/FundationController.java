@@ -30,4 +30,11 @@ public class FundationController {
         String sign = Ecdsa.sign(foundationPrivateKey, airdropDto, DataCoder.BASE58);
         return Result.ok(sign);
     }
+
+    @PostMapping("/sign")
+    public Result<String> sign(@RequestBody String data){
+        log.info("sign.params={}", data);
+        String sign = Ecdsa.sign(foundationPrivateKey, data, DataCoder.BASE58);
+        return Result.ok(sign);
+    }
 }

@@ -1,6 +1,7 @@
 package com.aitos.xenon.device.api;
 
 import com.aitos.xenon.core.model.Result;
+import com.aitos.xenon.device.api.domain.dto.PushMessageDto;
 import com.aitos.xenon.device.api.domain.vo.GameMiner;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,4 +18,12 @@ public interface RemoteGameMinerService {
 
     @PostMapping("/game/miner/register")
     Result<String> register();
+
+    /**
+     * 发送邮件
+     *
+     * @return
+     */
+    @PostMapping("/push/mail")
+    Result pushMail(@RequestBody PushMessageDto pushMessageDto) ;
 }

@@ -56,10 +56,6 @@
         order by create_time desc
     </select>
 
-    <insert id="saveTransactionReport" useGeneratedKeys="true" keyProperty="id">
-        insert into transaction_report(hash,tx_type,height,miner,owner,create_time)
-        value (#{hash},#{txType},#{height},#{miner},#{owner},#{createTime})
-    </insert>
 
     <select id="getAll" resultType="com.aitos.xenon.account.domain.Transaction">
         SELECT * FROM transaction WHERE tx_type in(8,9)ORDER BY id;
