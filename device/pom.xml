@@ -90,10 +90,6 @@
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.aitos</groupId>
-            <artifactId>api-message-push</artifactId>
-        </dependency>
 
     </dependencies>
 

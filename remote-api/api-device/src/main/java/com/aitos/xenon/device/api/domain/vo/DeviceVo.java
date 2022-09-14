@@ -11,6 +11,8 @@ public class DeviceVo  {
     private Long id;
     private String address;
     private String name;
+    private String imei;
+    private Long makerId;
     private String ownerAddress;
     /**
      * Miner类型
@@ -92,14 +94,11 @@ public class DeviceVo  {
      * 平均奖励
      */
     private BigDecimal avgReward;
+
     /**
-     * 今日奖励
+     * 0.已注册，1.表示已购买，2.表示已绑定.3.表示终止
      */
-    private BigDecimal todayReward;
-    /**
-     * 昨日奖励
-     */
-    private BigDecimal yesterdayReward;
+    private Integer status;
 
     private LocalDateTime createTime;
 

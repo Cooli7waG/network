@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableFeignClients(basePackages ={"com.aitos.xenon.device.api"})
-@MapperScan("com.aitos.xenon.account.mapper")
+@MapperScan("com.aitos.xenon.fundation.mapper")
 public class FundationApplication {
 
     public static void main(String[] args)

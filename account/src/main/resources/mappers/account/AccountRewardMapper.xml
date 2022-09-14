@@ -15,7 +15,8 @@
     </insert>
 
     <select id="statisticsRewards" resultType="java.math.BigDecimal">
-        select IFNULL(sum(amount),0) from  <include refid="tableName"/> where address=#{address} and create_time &gt;=#{startTime} and create_time &lt;=#{endTime}
+        select IFNULL(sum(amount),0) from  <include refid="tableName"/> where address=#{address}
+        and create_time between #{startTime} and #{endTime}
     </select>
     <select id="statisticsTotalRewards"
             resultType="com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsVo">
@@ -29,7 +30,7 @@
     <select id="statisticsRewardByDay"
             resultType="com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsDayVo">
         SELECT date_format(create_time,'%Y-%m-%d') as dataDate ,SUM(amount) as reward FROM `account_reward`
-        where create_time &gt;=#{startTime} and create_time &lt;=#{endTime} and address =#{address}
+        where address =#{address} and create_time between #{startTime} and #{endTime}
         group by date_format(create_time,'%Y-%m-%d')
         order by dataDate asc
     </select>

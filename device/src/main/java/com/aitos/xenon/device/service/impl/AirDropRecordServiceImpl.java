@@ -1,8 +1,6 @@
 package com.aitos.xenon.device.service.impl;
 
 import com.aitos.common.crypto.ecdsa.Ecdsa;
-import com.aitos.message.push.api.RemotePushService;
-import com.aitos.message.push.api.domain.dto.PushMessageDto;
 import com.aitos.xenon.account.api.RemoteAccountService;
 import com.aitos.xenon.account.api.RemoteTransactionService;
 import com.aitos.xenon.account.api.domain.dto.AccountRegisterDto;
@@ -69,8 +67,7 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
     private RemoteDeviceService remoteDeviceService;
     @Autowired
     private RemoteGameMinerService remoteGameMinerService;
-    @Autowired
-    private RemotePushService remotePushService;
+
     @Value("${xenon.web.claim}")
     private String webClaimUrl;
     @Value("${xenon.airdrop.apply.personalSign}")
@@ -160,6 +157,7 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
         device.setDeviceModel(airDropRecord.getDeviceModel());
         device.setDeviceSerialNum(airDropRecord.getDeviceSerialNum());
         device.setUpdateTime(LocalDateTime.now());
+        device.setStatus(BusinessConstants.DeviceStatus.BOUND);
         deviceMapper.bind(device);
 
         Result<Long> blockVoResult= remoteBlockService.getBlockHeight();
@@ -304,7 +302,7 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
                 HashMap<String,Object> customMap=new HashMap<>();
                 pushMessageDto.setCustomMap(customMap);
                 customMap.put("url",claimGameMinerUrl);
-                Result result = remotePushService.pushMail(pushMessageDto);
+                Result result = remoteGameMinerService.pushMail(pushMessageDto);
                 log.info("邮件发送结果:{}",JSON.toJSONString(result));
             }catch (Exception e){
                 log.error("邮件发送失败！");

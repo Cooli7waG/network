@@ -23,6 +23,28 @@ public interface BusinessConstants
     }
 
     /**
+     * 设备状态
+     */
+    interface DeviceStatus{
+        /**
+         * 已注册
+         */
+        int REGISTERED =0;
+        /**
+         * 表示已购买
+         */
+        int BOUGHT=1;
+        /**
+         * 表示已绑定
+         */
+        int BOUND=2;
+        /**
+         * 表示终止
+         */
+        int TERMINATE=3;
+    }
+
+    /**
      * 设备空投状态
      */
     interface DeviceAirdropStatus{

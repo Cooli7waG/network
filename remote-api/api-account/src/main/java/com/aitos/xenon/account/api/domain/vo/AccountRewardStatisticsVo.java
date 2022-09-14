@@ -16,13 +16,4 @@ public class AccountRewardStatisticsVo {
      * 平均奖励
      */
     private BigDecimal avgReward;
-    /**
-     * 今日奖励
-     */
-    private BigDecimal todayReward;
-
-    /**
-     * 昨日奖励
-     */
-    private BigDecimal yesterdayReward;
 }

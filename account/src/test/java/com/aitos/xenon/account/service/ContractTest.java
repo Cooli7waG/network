@@ -12,7 +12,9 @@ import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @SpringBootTest
@@ -20,6 +22,23 @@ public class ContractTest {
 
     @Autowired
     private Erc20Service erc20Service;
+
+    public static void main(String[] args) {
+        LocalDateTime utc = Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.of("UTC")).toLocalDateTime();
+        //System.out.println(utc.toInstant().toEpochMilli());
+        System.out.println(utc.toInstant(ZoneOffset.UTC).toEpochMilli());
+
+        System.out.println(LocalDateTime.now());
+
+        System.out.println(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+
+
+        LocalDateTime todayStart=LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+        LocalDateTime todayEnd=LocalDateTime.now();
+
+        System.out.println(todayStart);
+        System.out.println(todayEnd);
+    }
 
     @Test
     void test_address() throws Exception {

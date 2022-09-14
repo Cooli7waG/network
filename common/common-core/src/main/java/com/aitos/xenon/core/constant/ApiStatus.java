@@ -52,13 +52,15 @@ public enum ApiStatus implements ConstantsCode {
     BUSINESS_DEVICE_NOT_EXISTED(3005,"device  is not existed"),
 
     BUSINESS_DEVICE_NO_ONBOARD(3006,"miner did not do onboard"),
-    BUSINESS_DEVICE_TERMINATE(3007,"miner did not do onboard"),
+    BUSINESS_DEVICE_TERMINATE(3007,"miner has been terminated"),
     BUSINESS_DEVICE_BOUND(3008,"device is bound"),
 
     BUSINESS_AIRDROPDEVICE_NOT_EXISTED(3009,"airdrop device is not exist"),
     BUSINESS_AIRDROPDEVICE_EXISTED(3010,"airdrop device is existed"),
     BUSINESS_AIRDROPDEVICE_CLAIMED(3011,"airdrop device is claimed"),
     BUSINESS_AIRDROPDEVICE_CLAIM_EXPIRED(3012,"airdrop device is claim expired"),
+    BUSINESS_OWNER_BIND_APPLY_SIGN_ERROR(3013,"The signature of the owner binding application is incorrect"),
+    BUSINESS_DEVICE_MAKER_INFO_ERROR(3014,"maker information error"),
 
 
 
@@ -72,6 +74,7 @@ public enum ApiStatus implements ConstantsCode {
     BUSINESS_OWNER_ACCOUNT_NOT_EXIST(4007,"owner account is not exist"),
     BUSINESS_FOUNDATION_SIGN_ERROR(4008,"foundation signature error"),
     BUSINESS_ACCOUNT_REWARD_SEARCH_DAY_RANGE_ERROR(4009,"account reward days range error"),
+    BUSINESS_ACCOUNT_MAKER_NOT_EXIST(4010,"maker account is not exist"),
 
 
     // pogg相关
@@ -96,10 +99,12 @@ public enum ApiStatus implements ConstantsCode {
     private Integer code;
     private String msg;
 
+    @Override
     public String getMsg() {
         return msg;
     }
 
+    @Override
     public Integer getCode() {
         return code;
     }

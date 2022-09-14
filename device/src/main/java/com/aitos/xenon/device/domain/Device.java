@@ -73,4 +73,9 @@ public class Device extends BaseModel {
      * 设备序列号
      */
     private String deviceSerialNum;
+
+    /**
+     * 0.已注册，1.表示已购买，2.表示已绑定.3.表示终止
+     */
+    private Integer status;
 }
