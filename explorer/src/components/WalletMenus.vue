@@ -59,13 +59,34 @@
           </div>
         </section>
         <section class="el-drawer__body" v-else>
-          <div style="margin-top: 25px">
+          <div v-loading="loadBalance" style="border-radius: 5px;border: 1px solid rgb(229, 232, 235);">
+            <!--<el-row>
+              <el-col :span="24" style="height: 50px;text-align: center">
+                <div><span style="color: #72767b;font-size: 12px">Mining Reward</span></div>
+                <div><span style="font-size: 18px">{{user.earningMint}}</span></div>
+              </el-col>
+            </el-row>-->
+            <el-row>
+              <el-col :span="11" class="balance-div">
+                <div><span style="color: #72767b;font-size: 12px">Mining Reward</span></div>
+                <div><span style="font-size: 18px">{{user.earningMint}}</span></div>
+              </el-col>
+              <el-col :span="2" class="balance-div">
 
+              </el-col>
+              <el-col :span="11" class="balance-div">
+                <div><span style="color: #72767b;font-size: 12px">AKRE Balance</span></div>
+                <div><span style="font-size: 18px">{{user.balance}}</span></div>
+              </el-col>
+              <el-col :span="24" class="transfer-btn" @click="transferBalance">
+                <span style="font-size: 16px;line-height: 30px">transfer</span>
+              </el-col>
+            </el-row>
           </div>
           <div style="margin-top: 25px">
             <el-row class="login_select btn_xenon" @click="gotoApplyGameMiner">
               <el-col :span="24">
-                <i class="iconfont icon-liulanqi" style="color: black"></i>
+                <el-icon><Promotion /></el-icon>
                 <span style="margin-left: 5px"><b>Request a GameMiner</b></span>
               </el-col>
             </el-row>
@@ -97,7 +118,8 @@
       <el-button type="primary" @click="drawer = true">Login Wallet</el-button>
     </el-empty>
   </div>
-  <el-dialog v-model="dialogVisible" :show-close=false title="" width="30%" center style="z-index: 99999">
+  <!-- 用户隐私协议对话框 -->
+  <el-dialog v-model="dialogVisible" :show-close=false title="" width="30%" center style="z-index: 999">
     <div style="text-align: center;margin-top: -20px">
       <h1>Welcome to ARKREEN</h1>
     </div>
@@ -117,12 +139,14 @@
 </template>
 
 <script>
-import {formatString} from "@/utils/data_format";
+import {formatString, getTokenFixed} from "@/utils/data_format";
 import {
   getMetaMaskLoginUserAddress,
   loginWithMetaMask,
   removeMetaMaskUserAddress,
 } from "@/api/metamask_utils";
+import {findByAddress} from "@/api/account";
+import {toEther} from "@/utils/utils";
 
 export default {
   name: 'WalletMenus',
@@ -136,13 +160,41 @@ export default {
       drawer: false,
       direction: 'rtl',
       isShow: true,
-      userAddress: undefined
+      loadBalance: false,
+      userAddress: undefined,
+      user:{
+        earningMint:0,
+        balance:0
+      }
     }
   },
   created() {
     this.getInfo();
+    this.listenMetaMask();
   },
   methods: {
+    transferBalance(){
+      this.$message.warning("todo")
+    },
+    loadFindByAddress(){
+      this.loadBalance = true;
+      const userAddress = getMetaMaskLoginUserAddress();
+      if(userAddress == undefined || userAddress == null){
+        return;
+      }
+      findByAddress(getMetaMaskLoginUserAddress()).then((result)=>{
+        if(result.code == 0){
+          this.user.earningMint = result.data.earningMint.toLocaleString();
+          const fixed = getTokenFixed(result.data.balance);
+          this.user.balance = toEther(result.data.balance,fixed);
+        }
+        this.loadBalance = false;
+      }).catch((err) =>{
+        console.log(err);
+        this.loadBalance = false;
+      });
+
+    },
     copyAddress() {
       const input = document.createElement('input')
       input.value = this.userAddress;
@@ -160,6 +212,7 @@ export default {
     },
     openDrawer() {
       this.drawer = true
+      this.loadFindByAddress();
     },
     formatAddress(address) {
       return address.substring(0, 6) + "..." + address.substring(address.length - 4)
@@ -207,8 +260,7 @@ export default {
       });
     },
     getInfo() {
-      let MateMaskAddress = getMetaMaskLoginUserAddress()
-      this.userAddress = MateMaskAddress;
+      this.userAddress = getMetaMaskLoginUserAddress();
     },
     formatString(str) {
       return formatString(str, 15);
@@ -216,7 +268,6 @@ export default {
     async loginApp() {
       //首次使用弹出确认对话框
       let isPrivacyPolicy = window.localStorage.getItem('isPrivacyPolicy')
-      console.log("缓存的isPrivacyPolicy："+isPrivacyPolicy)
       if(isPrivacyPolicy == "true" ){
         await this.loginMetaMask();
       }else {
@@ -250,11 +301,37 @@ export default {
         this.loading = false;
         this.$message.error(this.$t('common.msg.LoginWithMetaMaskFailed'));
       }
+    },
+    // 监听到用户退出登录时直接返回首页
+    async listenMetaMask(){
+      const newAccounts = [];
+      newAccounts.push(this.userAddress)
+      // eslint-disable-next-line no-undef
+      ethereum.on('accountsChanged', () => {
+        if(this.userAddress){
+          removeMetaMaskUserAddress();
+          this.$router.push("/");
+        }
+      });
     }
   }
 }
 </script>
 <style scoped>
+.balance-div{
+  height: 80px;
+  text-align: center;
+  padding-top: 15px;
+}
+.transfer-btn{
+  height: 30px;
+  text-align: center;
+  background-color: #ffd04b;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  cursor: pointer;
+  user-select:none;
+}
 .privacySpan{
   color: #409EFF;
   cursor: pointer

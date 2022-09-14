@@ -207,7 +207,17 @@
         </el-table>
       </el-tab-pane>
     </el-tabs>
-
+  </div>
+  <div class="showMap" :class="{show:data.dialogMapVisible,hide:!data.dialogMapVisible}">
+    <div style="width: 650px;height: 400px;background-color: #FFFFFF;border-radius: 5px;padding: 1px">
+      <el-row style="padding: 4px">
+        <el-col :span="12"><span><el-icon><MapLocation /></el-icon> Miner Location</span></el-col>
+        <el-col :span="12" style="text-align: right">
+          <el-icon class="closeMap" @click="data.dialogMapVisible = false"><Close /></el-icon>
+        </el-col>
+      </el-row>
+      <div id="map" style="width: 650px;height: 374px;border-bottom-right-radius: 5px;border-bottom-left-radius: 5px"/>
+    </div>
   </div>
   <div v-if="data.noData">
     <el-col :sm="12" :lg="6">
@@ -229,6 +239,11 @@ import {onMounted, reactive} from "vue";
 import {useRoute} from 'vue-router'
 import {formatDate,formatPower,formatNumber,formatElectricity,formatToken} from "@/utils/data_format";
 import {getRewardList} from "@/api/account_reward";
+import {Tile as TileLayer, Vector as VectorLayer} from "ol/layer";
+import XYZSource from "ol/source/XYZ";
+import {Feature, Map, View} from "ol";
+import {Point} from "ol/geom";
+import {Vector as VectorSource} from "ol/source";
 
 export default {
   components: {},
@@ -240,7 +255,8 @@ export default {
   },
   methods: {
     gotoMap(latitude,longitude){
-      console.log("latitude:"+latitude+",longitude:"+longitude)
+      this.data.dialogMapVisible = true;
+      this.showMap(latitude,longitude);
     },
     handleGetList(){
       let url = window.location.href;
@@ -346,6 +362,48 @@ export default {
         this.data.transactionLoading = false;
       })
     },
+    //创建底图
+    createBaseLayer(){
+      const layers = [];
+      const world_Street_MapLayer = new TileLayer({
+        source: new XYZSource({
+          attributions: 'Tiles © <a href="https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer">ArcGIS</a>',
+          url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
+        }),
+      });
+      layers.push(world_Street_MapLayer)
+      return layers
+    },
+    showMap(latitude,longitude){
+      let elementById = document.getElementById("map");
+      for (const childNode of elementById.childNodes) {
+        childNode.remove();
+      }
+      elementById.innerHTML = "";
+      //
+      var features = [];
+      let x = (longitude * 20037508.34) / 180
+      let y = Math.log(Math.tan(((90 + latitude) * Math.PI) / 360)) / (Math.PI / 180)
+      y = (y * 20037508.34) / 180
+      const f = new Feature(new Point([x, y]));
+      features.push(f);
+      //
+      const map = new Map({
+        layers: this.createBaseLayer(),
+        target: "map",
+        view: new View({
+          center: [x, y],
+          zoom: 4,
+        })
+      })
+      //标注点图层
+      const markerSource = new VectorSource();
+      markerSource.clear(true);
+      markerSource.addFeatures(features);
+      const vectorLayer = new VectorLayer({source: markerSource, visible: true});
+      //
+      map.addLayer(vectorLayer);
+    }
   },
   computed: {
     formatDate() {
@@ -398,6 +456,7 @@ export default {
         total:0,
         tag:1
       },
+      dialogMapVisible:false,
       activeName: 'report',
       device: '',
       noData: false,
@@ -460,6 +519,29 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.closeMap {
+  cursor: pointer;
+}
+.closeMap:hover {
+  color: #72767b;
+}
+.showMap {
+  position: absolute;
+  z-index: 999;
+  width: 100%;
+  height: 100%;
+  left: 0px;
+  background-color: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &.show {
+    top: 0px;
+  }
+  &.hide{
+    top: -5000px;
+  }
+}
 .el-tabs1 {
   --el-tabs-header-height: 40px;
   border: 1px solid #e7eaf3;

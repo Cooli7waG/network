@@ -44,21 +44,16 @@
       <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.earningService') }}:</el-col>
       <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ formatToken(data.device.earningService) }}</el-col>
     </el-row>
-
     <el-row :gutter="20">
       <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.power') }}:</el-col>
       <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ formatPower(data.device.avgPower/1000/1000) }}</el-col>
     </el-row>
-
     <el-row :gutter="20">
       <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.totalEnergyGeneration') }}:</el-col>
       <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
         {{ formatPowerNotUnit(data.device.totalEnergyGeneration) }}
       </el-col>
     </el-row>
-    <div v-show="false" id="map" style="width: 400px;height: 300px">
-      <div id="popup"></div>
-    </div>
     <el-tabs v-model="data.activeName" @tab-click="handleClick" style="margin-top: 15px" type="border-card">
       <el-tab-pane label="Report" name="report">
         <el-pagination
@@ -139,6 +134,17 @@
       </el-tab-pane>
     </el-tabs>
   </div>
+  <div class="showMap" :class="{show:data.dialogMapVisible,hide:!data.dialogMapVisible}">
+    <div style="width: 650px;height: 400px;background-color: #FFFFFF;border-radius: 5px;padding: 1px">
+      <el-row style="padding: 4px">
+        <el-col :span="12"><span><el-icon><MapLocation /></el-icon> Miner Location</span></el-col>
+        <el-col :span="12" style="text-align: right">
+          <el-icon class="closeMap" @click="data.dialogMapVisible = false"><Close /></el-icon>
+        </el-col>
+      </el-row>
+      <div id="map" style="width: 650px;height: 374px;border-bottom-right-radius: 5px;border-bottom-left-radius: 5px"/>
+    </div>
+  </div>
   <div v-if="data.noData">
     <el-col :sm="12" :lg="6">
       <el-result icon="warning" :title="$t('minerinfo.msg.noData')">
@@ -175,8 +181,8 @@ export default {
   },
   methods: {
     gotoMap(latitude,longitude){
-      console.log("latitude:"+latitude+",longitude:"+longitude)
-      this.initMap(latitude,longitude)
+      this.data.dialogMapVisible = true;
+      this.showMap(latitude,longitude);
     },
     handleGetList(){
       let url = window.location.href;
@@ -254,6 +260,48 @@ export default {
         this.data.rewardData = rsp.data.items
         this.data.rewardLoading = false;
       })
+    },
+    //创建底图
+    createBaseLayer(){
+      const layers = [];
+      const world_Street_MapLayer = new TileLayer({
+        source: new XYZSource({
+          attributions: 'Tiles © <a href="https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer">ArcGIS</a>',
+          url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
+        }),
+      });
+      layers.push(world_Street_MapLayer)
+      return layers
+    },
+    showMap(latitude,longitude){
+      let elementById = document.getElementById("map");
+      for (const childNode of elementById.childNodes) {
+        childNode.remove();
+      }
+      elementById.innerHTML = "";
+      //
+      var features = [];
+      let x = (longitude * 20037508.34) / 180
+      let y = Math.log(Math.tan(((90 + latitude) * Math.PI) / 360)) / (Math.PI / 180)
+      y = (y * 20037508.34) / 180
+      const f = new Feature(new Point([x, y]));
+      features.push(f);
+      //
+      const map = new Map({
+        layers: this.createBaseLayer(),
+        target: "map",
+        view: new View({
+          center: [x, y],
+          zoom: 4,
+        })
+      })
+      //标注点图层
+      const markerSource = new VectorSource();
+      markerSource.clear(true);
+      markerSource.addFeatures(features);
+      const vectorLayer = new VectorLayer({source: markerSource, visible: true});
+      //
+      map.addLayer(vectorLayer);
     }
   },
   computed: {
@@ -293,6 +341,7 @@ export default {
         total:0,
         tag:1
       },
+      dialogMapVisible:false,
       activeName: 'report',
       device: '',
       noData: false,
@@ -311,57 +360,41 @@ export default {
         console.log(err);
       });
     }
-
-    //创建底图
-    const createBaseLayer = (latitude,longitude) => {
-      const layers = [];
-      const world_Street_MapLayer = new TileLayer({
-        source: new XYZSource({
-          attributions: 'Tiles © <a href="https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer">ArcGIS</a>',
-          url: 'https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
-        }),
-      });
-      const place = [longitude, latitude];
-      const point = new Point(place);
-      const vectorLayer_MapLayer = new VectorLayer({
-        source: new VectorSource({
-          features: [new Feature(point)],
-        }),
-        style: {
-          'circle-radius': 9,
-          'circle-fill-color': 'red',
-        },
-      });
-      layers.push(world_Street_MapLayer)
-      layers.push(vectorLayer_MapLayer)
-      return layers
-    }
-
-    const initMap = (latitude,longitude) => {
-      console.log("==>"+latitude+","+longitude)
-      const baseLayers = createBaseLayer(longitude,latitude)
-      data.map = new Map({
-        layers: baseLayers,
-        target: "map",
-        view: new View({
-          center: [longitude,latitude],
-          zoom: 4,
-        })
-      })
-    }
     onMounted(() => {
       data.query.minerAddress = route.params.address;
       data.page.address = route.params.address;
       loadQueryByMiner()
     })
     return {
-      data,
-      initMap
+      data
     }
   }
 }
 </script>
 <style lang="scss" scoped>
+.closeMap {
+  cursor: pointer;
+}
+.closeMap:hover {
+  color: #72767b;
+}
+.showMap {
+  position: absolute;
+  z-index: 999;
+  width: 100%;
+  height: 100%;
+  left: 0px;
+  background-color: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &.show {
+    top: 0px;
+  }
+  &.hide{
+    top: -5000px;
+  }
+}
 .el-tabs1 {
   --el-tabs-header-height: 40px;
   border: 1px solid #e7eaf3;
