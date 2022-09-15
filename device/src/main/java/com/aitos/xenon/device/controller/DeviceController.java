@@ -106,13 +106,10 @@ public class DeviceController {
         String minerData=paramsObject.toJSONString();
         log.info("onboard.minerData:{}",minerData);
 
-        if(!Ecdsa.verifyByAddress(payerAddress,payerData.getBytes(),payerSignature, DataCoder.BASE58)){
+        if(!Ecdsa.verifyByAddress(payerAddress,payerData,payerSignature, DataCoder.BASE58)){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_PAYER_SIGN_ERROR);
         }
-        /*if(!XenonCrypto.verify(ownerAddress,ownerData,ownerSignature)){
-            return Result.failed(ApiStatus.BUSINESS_DEVICE_OWNER_SIGN_ERROR);
-        }*/
-        if(!Ecdsa.verifyByAddress(minerAddress,minerData.getBytes(),minerSignature, DataCoder.BASE58)){
+        if(!Ecdsa.verifyByAddress(minerAddress,minerData,minerSignature, DataCoder.BASE58)){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_MINER_SIGN_ERROR);
         }
 
