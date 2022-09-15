@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class Maker extends BaseModel {
 
-    private String maker;
+    private String name;
 
     private String serviceUrl;
 

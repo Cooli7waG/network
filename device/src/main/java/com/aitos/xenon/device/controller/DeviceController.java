@@ -254,10 +254,11 @@ public class DeviceController {
 
     private Result call3rdPartyMakerService(String serviceUrl,OwnerBindApplyDto ownerBindApplyDto) {
         String jsonString = JSON.toJSONString(ownerBindApplyDto);
+        log.info("call3rdPartyMakerService.params={}",jsonString);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.valueOf("application/json;UTF-8"));
         HttpEntity<String> strEntity = new HttpEntity<String>(jsonString,headers);
-        String resultJSON = restTemplate.postForObject(serviceUrl,strEntity,String.class);
+        String resultJSON = restTemplate.postForObject(serviceUrl+"device/bindApply",strEntity,String.class);
         log.info("call3rdPartyMakerService.result={}",resultJSON);
         Result result =JSON.parseObject(resultJSON,new TypeReference<Result>(){});
         return result;

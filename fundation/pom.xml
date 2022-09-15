@@ -38,21 +38,6 @@
 
         <dependency>
             <groupId>com.aitos</groupId>
-            <artifactId>api-device</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.aitos</groupId>
-            <artifactId>api-account</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.aitos</groupId>
-            <artifactId>api-block</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.aitos</groupId>
             <artifactId>common-core</artifactId>
         </dependency>
 
@@ -60,20 +45,9 @@
             <groupId>com.aitos</groupId>
             <artifactId>common-db</artifactId>
         </dependency>
-
-        <!--<dependency>
-            <groupId>com.aitos</groupId>
-            <artifactId>common-crypto</artifactId>
-        </dependency>-->
         <dependency>
             <groupId>com.aitos</groupId>
-            <artifactId>common-web3j</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>4.9.0</version>
+            <artifactId>aitos-common-crypto</artifactId>
         </dependency>
         <dependency>
             <groupId>com.aitos</groupId>
