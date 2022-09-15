@@ -95,17 +95,13 @@ public class DeviceController {
 
         String payerAddress=paramsObject.getString("payerAddress");
         String payerSignature=paramsObject.getString("payerSignature");
-        /*String ownerAddress=paramsObject.getString("ownerAddress");
-        String ownerSignature=paramsObject.getString("ownerSignature");*/
         String minerAddress=paramsObject.getString("minerAddress");
         String minerSignature=paramsObject.getString("minerSignature");
 
         paramsObject.remove("payerSignature");
         String payerData=paramsObject.toJSONString();
         log.info("onboard.payerData:{}",payerData);
-        paramsObject.remove("ownerSignature");
-        /*String ownerData=paramsObject.toJSONString();
-        log.info("onboard.ownerData:{}",ownerData);*/
+        paramsObject.remove("payerAddress");
         paramsObject.remove("minerSignature");
         String minerData=paramsObject.toJSONString();
         log.info("onboard.minerData:{}",minerData);
