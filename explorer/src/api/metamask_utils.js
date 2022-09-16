@@ -202,7 +202,6 @@ export async function switchNetwork(cid){
         //判断当前网络节点
         const chainInfo = await getNetworkAndChainId();
         if(chainInfo.chainId == cid){
-            console.info("The current chainId has:"+cid);
             return true;
         }
         console.info("当前网络["+chainInfo.chainId+"]不一致：需要切换！");
@@ -211,7 +210,6 @@ export async function switchNetwork(cid){
             method: "wallet_switchEthereumChain",
             params: [{ chainId: cid }],
         });
-        console.info("Switch network success!");
         return true;
     }catch (e){
         const err = e;
@@ -244,7 +242,6 @@ export async function addToken(){
             },
         },
     });
-    console.log('addToken result', JSON.stringify(result));
     return result
 }
 
