@@ -35,7 +35,7 @@
         </el-table-column>
         <el-table-column prop="earningMint" :label="$t('miners.table.earningMint')">
           <template #default="scope">
-            {{formatElectricityNotUnit(scope.row.earningMint)}}
+            {{Number(scope.row.earningMint).toLocaleString()}}
           </template>
         </el-table-column>
         <el-table-column prop="earningService" :label="$t('miners.table.earningService')"  />

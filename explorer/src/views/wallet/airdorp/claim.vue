@@ -15,6 +15,7 @@
 import {claimGameMiner} from "@/api/miners";
 import {Base64} from "js-base64";
 import {getMetaMaskLoginUserAddress, personalSign} from "@/api/metamask_utils";
+import MetaMaskOnboarding from "@metamask/onboarding";
 
 export default {
   name: 'claim',
@@ -44,6 +45,11 @@ export default {
       this.minerForm.ownerAddress = obj.ownerAddress;
     },
     async submitForm() {
+      // 先判断用户是否安装MetaMask
+      if(!MetaMaskOnboarding.isMetaMaskInstalled()){
+        this.$message.error(this.$t('common.msg.metaMaskNotFound'));
+        return;
+      }
       this.loading = true;
       try {
         let message = '{"version":1,"ownerAddress":"'+this.minerForm.ownerAddress+'","minerAddress":"'+this.minerForm.minerAddress+'"}'

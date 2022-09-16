@@ -8,7 +8,7 @@
             <div style="color: #FFFFFF;padding: 10px">
               <h3>Welcome to</h3>
               <h2>Arkreen Explorer</h2>
-              Arkreen Explorer is a Block Explorer and Analytics Platform for Arkreen, a decentralized wireless connectivity platform.
+              Arkreen Explorer is a Block Explorer and Analytics Platform for Arkreen, a Decentralized Renewable Energy Resources Network.
             </div>
             <div style="height: 100%;background-color: #FFFFFF;padding-inline-end: 20px;">
               <el-col style="padding-top: 10px;padding-left: 15px">

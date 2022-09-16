@@ -218,7 +218,7 @@ export async function switchNetwork(cid){
         console.log(err);
         if (err.code === 4902) {
             try {// 添加
-                await addNetwork(ChainCfg["137"])
+                await addNetwork(ChainCfg["80001"])
                 return true;
             } catch (addError) {
                 console.error(addError);
@@ -238,24 +238,39 @@ export async function addToken(){
         params: {
             type: 'ERC20',
             options: {
-                address:TokenInfo.address,
-                symbol: TokenInfo.tokenSymbol,
-                decimals: TokenInfo.decimalUnits,
-                image: TokenInfo.image,
+                address:TokenInfo_TESTNET.address,
+                symbol: TokenInfo_TESTNET.tokenSymbol,
+                decimals: TokenInfo_TESTNET.decimalUnits
             },
         },
     });
-    console.info('addToken result', JSON.stringify(result));
+    console.log('addToken result', JSON.stringify(result));
+    return result
+}
+
+export function isPrivacyPolicy(){
+    let isPrivacyPolicy = window.localStorage.getItem('isPrivacyPolicy')
+    return isPrivacyPolicy == "true"?true:false;
+}
+
+export function setPrivacyPolicy(flag){
+    window.localStorage.setItem('isPrivacyPolicy', flag?"true":"false");
 }
 
 /**
  * Token 信息
  * @type {{image: string, address: number, tokenSymbol: string, decimalUnits: number}}
  */
-const TokenInfo = {
+const TokenInfo_MAINNET = {
     address : 18,
     image : 'https://metamask.github.io/test-dapp/metamask-fox.svg',
     decimalUnits : 4,
+    tokenSymbol : 'AKRE'
+}
+const TokenInfo_TESTNET = {
+    address : '0x1006690DBb985523502688d6bBb50d109F12cE09',
+    //image : 'https://metamask.github.io/test-dapp/metamask-fox.svg',
+    decimalUnits : 18,
     tokenSymbol : 'AKRE'
 }
 
@@ -352,4 +367,15 @@ const ChainCfg = {
         rpcUrls: ['https://polygon-rpc.com/'],
         blockExplorerUrls: ['https://polygonscan.com/'],
     },
+    80001: {
+        chainId: '0x13881',
+            chainName: 'Matic Mumbai',
+            nativeCurrency: {
+            name: 'MATIC',
+                symbol: 'MATIC',
+                decimals: 18,
+        },
+        rpcUrls: ['https://rpc-mumbai.maticvigil.com/'],
+        blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
+    }
 };

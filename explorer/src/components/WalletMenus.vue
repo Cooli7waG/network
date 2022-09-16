@@ -38,6 +38,7 @@
           <span style="cursor: pointer" @click="copyAddress">{{ userAddress == undefined ? "" : formatAddress(userAddress) }}</span>
         </header>
         <div style="height: 1px;width: 100%;background-color: silver"></div>
+        <!-- 未登录 -->
         <section class="el-drawer__body" v-if="userAddress==undefined">
           <span>If you don't have a </span>
           <el-tooltip class="item" effect="dark"
@@ -58,14 +59,9 @@
             </el-row>
           </div>
         </section>
+        <!-- 已登录 -->
         <section class="el-drawer__body" v-else>
           <div v-loading="loadBalance" style="border-radius: 5px;border: 1px solid rgb(229, 232, 235);">
-            <!--<el-row>
-              <el-col :span="24" style="height: 50px;text-align: center">
-                <div><span style="color: #72767b;font-size: 12px">Mining Reward</span></div>
-                <div><span style="font-size: 18px">{{user.earningMint}}</span></div>
-              </el-col>
-            </el-row>-->
             <el-row>
               <el-col :span="11" class="balance-div">
                 <div><span style="color: #72767b;font-size: 12px">Mining Reward</span></div>
@@ -79,7 +75,7 @@
                 <div><span style="font-size: 18px">{{user.balance}}</span></div>
               </el-col>
               <el-col :span="24" class="transfer-btn" @click="transferBalance">
-                <span style="font-size: 16px;line-height: 30px">transfer</span>
+                <span style="font-size: 16px;line-height: 30px">Withdraw Mining Reward</span>
               </el-col>
             </el-row>
           </div>
@@ -96,12 +92,12 @@
                 <span style="margin-left: 5px"><b>Arkreen Explorer</b></span>
               </el-col>
             </el-row>
-            <!--<el-row class="login_select btn_xenon" @click="gotoMyMiner">
+            <el-row class="login_select btn_xenon" @click="addAkreToken">
               <el-col :span="24">
-                <i class="iconfont icon-miner_" style="color: black"></i>
-                <span style="margin-left: 10px"><b>My Miners</b></span>
+                <el-icon><FolderAdd /></el-icon>
+                <span style="margin-left: 10px"><b>Add Token to MetaMask</b></span>
               </el-col>
-            </el-row>-->
+            </el-row>
             <el-row class="login_select btn_xenon" @click="Logout">
               <el-col :span="24">
                 <i class="iconfont icon-tuichu" style="color: black"></i>
@@ -113,8 +109,9 @@
       </div>
     </div>
   </div>
-  <div v-if="userAddress==undefined" style="width: 100%;height: 800px;background-color: #FFFFFF">
-    <el-empty description="Please login to your wallet first">
+  <!-- 用户未登录 -->
+  <div v-if="userAddress==undefined" class="notLogin">
+    <el-empty description="Please login to your wallet first" >
       <el-button type="primary" @click="drawer = true">Login Wallet</el-button>
     </el-empty>
   </div>
@@ -141,12 +138,14 @@
 <script>
 import {formatString, getTokenFixed} from "@/utils/data_format";
 import {
+  addToken,
   getMetaMaskLoginUserAddress,
-  loginWithMetaMask,
-  removeMetaMaskUserAddress,
+  loginWithMetaMask, isPrivacyPolicy,
+  removeMetaMaskUserAddress, switchNetwork, setPrivacyPolicy,
 } from "@/api/metamask_utils";
 import {findByAddress} from "@/api/account";
 import {toEther} from "@/utils/utils";
+import MetaMaskOnboarding from '@metamask/onboarding';
 
 export default {
   name: 'WalletMenus',
@@ -174,7 +173,7 @@ export default {
   },
   methods: {
     transferBalance(){
-      this.$message.warning("todo")
+      this.$message.warning("coming soon...")
     },
     loadFindByAddress(){
       this.loadBalance = true;
@@ -254,7 +253,7 @@ export default {
         removeMetaMaskUserAddress()
         this.closeDrawer()
         this.userAddress = undefined;
-        this.$router.push("/");
+        this.$router.push("/wallet?t="+new Date().getMilliseconds());
       }).catch(() => {
 
       });
@@ -262,13 +261,30 @@ export default {
     getInfo() {
       this.userAddress = getMetaMaskLoginUserAddress();
     },
+    async addAkreToken() {
+      const result = await addToken();
+      if(result){
+        this.$message.success("success!");
+      }else {
+        this.$message.error("failed!");
+      }
+    },
     formatString(str) {
       return formatString(str, 15);
     },
     async loginApp() {
+      // 先判断用户是否安装MetaMask
+      if(!MetaMaskOnboarding.isMetaMaskInstalled()){
+        this.$message.error(this.$t('common.msg.metaMaskNotFound'));
+        return;
+      }
+      //
+      if(!await switchNetwork("0x13881")){
+        this.$message.error(this.$t('common.msg.metaMaskNetWorkNotFound'));
+        return;
+      }
       //首次使用弹出确认对话框
-      let isPrivacyPolicy = window.localStorage.getItem('isPrivacyPolicy')
-      if(isPrivacyPolicy == "true" ){
+      if(isPrivacyPolicy()){
         await this.loginMetaMask();
       }else {
         this.dialogVisible = true;
@@ -277,9 +293,10 @@ export default {
     },
     async loginMetaMask() {
       this.loading = true;
-      window.localStorage.setItem('isPrivacyPolicy', "true");
+      setPrivacyPolicy(true);
+      this.dialogVisible = false;
       if (this.userAddress != undefined) {
-        this.$router.push("/wallet");
+        this.$router.push("/wallet?t="+new Date().getMilliseconds());
       }
       try {
         if (window.ethereum) {
@@ -287,11 +304,11 @@ export default {
           this.closeDrawer();
           let path = this.$route.path;
           if (path == "/wallet") {
-            this.$router.go(0);
-          } else if (path.startsWith("/claim/")) {
+            this.$router.push("/wallet?t="+new Date().getMilliseconds());
+          } else if (path.startsWith("/wallet/claim/")) {
             this.$router.go(0);
           } else {
-            this.$router.push("/wallet");
+            this.$router.push("/wallet?t="+new Date().getMilliseconds());
           }
         } else {
           this.$message.error(this.$t('common.msg.metaMaskNotFound'));
@@ -304,20 +321,27 @@ export default {
     },
     // 监听到用户退出登录时直接返回首页
     async listenMetaMask(){
-      const newAccounts = [];
-      newAccounts.push(this.userAddress)
-      // eslint-disable-next-line no-undef
-      ethereum.on('accountsChanged', () => {
-        if(this.userAddress){
-          removeMetaMaskUserAddress();
-          this.$router.push("/");
-        }
-      });
+      // 先判断用户是否安装MetaMask
+      if(MetaMaskOnboarding.isMetaMaskInstalled()){
+        // eslint-disable-next-line no-undef
+        ethereum.on('accountsChanged', () => {
+          if(this.userAddress != undefined){
+            removeMetaMaskUserAddress();
+            //this.$router.push("/wallet");
+            this.$router.push("/wallet?t="+new Date().getMilliseconds());
+          }
+        });
+      }
     }
   }
 }
 </script>
 <style scoped>
+.notLogin{
+  width: 100%;
+  height: 850px;
+  background-color: #FFFFFF;
+}
 .balance-div{
   height: 80px;
   text-align: center;

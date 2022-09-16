@@ -4,6 +4,7 @@ export default {
             timeout:"System interface request timeout",
             networkError:"Backend interface connection exception",
             metaMaskNotFound:"Please install metamask wallet first",
+            metaMaskNetWorkNotFound:"Please add or switch to Matic Mumbai network first!",
             airdropEventNotStart:"The airdrop event will start on September 1, please look forward to it!",
             notLoginWithMetaMask:"Please login to metamask and try again!",
             LoginWithMetaMaskFailed:"login with metamask failed, please try again!",

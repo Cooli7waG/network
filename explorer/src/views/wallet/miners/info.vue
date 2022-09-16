@@ -438,7 +438,6 @@ export default {
         {value:4,label:"TX_Terminate_Miner"},
         {value:5,label:"TX_Airdrop_Miner"},
         {value:6,label:"TX_Claim_Miner"},
-        {value:6,label:"TX_Claim_Miner"},
         {value:7,label:"TX_Commit_PoGG"},
         {value:8,label:"TX_Report_PoGG"},
         {value:9,label:"TX_Reward_PoGG"},

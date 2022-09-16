@@ -1,6 +1,6 @@
 <template>
   <el-row style="background-color: #545c64">
-    <el-col :span="24">
+    <el-col :span="20">
       <el-menu
           :default-active="autoActive()"
           class="el-menu-demo"
@@ -18,6 +18,15 @@
         <el-menu-item index="/blocks">{{ $t('menus.blocks') }}</el-menu-item>
         <el-menu-item index="/txs">{{ $t('menus.txs') }}</el-menu-item>
       </el-menu>
+    </el-col>
+    <el-col :span="4" class="login">
+      <div style="float: right;margin-right: 10px" v-show="isShow">
+        <div style="line-height: 50px">
+          <el-button type="text" style="color: #FFFFFF;" @click="this.$router.push('/wallet')">
+            <i class="iconfont icon-qianbao wallet-img" style="font-size: 26px"/>
+          </el-button>
+        </div>
+      </div>
     </el-col>
   </el-row>
 </template>
