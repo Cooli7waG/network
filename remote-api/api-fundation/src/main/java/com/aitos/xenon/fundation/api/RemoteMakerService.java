@@ -6,6 +6,8 @@ import com.aitos.xenon.fundation.api.domain.vo.MakerVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  */
 @FeignClient(name = "fundation",url = "http://localhost:9505")
@@ -21,6 +23,6 @@ public interface RemoteMakerService {
     Result<MakerVo> findByMaker(@RequestParam("maker")String maker);
 
     @GetMapping("/maker/findAll")
-    Result<MakerVo> findAll();
+    Result<List<MakerVo>> findAll();
 
 }

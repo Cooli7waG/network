@@ -6,11 +6,11 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class MakerVo extends BaseModel {
+public class MakerVo {
 
     private Long id;
 
-    private String maker;
+    private String name;
 
     private String serviceUrl;
 

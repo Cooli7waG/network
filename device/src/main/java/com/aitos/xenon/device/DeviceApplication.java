@@ -11,7 +11,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
         "com.aitos.xenon.fundation.api",
         "com.aitos.xenon.block.api",
         "com.aitos.xenon.device.api",
-        "com.aitos.message.push.api",
 })
 @MapperScan("com.aitos.xenon.device.mapper")
 public class DeviceApplication {

@@ -95,28 +95,21 @@ public class DeviceController {
 
         String payerAddress=paramsObject.getString("payerAddress");
         String payerSignature=paramsObject.getString("payerSignature");
-        /*String ownerAddress=paramsObject.getString("ownerAddress");
-        String ownerSignature=paramsObject.getString("ownerSignature");*/
         String minerAddress=paramsObject.getString("minerAddress");
         String minerSignature=paramsObject.getString("minerSignature");
 
         paramsObject.remove("payerSignature");
         String payerData=paramsObject.toJSONString();
         log.info("onboard.payerData:{}",payerData);
-        paramsObject.remove("ownerSignature");
-        /*String ownerData=paramsObject.toJSONString();
-        log.info("onboard.ownerData:{}",ownerData);*/
+        paramsObject.remove("payerAddress");
         paramsObject.remove("minerSignature");
         String minerData=paramsObject.toJSONString();
         log.info("onboard.minerData:{}",minerData);
 
-        if(!Ecdsa.verifyByAddress(payerAddress,payerData.getBytes(),payerSignature, DataCoder.BASE58)){
+        if(!Ecdsa.verifyByAddress(payerAddress,payerData,payerSignature, DataCoder.BASE58)){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_PAYER_SIGN_ERROR);
         }
-        /*if(!XenonCrypto.verify(ownerAddress,ownerData,ownerSignature)){
-            return Result.failed(ApiStatus.BUSINESS_DEVICE_OWNER_SIGN_ERROR);
-        }*/
-        if(!Ecdsa.verifyByAddress(minerAddress,minerData.getBytes(),minerSignature, DataCoder.BASE58)){
+        if(!Ecdsa.verifyByAddress(minerAddress,minerData,minerSignature, DataCoder.BASE58)){
             return Result.failed(ApiStatus.BUSINESS_DEVICE_MINER_SIGN_ERROR);
         }
 
@@ -254,10 +247,11 @@ public class DeviceController {
 
     private Result call3rdPartyMakerService(String serviceUrl,OwnerBindApplyDto ownerBindApplyDto) {
         String jsonString = JSON.toJSONString(ownerBindApplyDto);
+        log.info("call3rdPartyMakerService.params={}",jsonString);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.valueOf("application/json;UTF-8"));
         HttpEntity<String> strEntity = new HttpEntity<String>(jsonString,headers);
-        String resultJSON = restTemplate.postForObject(serviceUrl,strEntity,String.class);
+        String resultJSON = restTemplate.postForObject(serviceUrl+"device/bindApply",strEntity,String.class);
         log.info("call3rdPartyMakerService.result={}",resultJSON);
         Result result =JSON.parseObject(resultJSON,new TypeReference<Result>(){});
         return result;

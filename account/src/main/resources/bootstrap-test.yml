@@ -13,5 +13,6 @@ spring:
         file-extension: yml
         # 共享配置
         shared-configs:
-          #- application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+          - mysql-dev.yml
           - redis-dev.yml
+          - global-params-dev.yml

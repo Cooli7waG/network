@@ -68,7 +68,7 @@
                 energy=#{energy},
                 power=#{power},
                 capabilities=#{capabilities},
-                status=#{status}
+                status=#{status},
                 <if test="deviceModel!=null and deviceModel!=''">
                     device_model=#{deviceModel},
                 </if>
