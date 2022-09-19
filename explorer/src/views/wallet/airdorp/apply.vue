@@ -28,16 +28,13 @@
 <script>
 import {applyGameMiner,getApplyActiveInfo} from "@/api/miners";
 import {
-  addNetwork, addToken,
   getMetaMaskLoginUserAddress,
-  personalSign,
-  signTypedDataV3,
-  signTypedDataV4, switchNetwork
+  personalSign, switchNetwork
 } from "@/api/metamask_utils";
 import MetaMaskOnboarding from "@metamask/onboarding";
 
 export default {
-  name: 'apply',
+  name: 'Request a GameMiner',
   data() {
     return {
       loading: false,

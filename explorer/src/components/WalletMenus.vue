@@ -1,4 +1,5 @@
 <template>
+  <!-- 头部菜单 -->
   <el-row style="background-color: #545c64">
     <el-col :span="20">
       <el-menu
@@ -12,6 +13,7 @@
         <div style="height: 59px;line-height: 59px;padding-left: 15px">
           <img src="../assets/logo-arkreen.png" style="width: 40px;height: 40px;margin-top: 8px;margin-inline-end: 15px;">
         </div>
+        <el-menu-item index="/wallet">{{ $t('menus.dashboard') }}</el-menu-item>
         <el-menu-item index="/wallet/miners">{{ $t('menus.miners') }}</el-menu-item>
         <el-menu-item index="/wallet/txs">{{ $t('menus.txs') }}</el-menu-item>
       </el-menu>
@@ -26,6 +28,7 @@
       </div>
     </el-col>
   </el-row>
+  <!-- 侧滑菜单 -->
   <div v-show="drawer" tabindex="-1" class="el-drawer__wrapper" style="z-index: 9999;">
     <div role="document" tabindex="-1" class="el-drawer__container el-drawer__open" @click="closeDrawer">
       <div tabindex="-1" class="el-drawer rtl" style="width: 350px;right: 0;margin-top: 58px" @click="stopPropagation">
@@ -61,6 +64,7 @@
         </section>
         <!-- 已登录 -->
         <section class="el-drawer__body" v-else>
+          <!-- Balance展示-->
           <div v-loading="loadBalance" style="border-radius: 5px;border: 1px solid rgb(229, 232, 235);">
             <el-row>
               <el-col :span="11" class="balance-div">
@@ -79,17 +83,18 @@
               </el-col>
             </el-row>
           </div>
+          <!-- 菜单项 -->
           <div style="margin-top: 25px">
             <el-row class="login_select btn_xenon" @click="gotoApplyGameMiner">
               <el-col :span="24">
                 <el-icon><Promotion /></el-icon>
-                <span style="margin-left: 5px"><b>Request a GameMiner</b></span>
+                <span style="margin-left: 5px"><b> Request a GameMiner</b></span>
               </el-col>
             </el-row>
             <el-row class="login_select btn_xenon" @click="gotoBrowser">
               <el-col :span="24">
                 <i class="iconfont icon-liulanqi" style="color: black"></i>
-                <span style="margin-left: 5px"><b>Arkreen Explorer</b></span>
+                <span style="margin-left: 5px"><b> Arkreen Explorer</b></span>
               </el-col>
             </el-row>
             <el-row class="login_select btn_xenon" @click="addAkreToken">
@@ -228,7 +233,7 @@ export default {
         return "/wallet/txs"
       }
       if (path == "/wallet") {
-        return "/wallet/miners"
+        return "/wallet"
       }
       return path;
     },
@@ -361,7 +366,7 @@ export default {
   cursor: pointer
 }
 .btn_xenon {
-  text-align: center;
+  text-align: left;
   cursor: pointer;
   background-color: aliceblue !important;
 }

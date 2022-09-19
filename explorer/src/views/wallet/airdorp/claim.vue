@@ -18,7 +18,7 @@ import {getMetaMaskLoginUserAddress, personalSign} from "@/api/metamask_utils";
 import MetaMaskOnboarding from "@metamask/onboarding";
 
 export default {
-  name: 'claim',
+  name: 'Claim GameMiner',
   data() {
     return {
       loading:false,

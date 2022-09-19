@@ -230,7 +230,6 @@ public class DeviceController {
         return Result.ok(deviceList);
     }
 
-
     @PostMapping("/ownerBindApply")
     public Result ownerApplyBind(@Validated @RequestBody OwnerBindApplyDto ownerBindApplyDto){
 

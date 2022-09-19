@@ -59,17 +59,17 @@ const routes = [
         children: [
             {
                 path: "",
-                name: "Index",
-                component: import('@/views/wallet/miners/index.vue'),
+                name: "My Dashboard",
+                component: import('@/views/wallet/dashboard/dashboard.vue'),
             },
             {
                 path: "apply",
-                name: "Arkreen",
+                name: "Request a GameMiner",
                 component: import('@/views/wallet/airdorp/apply.vue'),
             },
             {
                 path: "claim/:address",
-                name: "Claim Game Miner",
+                name: "Claim GameMiner",
                 component: import('@/views/wallet/airdorp/claim.vue'),
             },
             {

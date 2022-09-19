@@ -311,7 +311,7 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
             return ApiStatus.SUCCESS.getMsg();
         }catch (Exception e){
             log.error("Apply Game Miner Error:{}",e.getMessage());
-            throw new RecoverPublicKeyException("Failed to get user address");
+            throw new RecoverPublicKeyException(e.getMessage());
         }
     }
 
