@@ -19,10 +19,10 @@
     </el-col>
     <!-- 柱状图 -->
     <el-col class="card-hor-style" :sm="24" :lg="12">
-      <el-card class="box-card" style="width: 863px;height: 400px;margin: 10px 20px">
+      <el-card class="box-card" style="height: 400px;margin: 10px 20px">
         <template #header>
           <div class="card-header">
-            <span>Rewwrd Trend</span>
+            <span>{{RewardTrendTitle}}</span>
             <el-button class="card-operate-btn" type="text">
               <el-dropdown>
                 <span class="el-dropdown-link">
@@ -41,10 +41,64 @@
           </div>
         </template>
         <div class="text item" v-loading="loadBalance">
-          <div id="histogram" style="width: 828px;height:300px;"></div>
+          <div id="histogram" style="height:300px;"></div>
         </div>
       </el-card>
     </el-col>
+    <!-- 饼图 -->
+    <el-col class="card-hor-style" :sm="24" :lg="12">
+      <el-card class="box-card" style="height: 400px;margin: 10px 20px">
+        <template #header>
+          <div class="card-header">
+            <span>{{RewardPercentageTitle}}</span>
+            <el-button class="card-operate-btn" type="text">
+              <el-dropdown>
+                <span class="el-dropdown-link">
+                  <el-icon style="font-size: 18px"><Operation /></el-icon>
+                </span>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item @click="handleMinerPieStatisticsRewardByDay(7)">Last 7 days</el-dropdown-item>
+                    <el-dropdown-item @click="handleMinerPieStatisticsRewardByDay(15)">Last 15 days</el-dropdown-item>
+                    <el-dropdown-item @click="handleMinerPieStatisticsRewardByDay(30)">Last 30 days</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </el-button>
+          </div>
+        </template>
+        <div class="text item" v-loading="loadPie" :element-loading-text="loadPieText">
+          <div id="minerPie" style="height:300px;"></div>
+        </div>
+      </el-card>
+    </el-col>
+    <el-dialog v-model="dialogLineVisible" title="" :show-close=false>
+      <el-card class="box-card" style="height: 400px;margin-top: -60px;margin-left: -20px;margin-bottom: -30px;margin-right: -20px">
+        <template #header>
+          <div class="card-header">
+            <span>{{minerRewardTitle}}</span>
+            <el-button class="card-operate-btn" type="text">
+              <el-dropdown>
+                <span class="el-dropdown-link" style="margin-top: -10px">
+                  <el-icon style="font-size: 18px"><Operation /></el-icon>
+                </span>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item @click="handleMinerStatisticsRewardByDay(7)">Last 7 days</el-dropdown-item>
+                    <el-dropdown-item @click="handleMinerStatisticsRewardByDay(15)">Last 15 days</el-dropdown-item>
+                    <el-dropdown-item @click="handleMinerStatisticsRewardByDay(30)">Last 30 days</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+              <el-icon class="closeDialogLineVisible" @click="dialogLineVisible = false"><Close /></el-icon>
+            </el-button>
+          </div>
+        </template>
+        <div class="text item" v-loading="loadMinerBalance">
+          <div id="minerHistogram" style="height:300px;"></div>
+        </div>
+      </el-card>
+    </el-dialog>
   </el-row>
 </template>
 
@@ -53,7 +107,7 @@ import {getMetaMaskLoginUserAddress} from "@/api/metamask_utils";
 import {statisticsByDateTimeRange, statisticsRewardByDay} from "@/api/walletDashboard";
 import {deviceList} from "@/api/miners";
 import {findByAddress} from "@/api/account";
-import {getTokenFixed} from "@/utils/data_format";
+import {getAddress, getTokenFixed} from "@/utils/data_format";
 import {toEther} from "@/utils/utils";
 import * as echarts from 'echarts';
 
@@ -63,10 +117,20 @@ export default {
   },
   data(){
     return {
+      chartType:'bar',
+      loadPie:false,
+      loadPieText:"Loading...",
       loadBalance:false,
+      loadMinerBalance:false,
       loadingHistogram:false,
+      RewardTrendTitle:"Reward Trend - Last 15 Days",
+      dialogLineVisible:false,
+      RewardPercentageTitle:"Miner Reward Percentage - Last 15 Days",
+      minerRewardTitle:" Reward Percentage - Last 15 Days",
       miner : {
-        total:0
+        address:undefined,
+        total:0,
+        list:undefined
       },
       user : {
         balance:0,
@@ -75,8 +139,9 @@ export default {
     }
   },
   created() {
-    this.handleStatisticsRewardByDay(15);
     this.loadFindByAddress();
+    this.handleStatisticsRewardByDay(15);
+    this.handleMinerPieStatisticsRewardByDay(15);
   },
   methods:{
     timeFormat(offset){
@@ -107,48 +172,82 @@ export default {
     handleStatisticsRewardByDay(day){
       const owner = getMetaMaskLoginUserAddress();
       let time = this.timeFormat(day);
-      console.log("startTime:"+time.startTime)
-      console.log("endTime:"+time.endTime)
       const data = {
         "address": owner,
         "startTime": time.startTime,
         "endTime": time.endTime
       }
-      this.loadingHistogram = true;
+      this.loadBalance = true
       statisticsRewardByDay(data).then(rsp => {
         if (rsp.code == 0) {
           let rotateX=-20;
           if(rsp.data.length > 7){
             rotateX = -40
           }
+          this.RewardTrendTitle = "Reward Trend - Last "+day+" Days";
           this.drawHistogram(rsp.data,rotateX);
         } else {
           console.log("get statisticsRewardByDay error!")
         }
       })
-      this.loadingHistogram = false;
+      this.loadBalance = false
     },
-    handleStatisticsByDateTimeRange(){
-      statisticsByDateTimeRange().then(rsp => {
+    async handleMinerStatisticsRewardByDay(day) {
+      //
+      this.minerRewardTitle = this.miner.address + " - Last "+day+" Days"
+      this.loadMinerBalance = true;
+      let time = this.timeFormat(day);
+      let rotateX = -20;
+      if (day > 7) {
+        rotateX = -40
+      }
+      const histogramData = {
+        xAxisData: [],
+        legendData: [],
+        series: []
+      }
+      //
+      const data = {
+        "address": this.miner.address,
+        "startTime": time.startTime,
+        "endTime": time.endTime
+      }
+      await statisticsRewardByDay(data).then(rsp => {
         if (rsp.code == 0) {
-
-        } else {
-
+          const xAxisData = []
+          const series = {
+            name: this.miner.address,
+            data: [],
+            type: 'line',
+            emphasis: {
+              focus: 'series'
+            }
+          }
+          for (let index = 0; index < rsp.data.length; index++) {
+            xAxisData.push(rsp.data[index].dataDate);
+            series.data.push(rsp.data[index].reward);
+          }
+          //
+          histogramData.xAxisData = xAxisData;
+          histogramData.series.push(series)
         }
       })
+      this.drawMinerHistogram(histogramData, rotateX);
+      this.loadMinerBalance = false
     },
-    handleGetMinerCount(){
+    async handleGetMinerCount(limit){
       const owner = getMetaMaskLoginUserAddress();
       if(owner == undefined || owner == null){
         return;
       }
       const params={
         offset:1,
-        limit:20,
+        limit:limit,
         address:owner
       }
       deviceList(params).then((result)=>{
-        this.miner.total=result.data.total
+        this.miner.total = result.data.total
+        this.miner.list = result.data.items
       }).catch((err) =>{
         console.log(err);
       });
@@ -165,7 +264,7 @@ export default {
           const fixed = getTokenFixed(result.data.balance);
           this.user.balance = toEther(result.data.balance,fixed);
         }
-        this.handleGetMinerCount();
+        this.handleGetMinerCount(10);
         this.loadBalance = false;
       }).catch((err) =>{
         console.log(err);
@@ -238,7 +337,8 @@ export default {
               title:{
                 line:'Switch to Line Chart',
                 bar:'Switch to Bar Chart'
-              }},
+              }
+            },
             restore: { show: false }
           }
         },
@@ -253,15 +353,11 @@ export default {
             }
           }
         ],
-        yAxis: [
-          {
-            type: 'value'
-          }
-        ],
+        yAxis: [{type: 'value'}],
         series: [
           {
             name: 'reward',
-            type: 'bar',
+            type: this.chartType,
             barGap: 0,
             label: labelOption,
             emphasis: {
@@ -272,11 +368,228 @@ export default {
         ]
       };
       option && myChart.setOption(option);
+      myChart.on('magictypechanged', (params) => {
+        if (params.currentType == 'line') {
+          this.chartType = 'line'
+        } else if (params.currentType == 'bar') {
+          this.chartType = 'bar'
+        }
+      })
     },
+    drawMinerHistogram(histogramData,rotateX){
+      //
+      console.log("histogramData:"+JSON.stringify(histogramData))
+      //
+      const app = {}
+      const chartDom = document.getElementById('minerHistogram')
+      const myChart = echarts.init(chartDom)
+      let option
+      app.config = {
+        rotate: 90,
+        align: 'left',
+        verticalAlign: 'middle',
+        position: 'insideBottom',
+        distance: 15,
+        onChange: function () {
+          const labelOption = {
+            rotate: app.config.rotate,
+            align: app.config.align,
+            verticalAlign: app.config.verticalAlign,
+            position: app.config.position,
+            distance: app.config.distance
+          };
+          myChart.setOption({
+            series: [{label: labelOption}]
+          });
+        }
+      };
+      const labelOption = {
+        show: false,
+        position: app.config.position,
+        distance: app.config.distance,
+        align: app.config.align,
+        verticalAlign: app.config.verticalAlign,
+        rotate: app.config.rotate,
+        formatter: '{c}  {name|{a}}',
+        fontSize: 16,
+        rich: {
+          name: {}
+        }
+      };
+      for(let index;index<histogramData.series.length;index++){
+        histogramData.series[index].type = 'line'
+        histogramData.series[index].label = labelOption
+        histogramData.series[index].emphasis.focus = 'series'
+      }
+      option = {
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        legend: {
+          data: histogramData.legendData
+        },
+        toolbox: {
+          show: true,
+          orient: 'vertical',
+          left: 'right',
+          top: 'top',
+          feature: {
+            mark: { show: false },
+            magicType: {
+              show: false,
+              type: ['line','bar'],
+              title:{
+                line:'Switch to Line Chart',
+                bar:'Switch to Bar Chart'
+              }
+            },
+            restore: { show: false }
+          }
+        },
+        xAxis: [
+          {
+            type: 'category',
+            axisTick: { show: true },
+            data: histogramData.xAxisData,
+            axisLabel: {
+              interval: 0,
+              rotate: rotateX
+            }
+          }
+        ],
+        yAxis: [{type: 'value'}],
+        series: histogramData.series
+      };
+      option && myChart.setOption(option);
+    },
+    handleMinerPieStatisticsRewardByDay(day) {
+      const owner = getMetaMaskLoginUserAddress();
+      if (owner == undefined || owner == null) {
+        return;
+      }
+      const params = {
+        offset: 1,
+        limit: this.miner.total,
+        address: owner
+      }
+      deviceList(params).then((result) => {
+        this.miner.total = result.data.total
+        params.limit = result.data.total
+        deviceList(params).then(async (result) => {
+          this.RewardPercentageTitle = "Miner Reward Percentage - Last "+day+" Days"
+          this.miner.total = result.data.total
+          this.loadPie = true;
+          let time = this.timeFormat(day);
+          const pieData = {
+            legendData: [],
+            series: []
+          }
+          for (const item of result.data.items) {
+            const data = {
+              "address": item.address,
+              "startTime": time.startTime,
+              "endTime": time.endTime
+            }
+            pieData.legendData.push(item.address)
+            await statisticsByDateTimeRange(data).then(rsp => {
+              if (rsp.code == 0) {
+                const series = {
+                  name: item.address,
+                  value: rsp.data,
+                }
+                for (let index = 0; index < rsp.data.length; index++) {
+                  series.data.push(rsp.data[index].reward);
+                }
+                pieData.series.push(series)
+              }
+            })
+          }
+          this.drawPie(pieData);
+          this.loadPie = false;
+        })
+      })
+    },
+    drawPie(dataPie){
+      const chartDom = document.getElementById('minerPie');
+      const myChart = echarts.init(chartDom);
+      let option;
+      option = {
+        title: {
+          text: '',
+          subtext: '',
+          left: 'left'
+        },
+        tooltip: {
+          trigger: 'item',
+          textStyle: {
+            fontSize: 8
+          },
+          formatter: function (params){
+            let value = Number(params.value).toFixed(3).toLocaleString();
+            return params.seriesName+' Address：'+params.name+'<br/>Reward: '+value+' ('+params.percent+'%)'
+          }
+        },
+        legend: {
+          type: 'scroll',
+          orient: 'vertical',
+          right: 10,
+          top: 20,
+          bottom: 20,
+          data: dataPie.legendData,
+          formatter: function (params){
+            return getAddress(params)
+          }
+        },
+        series: [
+          {
+            name: 'Miner',
+            type: 'pie',
+            radius: '80%',
+            center: ['30%', '50%'],
+            data: dataPie.series,
+            labelLine: {
+              show: true
+            },
+            label: {
+              show: true,
+              position: 'outside',
+              formatter: function (params){
+                return getAddress(params.name)
+              }
+            },
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+              }
+            }
+          }
+        ]
+      };
+      option && myChart.setOption(option);
+      myChart.on('click', params =>{
+        this.miner.address = params.name;
+        this.dialogLineVisible = true;
+        this.handleMinerStatisticsRewardByDay(15)
+      })
+    }
   }
 }
 </script>
 <style lang="scss" scoped>
+.closeDialogLineVisible :hover{
+  color: #545c64;
+}
+.closeDialogLineVisible{
+  font-size: 18px;
+  color: #72767b;
+  margin-left: 10px;
+  margin-top: -10px
+}
 .card-col{
   margin: 10px;
   width: 250px;

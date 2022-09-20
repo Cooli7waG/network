@@ -68,7 +68,7 @@
           <div v-show="false" style="color: #FFFFFF">
             <h3>0x4dea3e19583117f7361a93c5cd462d837a846940</h3>
             <h4>Miner Type: Game Miner</h4>
-            <h4>Maker: Arkreen</h4>
+            <h4>Miner Maker: Arkreen</h4>
             <h4>Owner: 0x4dea3e19583117f7361a93c5cd462d837a846940</h4>
           </div>
           <div style="height: 100%">
@@ -157,13 +157,21 @@ export default {
       data.timer = setInterval(() => {
         loadBlockchainstats()
         loadMinerStatistics()
-        initMap();
+        initMap(data.center,data.zoom);
       }, 300000)
     }
     const showInfo = (miner) => {
-      console.log(JSON.stringify(miner))
+      //console.log(JSON.stringify(miner))
+      let x = ((miner.longitude * 20037508.34) / 180)-600000
+      let y = Math.log(Math.tan(((90 + miner.latitude) * Math.PI) / 360)) / (Math.PI / 180)
+      y = ((y * 20037508.34) / 180)
+      if(data.center[0] == x && data.center[1] == y){
+        return;
+      }
+      data.center = [x,y]
+      //
+      initMap(data.center,6);
     }
-
     const closeOrOpen = () => {
       if (data.leftShow) {
         data.leftShow = false;
@@ -174,7 +182,6 @@ export default {
         data.rightIndex = 18;
       }
     }
-
     const data = reactive({
       timer:undefined,
       leftShow: true,
@@ -184,6 +191,8 @@ export default {
       minerInfoLoad: true,
       direction: 'rtl',
       minersList: null,
+      center:[0,0],
+      zoom:0,
       blockchainstats: {
         usdbmtMarketPrice: 0,
         totalBMTMarket: 0,
@@ -198,7 +207,6 @@ export default {
       max: 5,
       min: 1,
     })
-
     const loadBlockchainstats = () => {
       getBlockchainstats().then((result) => {
         data.blockchainstats = result.data;
@@ -210,7 +218,6 @@ export default {
         console.log(err);
       });
     }
-
     const loadMinerStatistics = () => {
       getMinerStatistics().then((result) => {
         data.minerStatistics = result.data;
@@ -219,7 +226,6 @@ export default {
         console.log("loadMinerStatistics error:"+err);
       });
     }
-
     const styleFn = function (f, res) {
       switch ("color") {
           /*case 'point':{
@@ -251,7 +257,6 @@ export default {
         }
       }
     };
-
     //创建六边形图层
     const createHexBinLayer = (source) => {
       const hexbin = new HexBinource({
@@ -267,14 +272,12 @@ export default {
 
       return vectorLayer;
     }
-
     //创建marker图层
     const createMarkerLayer = () => {
       const markerSource = new VectorSource();
       addFeatures(markerSource);
       return new VectorLayer({source: markerSource, visible: true});
     }
-
     //创建日照图层
     const createDayNightLayer = () => {
       const dayNightSource = new DayNight({});
@@ -291,7 +294,6 @@ export default {
         })
       });
     }
-
     //创建底图
     const createBaseLayer = () => {
       const layers = [];
@@ -304,8 +306,7 @@ export default {
       layers.push(world_Street_MapLayer)
       return layers
     }
-
-    const initMap = () => {
+    const initMap = (center,zoom) => {
       let elementById = document.getElementById("map");
       for (const childNode of elementById.childNodes) {
         childNode.remove();
@@ -319,8 +320,8 @@ export default {
         layers: baseLayers,
         target: "map",
         view: new View({
-          center: [0, 0],
-          zoom: 2,
+          center: center,
+          zoom: zoom,
         })
       })
 
@@ -356,7 +357,6 @@ export default {
         }
       });
     }
-
     const showMinerList = (minerAddressList) => {
       if (!data.minersDrawer) {
         data.minersDrawer = true;
@@ -372,7 +372,6 @@ export default {
         console.log(err);
       });
     }
-
     const addFeatures = (source) => {
       //
       let minerLocation = undefined;
@@ -400,11 +399,10 @@ export default {
         console.log(err);
       });
     }
-
     onMounted(() => {
       loadBlockchainstats()
       loadMinerStatistics()
-      initMap();
+      initMap(data.center,data.zoom);
       intervalLet();
     })
     onDeactivated(()=>{

@@ -1,59 +1,75 @@
 <template>
-  <el-breadcrumb style="margin-bottom: 20px;">
-    <el-breadcrumb-item :to="{ path: '/' }">{{ $t('minerinfo.path.home') }}</el-breadcrumb-item>
-    <el-breadcrumb-item :to="{ path: '/miners' }">{{ $t('minerinfo.path.miners') }}</el-breadcrumb-item>
-    <el-breadcrumb-item>{{ $t('minerinfo.path.info') }}</el-breadcrumb-item>
-  </el-breadcrumb>
+  <el-row>
+    <el-col :span="12">
+      <el-breadcrumb style="margin-bottom: 20px;">
+        <el-breadcrumb-item :to="{ path: '/' }">{{ $t('minerinfo.path.home') }}</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: '/miners' }">{{ $t('minerinfo.path.miners') }}</el-breadcrumb-item>
+        <el-breadcrumb-item>{{ $t('minerinfo.path.info') }}</el-breadcrumb-item>
+      </el-breadcrumb>
+    </el-col>
+    <el-col :span="12" style="padding-left: 50px">
+      <span>Reward Trend</span>
+    </el-col>
+  </el-row>
   <div v-if="data.device">
-    <el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.address') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ data.device.address }}</el-col>
-    </el-row>
-    <el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.minerType') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
-        {{ data.device.minerType ? Constant.MinerType[data.device.minerType] : '' }}
-      </el-col>
-    </el-row>
-    <el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.ownerAddress') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ data.device.ownerAddress }}</el-col>
-    </el-row>
-    <el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.maker') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ data.device.maker }}</el-col>
-    </el-row>
-    <el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.latlog') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
-        {{ data.device.latitude + "," + data.device.longitude }}
-        <i class="iconfont icon-weizhi" style="color: deepskyblue;cursor: pointer" @click="gotoMap(data.device.latitude,data.device.longitude)"/>
-      </el-col>
-    </el-row>
-    <el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.createTime') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
-        {{ formatDate(data.device.createTime, "yyyy-MM-dd hh:mm:ss") }}
-      </el-col>
-    </el-row>
-    <el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.earningMint') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ formatToken(data.device.earningMint) }}</el-col>
-    </el-row>
-    <el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.earningService') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ formatToken(data.device.earningService) }}</el-col>
-    </el-row>
-    <el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.power') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">{{ formatPower(data.device.avgPower/1000/1000) }}</el-col>
-    </el-row>
-    <el-row :gutter="20">
-      <el-col :xs="12" :sm="8" :md="7" :lg="6" :xl="4">{{ $t('minerinfo.info.totalEnergyGeneration') }}:</el-col>
-      <el-col :xs="12" :sm="16" :md="17" :lg="18" :xl="20">
-        {{ formatPowerNotUnit(data.device.totalEnergyGeneration) }}
-      </el-col>
-    </el-row>
+    <div>
+      <el-row>
+        <el-col :span="12">
+          <el-row :gutter="20">
+            <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.address') }}:</el-col>
+            <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">{{ data.device.address }}</el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.minerType') }}:</el-col>
+            <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">
+              {{ data.device.minerType ? Constant.MinerType[data.device.minerType] : '' }}
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.ownerAddress') }}:</el-col>
+            <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">{{ data.device.ownerAddress }}</el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.maker') }}:</el-col>
+            <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">{{ data.device.maker }}</el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.latlog') }}:</el-col>
+            <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">
+              {{ data.device.latitude + "," + data.device.longitude }}
+              <i class="iconfont icon-weizhi" style="color: deepskyblue;cursor: pointer" @click="gotoMap(data.device.latitude,data.device.longitude)"/>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.createTime') }}:</el-col>
+            <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">
+              {{ formatDate(data.device.createTime, "yyyy-MM-dd hh:mm:ss") }}
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.earningMint') }}:</el-col>
+            <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">{{ formatToken(data.device.earningMint) }}</el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.earningService') }}:</el-col>
+            <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">{{ formatToken(data.device.earningService) }}</el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.power') }}:</el-col>
+            <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">{{ formatPower(data.device.avgPower/1000/ 1000) }}</el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.totalEnergyGeneration') }}:</el-col>
+            <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">
+              {{ formatElectricity(data.device.totalEnergyGeneration/1000) }}
+            </el-col>
+          </el-row>
+        </el-col>
+        <el-col :span="12" style="padding-left: 50px">
+          <div id="minerHistogram" style="height:224px;"></div>
+        </el-col>
+      </el-row>
+    </div>
     <el-tabs v-model="data.activeName" @tab-click="handleClick" style="margin-top: 15px" type="border-card">
       <el-tab-pane label="Report" name="report">
         <el-pagination
@@ -170,6 +186,8 @@ import {Tile as TileLayer,Vector as VectorLayer} from 'ol/layer';
 import XYZSource from "ol/source/XYZ";
 import {Vector as VectorSource} from 'ol/source';
 import {Point} from 'ol/geom';
+import {statisticsRewardByDay} from "@/api/walletDashboard";
+import * as echarts from "echarts";
 //
 export default {
   components: {},
@@ -178,8 +196,164 @@ export default {
   },
   created() {
     this.handleGetList();
+    this.handleMinerStatisticsRewardByDay(15);
   },
   methods: {
+    timeFormat(offset){
+      let date = new Date()
+      let startMonth = date.getUTCMonth()+1
+      if(startMonth<10){
+        startMonth = "0"+startMonth
+      }
+      let startDate = date.getUTCDate();
+      if(startDate<10){
+        startDate = "0"+startDate
+      }
+      let endTime = date.getUTCFullYear()+"-"+startMonth+"-"+startDate+"T23:59:59.000Z";
+      date = date - ((offset-1) * 24 * 60 * 60 * 1000)
+      date = new Date(date);
+      let endMonth = date.getUTCMonth()+1
+      if(endMonth<10){
+        endMonth = "0"+endMonth
+      }
+      let endDate = date.getUTCDate();
+      if(endDate<10){
+        endDate = "0"+endDate
+      }
+      let startTime =  date.getUTCFullYear()+"-"+endMonth+"-"+endDate+"T00:00:00.000Z";
+      let time = {startTime:startTime,endTime:endTime}
+      return time;
+    },
+    async handleMinerStatisticsRewardByDay(day) {
+      //
+      this.data.minerRewardTitle = this.$route.params.address + " - Last "+day+" Days"
+      this.data.loadMinerBalance = true;
+      let time = this.timeFormat(day);
+      let rotateX = -10;
+      if (day > 7) {
+        rotateX = -30
+      }
+      const histogramData = {
+        xAxisData: [],
+        legendData: [],
+        series: []
+      }
+      //
+      console.log("this.data.query.minerAddress:"+this.$route.params.address)
+      const data = {
+        "address": this.$route.params.address,
+        "startTime": time.startTime,
+        "endTime": time.endTime
+      }
+      await statisticsRewardByDay(data).then(rsp => {
+        if (rsp.code == 0) {
+          const xAxisData = []
+          const series = {
+            name:  this.$route.params.address,
+            data: [],
+            type: 'line',
+            emphasis: {
+              focus: 'series'
+            }
+          }
+          for (let index = 0; index < rsp.data.length; index++) {
+            xAxisData.push(rsp.data[index].dataDate);
+            series.data.push(rsp.data[index].reward);
+          }
+          //
+          histogramData.xAxisData = xAxisData;
+          histogramData.series.push(series)
+        }
+      })
+      this.drawMinerHistogram(histogramData, rotateX);
+      this.dataloadMinerBalance = false
+    },
+    drawMinerHistogram(histogramData,rotateX){
+      const app = {}
+      const chartDom = document.getElementById('minerHistogram')
+      const myChart = echarts.init(chartDom)
+      let option
+      app.config = {
+        rotate: 90,
+        align: 'left',
+        verticalAlign: 'middle',
+        position: 'insideBottom',
+        distance: 15,
+        onChange: function () {
+          const labelOption = {
+            rotate: app.config.rotate,
+            align: app.config.align,
+            verticalAlign: app.config.verticalAlign,
+            position: app.config.position,
+            distance: app.config.distance
+          };
+          myChart.setOption({
+            series: [{label: labelOption}]
+          });
+        }
+      };
+      const labelOption = {
+        show: false,
+        position: app.config.position,
+        distance: app.config.distance,
+        align: app.config.align,
+        verticalAlign: app.config.verticalAlign,
+        rotate: app.config.rotate,
+        formatter: '{c}  {name|{a}}',
+        fontSize: 16,
+        rich: {
+          name: {}
+        }
+      };
+      for(let index;index<histogramData.series.length;index++){
+        histogramData.series[index].type = 'line'
+        histogramData.series[index].label = labelOption
+        histogramData.series[index].emphasis.focus = 'series'
+      }
+      option = {
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        legend: {
+          data: histogramData.legendData
+        },
+        toolbox: {
+          show: true,
+          orient: 'vertical',
+          left: 'right',
+          top: 'top',
+          feature: {
+            mark: { show: false },
+            magicType: {
+              show: true,
+              type: ['line','bar'],
+              title:{
+                line:'Switch to Line Chart',
+                bar:'Switch to Bar Chart'
+              }
+            },
+            restore: { show: false }
+          }
+        },
+        xAxis: [
+          {
+            type: 'category',
+            axisTick: { show: true },
+            data: histogramData.xAxisData,
+            axisLabel: {
+              interval: 0,
+              rotate: rotateX
+            }
+          }
+        ],
+        yAxis: [{type: 'value'}],
+        series: histogramData.series
+      };
+      option && myChart.setOption(option);
+    },
     gotoMap(latitude,longitude){
       this.data.dialogMapVisible = true;
       this.showMap(latitude,longitude);
@@ -330,6 +504,8 @@ export default {
   setup() {
     const route = useRoute()
     const data = reactive({
+      minerRewardTitle:"",
+      loadMinerBalance:false,
       query: {
         minerAddress: ''
       },
