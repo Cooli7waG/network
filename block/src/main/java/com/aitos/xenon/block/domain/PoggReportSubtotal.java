@@ -14,4 +14,6 @@ public class PoggReportSubtotal extends BaseModel {
     private Long epoch;
 
     private int recordNum;
+
+    private Long totalEnergyGeneration;
 }

@@ -68,7 +68,7 @@ public class PoggRewardTest {
         System.out.println("------------------------------------------------");
         //获得有资格的miner
         List<PoggReportSubtotalStatistics> qualifiedMinerList = subtotalStatisticsList.parallelStream()
-                .filter(item ->  processAwardEligibility(poggCommit.getPrivateKey(), item.getAddress(), item.getTotal()))
+                .filter(item ->  processAwardEligibility(poggCommit.getPrivateKey(), item.getAddress(), item.getTotalRecord()))
                 .collect(Collectors.toList());
         if(qualifiedMinerList.size()==0){
             System.out.println("qualifiedMinerList.size()==0");
@@ -86,7 +86,7 @@ public class PoggRewardTest {
 
         //计算每个miner获得的奖励
         List<PoggRewardDetail> rewards=subtotalStatisticsList.stream().map(item->{
-            BigDecimal awardNumber = rewardCalculation(systemConfig,totalRewardWeight, item.getMinerType(), item.getTotal());
+            BigDecimal awardNumber = rewardCalculation(systemConfig,totalRewardWeight, item.getMinerType(), item.getTotalRecord());
             PoggRewardDetail poggRewardDetail=new PoggRewardDetail();
             poggRewardDetail.setAddress(item.getAddress());
             poggRewardDetail.setOwnerAddress(item.getOwnerAddress());
@@ -146,7 +146,7 @@ public class PoggRewardTest {
      */
     public BigDecimal calTotalRewardWeight(SystemConfig systemConfig,List<PoggReportSubtotalStatistics> qualifiedMinerList){
         BigDecimal totalRewardWeight = qualifiedMinerList.stream()
-                .map(item->BigDecimal.valueOf(calCoefficient(systemConfig,item.getMinerType())*item.getTotal())).reduce(BigDecimal::add)
+                .map(item->BigDecimal.valueOf(calCoefficient(systemConfig,item.getMinerType())*item.getTotalRecord())).reduce(BigDecimal::add)
                 .orElse(BigDecimal.ZERO);
         return totalRewardWeight;
     }
