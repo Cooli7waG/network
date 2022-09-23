@@ -1,10 +1,13 @@
 package com.aitos.xenon.device.api.domain.dto;
 
 import com.aitos.xenon.core.model.BaseModel;
+import com.alibaba.fastjson.annotation.JSONType;
 import lombok.Data;
 
 @Data
-public class DeviceInfoDto extends BaseModel {
+@JSONType(orders = {"version","energy","capabilities","power"
+        ,"deviceModel","deviceSerialNum"},ignores = {"address"})
+public class DeviceInfoDto  {
 
     private String address;
 
@@ -17,7 +20,7 @@ public class DeviceInfoDto extends BaseModel {
     /**
      * 设备能力
      */
-    private String capabilities;
+    private Integer capabilities;
     /**
      * 装机容量
      */

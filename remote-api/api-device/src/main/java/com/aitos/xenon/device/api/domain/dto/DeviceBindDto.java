@@ -1,10 +1,14 @@
 package com.aitos.xenon.device.api.domain.dto;
 
+import com.alibaba.fastjson.annotation.JSONType;
 import lombok.Data;
 
 import java.math.BigInteger;
 
 @Data
+@JSONType(orders = {"version","minerAddress","ownerAddress","location"
+        ,"minerInfo","stakingFee","minerSignature","payerAddress","payerSignature"},
+        ignores = {"ownerSignature","deviceId","txHash","txData"})
 public class DeviceBindDto {
     private Integer version;
     /**
@@ -20,7 +24,7 @@ public class DeviceBindDto {
      */
     private String payerAddress;
 
-    private DeviceLocationDto  location;
+    private DeviceLocationDto location;
 
     private DeviceInfoDto minerInfo;
 
@@ -33,10 +37,6 @@ public class DeviceBindDto {
      *staking_fee及以上内容的Miner签名
      */
     private String minerSignature;
-    /**
-     *staking_fee及以上内容的Owner签名
-     */
-    private String ownerSignature;
     /**
      *staking_fee及以上内容的Payer签名
      */

@@ -1,10 +1,13 @@
 package com.aitos.xenon.device.api.domain.dto;
 
 import com.aitos.xenon.core.model.BaseModel;
+import com.alibaba.fastjson.annotation.JSONType;
 import lombok.Data;
 
 @Data
-public class DeviceLocationDto extends BaseModel {
+@JSONType(orders = {"version","locationType","latitude","longitude"
+        ,"h3index"})
+public class DeviceLocationDto {
 
     private Integer version;
 
@@ -15,9 +18,10 @@ public class DeviceLocationDto extends BaseModel {
     /**
      *
      */
-    private Double latitude;
+    private String latitude;
 
-    private Double longitude;
+    private String longitude;
 
     private Long h3index;
 }
+
