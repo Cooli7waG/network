@@ -104,9 +104,9 @@
 
 <script>
 import {getMetaMaskLoginUserAddress} from "@/api/metamask_utils";
-import {statisticsByDateTimeRange, statisticsRewardByDay} from "@/api/walletDashboard";
+import {statisticsByDateTimeRange, statisticsRewardByDay,statisticsRewardsByOwnerAddress} from "@/api/walletDashboard";
 import {deviceList} from "@/api/miners";
-import {findByAddress} from "@/api/account";
+import {accountInfo} from "@/api/account";
 import {getAddress, getTokenFixed} from "@/utils/data_format";
 import {toEther} from "@/utils/utils";
 import * as echarts from 'echarts';
@@ -258,7 +258,7 @@ export default {
         return;
       }
       this.loadBalance = true;
-      findByAddress(userAddress).then((result)=>{
+      accountInfo(userAddress).then((result)=>{
         if(result.code == 0){
           this.user.earningMint = result.data.earningMint.toLocaleString();
           const fixed = getTokenFixed(result.data.balance);
@@ -478,46 +478,29 @@ export default {
       if (owner == undefined || owner == null) {
         return;
       }
+      let time = this.timeFormat(day);
       const params = {
-        offset: 1,
-        limit: this.miner.total,
-        address: owner
+        "ownerAddress": owner,
+        "startTime": time.startTime,
+        "endTime": time.endTime
       }
-      deviceList(params).then((result) => {
-        this.miner.total = result.data.total
-        params.limit = result.data.total
-        deviceList(params).then(async (result) => {
-          this.RewardPercentageTitle = "Miner Reward Percentage - Last "+day+" Days"
-          this.miner.total = result.data.total
-          this.loadPie = true;
-          let time = this.timeFormat(day);
-          const pieData = {
-            legendData: [],
-            series: []
+      statisticsRewardsByOwnerAddress(params).then(result => {
+        this.RewardPercentageTitle = "Miner Reward Percentage - Last "+day+" Days"
+        const pieData = {
+          legendData: [],
+          series: []
+        }
+        for (let item in result.data) {
+          pieData.legendData.push(result.data[item].address)
+          const series = {
+            name: result.data[item].address,
+            value: result.data[item].reward
           }
-          for (const item of result.data.items) {
-            const data = {
-              "address": item.address,
-              "startTime": time.startTime,
-              "endTime": time.endTime
-            }
-            pieData.legendData.push(item.address)
-            await statisticsByDateTimeRange(data).then(rsp => {
-              if (rsp.code == 0) {
-                const series = {
-                  name: item.address,
-                  value: rsp.data,
-                }
-                for (let index = 0; index < rsp.data.length; index++) {
-                  series.data.push(rsp.data[index].reward);
-                }
-                pieData.series.push(series)
-              }
-            })
-          }
-          this.drawPie(pieData);
-          this.loadPie = false;
-        })
+          pieData.series.push(series)
+        }
+        this.drawPie(pieData);
+        console.log("pieData:"+JSON.stringify(pieData))
+        this.loadPie = false;
       })
     },
     drawPie(dataPie){

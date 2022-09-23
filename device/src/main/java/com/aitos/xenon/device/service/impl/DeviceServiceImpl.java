@@ -245,6 +245,7 @@ public class DeviceServiceImpl implements DeviceService {
                     MINER_LOCATION_CACHE.put(deviceVo.getAddress(),location);
                 }
             }
+            log.info("更新Miner位置信息:{}",JSON.toJSONString(MINER_LOCATION_CACHE));
             MINER_LOCATION_CACHE_EXPIRING = l + (2*60*1000);
         }
         return MINER_LOCATION_CACHE;

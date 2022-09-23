@@ -85,13 +85,13 @@
           </div>
           <!-- 菜单项 -->
           <div style="margin-top: 25px">
-            <el-row class="login_select btn_xenon" @click="gotoApplyGameMiner">
+            <el-row class="login_select btn_xenon" @click="gotoRouter('/wallet/apply')">
               <el-col :span="24">
                 <el-icon><Promotion /></el-icon>
                 <span style="margin-left: 5px"><b> Request a GameMiner</b></span>
               </el-col>
             </el-row>
-            <el-row class="login_select btn_xenon" @click="gotoBrowser">
+            <el-row class="login_select btn_xenon" @click="gotoRouter('/')">
               <el-col :span="24">
                 <i class="iconfont icon-liulanqi" style="color: black"></i>
                 <span style="margin-left: 5px"><b> Arkreen Explorer</b></span>
@@ -297,31 +297,9 @@ export default {
       }
       return path;
     },
-    gotoMyMiner() {
+    gotoRouter(router){
       this.closeDrawer()
-      this.$router.push("/wallet/miners")
-    },
-    gotoBrowser() {
-      this.closeDrawer()
-      this.$router.push("/")
-    },
-    gotoApplyGameMiner(){
-      this.$router.push("/wallet/apply");
-      this.closeDrawer();
-    },
-    Logout() {
-      this.$confirm('Are you sure want to logout?', 'Tips', {
-        confirmButtonText: 'OK',
-        cancelButtonText: 'Cancel',
-        type: 'warning'
-      }).then(() => {
-        removeMetaMaskUserAddress()
-        this.closeDrawer()
-        this.userAddress = undefined;
-        this.$router.push("/wallet?t="+new Date().getMilliseconds());
-      }).catch(() => {
-
-      });
+      this.$router.push(router)
     },
     getInfo() {
       this.userAddress = getMetaMaskLoginUserAddress();
@@ -355,6 +333,20 @@ export default {
         this.dialogVisible = true;
         this.closeDrawer();
       }
+    },
+    Logout() {
+      this.$confirm('Are you sure want to logout?', 'Tips', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        removeMetaMaskUserAddress()
+        this.closeDrawer()
+        this.userAddress = undefined;
+        this.$router.push("/wallet?t="+new Date().getMilliseconds());
+      }).catch(() => {
+
+      });
     },
     async loginMetaMask() {
       this.loading = true;

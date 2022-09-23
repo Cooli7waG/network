@@ -15,3 +15,11 @@ export function statisticsByDateTimeRange(data){
         data:data
     })
 }
+
+export function statisticsRewardsByOwnerAddress(data){
+    return request({
+        url: '/account/accountreward/statisticsRewardsByOwnerAddress',
+        method: 'post',
+        data:data
+    })
+}
