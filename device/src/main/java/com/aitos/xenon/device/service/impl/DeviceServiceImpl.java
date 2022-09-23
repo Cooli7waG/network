@@ -56,6 +56,7 @@ public class DeviceServiceImpl implements DeviceService {
     private RemoteAccountRewardService remoteAccountRewardService;
 
     private static HashMap MINER_LOCATION_CACHE = new HashMap();
+    private static long MINER_LOCATION_CACHE_EXPIRING = 0L;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -233,16 +234,18 @@ public class DeviceServiceImpl implements DeviceService {
      */
     @Override
     public HashMap getMinerLocation() {
-        if(MINER_LOCATION_CACHE.size()==0){
+        long l = System.currentTimeMillis();
+        if(MINER_LOCATION_CACHE.size()==0 || l>MINER_LOCATION_CACHE_EXPIRING){
             List<DeviceVo> deviceList = deviceMapper.getAllMinerLocation();
             for (DeviceVo deviceVo : deviceList) {
-                Location location = new Location();
-                location.setLatitude(deviceVo.getLatitude());
-                location.setLongitude(deviceVo.getLongitude());
                 if(deviceVo.getLatitude()!=null && deviceVo.getLongitude()!=null){
+                    Location location = new Location();
+                    location.setLatitude(deviceVo.getLatitude());
+                    location.setLongitude(deviceVo.getLongitude());
                     MINER_LOCATION_CACHE.put(deviceVo.getAddress(),location);
                 }
             }
+            MINER_LOCATION_CACHE_EXPIRING = l + (2*60*1000);
         }
         return MINER_LOCATION_CACHE;
     }
