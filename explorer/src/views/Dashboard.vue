@@ -403,7 +403,11 @@ export default {
       loadBlockchainstats()
       loadMinerStatistics()
       initMap(data.center,data.zoom);
-      intervalLet();
+      data.timer = window.setInterval(() => {
+        loadBlockchainstats()
+        loadMinerStatistics()
+        initMap(data.center,data.zoom);
+      }, 300000)
     })
     onDeactivated(()=>{
       //离开当前组件的生命周期执行的方法

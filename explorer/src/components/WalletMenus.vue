@@ -11,7 +11,8 @@
           active-text-color="#ffd04b"
           :router="true">
         <div style="height: 59px;line-height: 59px;padding-left: 15px">
-          <img src="../assets/logo-arkreen.png" style="width: 40px;height: 40px;margin-top: 8px;margin-inline-end: 15px;">
+          <img src="../assets/logo-arkreen.png"
+               style="width: 40px;height: 40px;margin-top: 8px;margin-inline-end: 15px;">
         </div>
         <el-menu-item index="/wallet">{{ $t('menus.dashboard') }}</el-menu-item>
         <el-menu-item index="/wallet/miners">{{ $t('menus.miners') }}</el-menu-item>
@@ -38,7 +39,8 @@
               <a style="cursor: pointer">My Wallet</a>
             </li>
           </ul>
-          <span style="cursor: pointer" @click="copyAddress">{{ userAddress == undefined ? "" : formatAddress(userAddress) }}</span>
+          <span style="cursor: pointer"
+                @click="copyAddress">{{ userAddress == undefined ? "" : formatAddress(userAddress) }}</span>
         </header>
         <div style="height: 1px;width: 100%;background-color: silver"></div>
         <!-- 未登录 -->
@@ -69,14 +71,17 @@
             <el-row>
               <el-col :span="11" class="balance-div">
                 <div><span style="color: #72767b;font-size: 12px">Mining Reward</span></div>
-                <div><span style="font-size: 18px">{{Number(Number(user.earningMint).toFixed(3)).toLocaleString()}}</span></div>
+                <div><span
+                    style="font-size: 18px">{{ Number(Number(user.earningMint).toFixed(3)).toLocaleString() }}</span>
+                </div>
               </el-col>
               <el-col :span="2" class="balance-div">
 
               </el-col>
               <el-col :span="11" class="balance-div">
                 <div><span style="color: #72767b;font-size: 12px">AKRE Balance</span></div>
-                <div><span style="font-size: 18px">{{Number(Number(user.balance).toFixed(3)).toLocaleString()}}</span></div>
+                <div><span style="font-size: 18px">{{ Number(Number(user.balance).toFixed(3)).toLocaleString() }}</span>
+                </div>
               </el-col>
               <el-col :span="24" class="transfer-btn" @click="transferBalance">
                 <span style="font-size: 16px;line-height: 30px">Withdraw Mining Reward</span>
@@ -87,7 +92,9 @@
           <div style="margin-top: 25px">
             <el-row class="login_select btn_xenon" @click="gotoRouter('/wallet/apply')">
               <el-col :span="24">
-                <el-icon><Promotion /></el-icon>
+                <el-icon>
+                  <Promotion/>
+                </el-icon>
                 <span style="margin-left: 5px"><b> Request a GameMiner</b></span>
               </el-col>
             </el-row>
@@ -99,7 +106,9 @@
             </el-row>
             <el-row class="login_select btn_xenon" @click="addAkreToken">
               <el-col :span="24">
-                <el-icon><FolderAdd /></el-icon>
+                <el-icon>
+                  <FolderAdd/>
+                </el-icon>
                 <span style="margin-left: 10px"><b>Add Token to MetaMask</b></span>
               </el-col>
             </el-row>
@@ -116,7 +125,7 @@
   </div>
   <!-- 用户未登录 -->
   <div v-if="userAddress==undefined" class="notLogin">
-    <el-empty description="Please login to your wallet first" >
+    <el-empty description="Please login to your wallet first">
       <el-button type="primary" @click="drawer = true">Login Wallet</el-button>
     </el-empty>
   </div>
@@ -129,7 +138,8 @@
       <img src="../assets/img/acb78eda-89b9-4e9d-a20d-46ba09b8e612.png" style="width: 200px;">
     </div>
     <div style="margin-top: 15px;font-weight: bold">
-      By connecting your wallet and using ARKREEN,you agree to our <span class="privacySpan">Terms of Service</span> and <span class="privacySpan">Privacy Policy</span>
+      By connecting your wallet and using ARKREEN,you agree to our <span class="privacySpan">Terms of Service</span> and
+      <span class="privacySpan">Privacy Policy</span>
     </div>
     <template #footer>
       <span class="dialog-footer">
@@ -141,7 +151,7 @@
 </template>
 
 <script>
-import {formatString, getTokenFixed} from "@/utils/data_format";
+import {formatString} from "@/utils/data_format";
 import {
   addToken, personalSign,
   getMetaMaskLoginUserAddress,
@@ -149,9 +159,10 @@ import {
   removeMetaMaskUserAddress, switchNetwork, setPrivacyPolicy
 } from "@/api/metamask_utils";
 import {accountInfo, withdraw} from "@/api/account";
-import {toEther} from "@/utils/utils";
+import {hexToBytes} from "@/utils/utils";
 import MetaMaskOnboarding from '@metamask/onboarding';
 import {balanceOf, etherWithdraw, getTransactionStatus} from '@/api/contract_utils'
+import bs58 from 'bs58'
 
 export default {
   name: 'WalletMenus',
@@ -160,17 +171,17 @@ export default {
   },
   data() {
     return {
-      loading:false,
-      dialogVisible:false,
+      loading: false,
+      dialogVisible: false,
       drawer: false,
       direction: 'rtl',
       isShow: true,
       loadBalance: false,
       userAddress: undefined,
       isInit: false,
-      user:{
-        earningMint:0,
-        balance:0
+      user: {
+        earningMint: 0,
+        balance: 'loading...'
       }
     }
   },
@@ -180,47 +191,56 @@ export default {
   },
   methods: {
     async transferBalance() {
-      //this.$message.warning("coming soon...")
       let balance = await balanceOf()
-      console.log("balanceOf Result:" +balance)
-      //this.handleWithdraw();
+      console.log("balanceOf Result:" + balance)
+      this.handleWithdraw();
     },
-    handleWithdraw(){
+    handleWithdraw() {
       this.loadBalance = true;
       accountInfo(getMetaMaskLoginUserAddress()).then(async (result) => {
         if (result.code == 0) {
           const form = await this.handlePersonalSign(result.data.earningMint);
-          console.log("withdraw request data:"+JSON.stringify(form))
+          console.log("withdraw request data:" + JSON.stringify(form))
           withdraw(form).then(async rsp => {
             console.log(rsp)
-            if(rsp.code == 0){
-              let metaTx = rsp.metaTx;
-              let contract = rsp.contract;
-              console.log("withdraw result --> metaTx:"+metaTx+"  contract:"+contract)
-              //await etherWithdraw(value, nonce, v, r, s)
-            }else {
-              const value = 1000;
-              const nonce = 1;
-              const v = 28
-              const r = '0x2b41351720b54e91ce0c2fad28f7a3de0414638291f6fe16ef4b0ea59604f444';
-              const s = '0x26d0e211e02fdaef70bbc1fefdc4f3434de7b80b8cb079a776ccfe406f3e659b';
-              //await withdrawWithContract(100,0,27,'0x0fce78e5fa0cb9462fb96ad193cc26f4c3338ad61d84afdde48712042a97bdd3','0x098694d0a11ac16f9dbba46c7cea58a956183c180ed7abab3b06367469907c3c')
-              //await withdrawWithContract(1, 188, 123123, 123213, 123213);
-              let hash = await etherWithdraw(value, nonce, v, r, s)
-              console.info("withdraw hash Result hash:"+hash)
-              this.$message.info("The withdraw has been submitted. Please wait...")
-              let status = await getTransactionStatus(hash);
-              console.log('Transaction Status: ' + status);
-              if(status==0){
-                this.$message.error("withdraw failed")
-              }else {
-                this.$message.success("withdraw success,Please check your wallet!")
+            if (rsp.code == 0) {
+              let value = rsp.originData.value;
+              let nonce = rsp.originData.nonce;
+              let v = rsp.sig.v;
+              let r = rsp.sig.r;
+              let s = rsp.sig.s;
+              console.log("withdraw server result:" + JSON.stringify(rsp.data))
+              try {
+                let hash = await etherWithdraw(value, nonce, v, r, s)
+                console.info("withdraw hash Result hash:" + hash)
+                this.$message.info("The withdraw has been submitted. Please wait...")
+                let status = await getTransactionStatus(hash);
+                console.log('Transaction Status: ' + status);
+                if (status == 0) {
+                  this.$message.error("withdraw failed")
+                } else {
+                  this.$message.success("withdraw success,Please check your wallet!")
+                  this.getInfo();
+                  this.loadBalance = true;
+                  await this.loadFindByAddress();
+                }
+              } catch (err) {
+                let str = 'Error: user rejected transaction';
+                if (err.toString().indexOf(str) != -1) {
+                  this.$message.warning("user rejected transaction")
+                }
+                console.log(err)
               }
+            } else {
+              this.loadBalance = false;
+              this.$message.error("withdraw failed:" + rsp.msg)
             }
           })
+        } else {
+          this.loadBalance = false;
+          this.$message.error("Failed to query the latest reward data,Please try again!")
         }
-        this.loadBalance = false;
-      }).catch((err) =>{
+      }).catch((err) => {
         console.log(err);
         this.loadBalance = false;
       });
@@ -231,33 +251,33 @@ export default {
         amount: amount
       }
       let message = JSON.stringify(form);
-      console.log("Withdraw Personal Sign Message:"+message)
+      console.log("Withdraw Personal Sign Message:" + message)
       const requestSig = await personalSign(message);
-      console.log("Withdraw Personal Sign Result:" + requestSig)
-      form.requestSig = requestSig
+      let str = requestSig.substring(2);
+      console.log("Withdraw Personal Sign Result:" + str)
+      form.requestSig = bs58.encode(hexToBytes(str))
       return form;
     },
-    loadFindByAddress(){
-      if(!this.isInit){
+    async loadFindByAddress() {
+      if (!this.isInit) {
         this.loadBalance = true;
       }
       const userAddress = getMetaMaskLoginUserAddress();
-      if(userAddress == undefined || userAddress == null){
+      if (userAddress == undefined || userAddress == null) {
         return;
       }
-      accountInfo(getMetaMaskLoginUserAddress()).then((result)=>{
-        if(result.code == 0){
+      accountInfo(getMetaMaskLoginUserAddress()).then((result) => {
+        if (result.code == 0) {
           this.user.earningMint = result.data.earningMint.toLocaleString();
-          const fixed = getTokenFixed(result.data.balance);
-          this.user.balance = toEther(result.data.balance,fixed);
           this.isInit = true
         }
         this.loadBalance = false;
-      }).catch((err) =>{
+      }).catch((err) => {
         console.log(err);
         this.loadBalance = false;
       });
-
+      let balance = await balanceOf()
+      this.user.balance = balance / Math.pow(10, 18)
     },
     copyAddress() {
       const input = document.createElement('input')
@@ -297,7 +317,7 @@ export default {
       }
       return path;
     },
-    gotoRouter(router){
+    gotoRouter(router) {
       this.closeDrawer()
       this.$router.push(router)
     },
@@ -306,9 +326,9 @@ export default {
     },
     async addAkreToken() {
       const result = await addToken();
-      if(result){
+      if (result) {
         this.$message.success("success!");
-      }else {
+      } else {
         this.$message.error("failed!");
       }
     },
@@ -317,19 +337,19 @@ export default {
     },
     async loginApp() {
       // 先判断用户是否安装MetaMask
-      if(!MetaMaskOnboarding.isMetaMaskInstalled()){
+      if (!MetaMaskOnboarding.isMetaMaskInstalled()) {
         this.$message.error(this.$t('common.msg.metaMaskNotFound'));
         return;
       }
       //
-      if(!await switchNetwork("0x13881")){
+      if (!await switchNetwork("0x13881")) {
         this.$message.error(this.$t('common.msg.metaMaskNetWorkNotFound'));
         return;
       }
       //首次使用弹出确认对话框
-      if(isPrivacyPolicy()){
+      if (isPrivacyPolicy()) {
         await this.loginMetaMask();
-      }else {
+      } else {
         this.dialogVisible = true;
         this.closeDrawer();
       }
@@ -343,7 +363,7 @@ export default {
         removeMetaMaskUserAddress()
         this.closeDrawer()
         this.userAddress = undefined;
-        this.$router.push("/wallet?t="+new Date().getMilliseconds());
+        this.$router.push("/wallet?t=" + new Date().getMilliseconds());
       }).catch(() => {
 
       });
@@ -353,7 +373,7 @@ export default {
       setPrivacyPolicy(true);
       this.dialogVisible = false;
       if (this.userAddress != undefined) {
-        this.$router.push("/wallet?t="+new Date().getMilliseconds());
+        this.$router.push("/wallet?t=" + new Date().getMilliseconds());
       }
       try {
         if (window.ethereum) {
@@ -361,11 +381,11 @@ export default {
           this.closeDrawer();
           let path = this.$route.path;
           if (path == "/wallet") {
-            this.$router.push("/wallet?t="+new Date().getMilliseconds());
+            this.$router.push("/wallet?t=" + new Date().getMilliseconds());
           } else if (path.startsWith("/wallet/claim/")) {
             this.$router.go(0);
           } else {
-            this.$router.push("/wallet?t="+new Date().getMilliseconds());
+            this.$router.push("/wallet?t=" + new Date().getMilliseconds());
           }
         } else {
           this.$message.error(this.$t('common.msg.metaMaskNotFound'));
@@ -377,15 +397,15 @@ export default {
       }
     },
     // 监听到用户退出登录时直接返回首页
-    async listenMetaMask(){
+    async listenMetaMask() {
       // 先判断用户是否安装MetaMask
-      if(MetaMaskOnboarding.isMetaMaskInstalled()){
+      if (MetaMaskOnboarding.isMetaMaskInstalled()) {
         // eslint-disable-next-line no-undef
         ethereum.on('accountsChanged', () => {
-          if(this.userAddress != undefined){
+          if (this.userAddress != undefined) {
             removeMetaMaskUserAddress();
             //this.$router.push("/wallet");
-            this.$router.push("/wallet?t="+new Date().getMilliseconds());
+            this.$router.push("/wallet?t=" + new Date().getMilliseconds());
           }
         });
       }
@@ -394,37 +414,43 @@ export default {
 }
 </script>
 <style scoped>
-.notLogin{
+.notLogin {
   width: 100%;
   height: 850px;
   background-color: #FFFFFF;
 }
-.balance-div{
+
+.balance-div {
   height: 80px;
   text-align: center;
   padding-top: 15px;
 }
-.transfer-btn{
+
+.transfer-btn {
   height: 30px;
   text-align: center;
   background-color: #ffd04b;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
   cursor: pointer;
-  user-select:none;
+  user-select: none;
 }
-.privacySpan{
+
+.privacySpan {
   color: #409EFF;
   cursor: pointer
 }
+
 .btn_xenon {
   text-align: left;
   cursor: pointer;
   background-color: aliceblue !important;
 }
+
 .btn_xenon:hover {
   background-color: rgb(83, 168, 255) !important;
 }
+
 .login_select {
   height: 45px;
   line-height: 45px;
@@ -518,12 +544,15 @@ a {
   color: #000000;
   font-weight: bold;
 }
+
 li {
   text-align: left;
 }
+
 ul {
   padding-inline-start: 2px !important;
 }
+
 ul.box > li.user {
   width: 150px;
   height: 20px;
@@ -571,10 +600,12 @@ ul.box > li > .down-menu > li:hover {
   background-color: #545c64;
   border-bottom: solid 1px var(--el-menu-border-color);
 }
+
 .el-dropdown-link {
   cursor: pointer;
   color: #409EFF;
 }
+
 .el-icon-arrow-down {
   font-size: 12px;
 }

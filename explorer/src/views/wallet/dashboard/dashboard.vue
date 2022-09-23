@@ -104,12 +104,12 @@
 
 <script>
 import {getMetaMaskLoginUserAddress} from "@/api/metamask_utils";
-import {statisticsByDateTimeRange, statisticsRewardByDay,statisticsRewardsByOwnerAddress} from "@/api/walletDashboard";
+import {statisticsRewardByDay,statisticsRewardsByOwnerAddress} from "@/api/walletDashboard";
 import {deviceList} from "@/api/miners";
 import {accountInfo} from "@/api/account";
-import {getAddress, getTokenFixed} from "@/utils/data_format";
-import {toEther} from "@/utils/utils";
+import {getAddress} from "@/utils/data_format";
 import * as echarts from 'echarts';
+import {balanceOf} from "@/api/contract_utils";
 
 export default {
   props: {
@@ -133,7 +133,7 @@ export default {
         list:undefined
       },
       user : {
-        balance:0,
+        balance:'loading...',
         earningMint:0
       }
     }
@@ -252,24 +252,25 @@ export default {
         console.log(err);
       });
     },
-    loadFindByAddress(){
+    async loadFindByAddress() {
       const userAddress = getMetaMaskLoginUserAddress();
-      if(userAddress == undefined || userAddress == null){
+      if (userAddress == undefined || userAddress == null) {
         return;
       }
       this.loadBalance = true;
-      accountInfo(userAddress).then((result)=>{
-        if(result.code == 0){
+      accountInfo(userAddress).then((result) => {
+        if (result.code == 0) {
           this.user.earningMint = result.data.earningMint.toLocaleString();
-          const fixed = getTokenFixed(result.data.balance);
-          this.user.balance = toEther(result.data.balance,fixed);
         }
         this.handleGetMinerCount(10);
         this.loadBalance = false;
-      }).catch((err) =>{
+      }).catch((err) => {
         console.log(err);
         this.loadBalance = false;
       });
+      let balance = await balanceOf()
+      let b = balance/Math.pow(10,18)
+      this.user.balance = Number(b).toFixed(3);
     },
     drawHistogram(data,rotateX){
       const labels = [];
@@ -499,7 +500,6 @@ export default {
           pieData.series.push(series)
         }
         this.drawPie(pieData);
-        console.log("pieData:"+JSON.stringify(pieData))
         this.loadPie = false;
       })
     },
