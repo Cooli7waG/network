@@ -1,10 +1,7 @@
 package com.aitos.xenon.account.service.impl;
 
 import com.aitos.xenon.account.api.domain.dto.AccountRewardSearchDto;
-import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsDayVo;
-import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsVo;
-import com.aitos.xenon.account.api.domain.vo.AccountRewardVo;
-import com.aitos.xenon.account.api.domain.vo.AccountVo;
+import com.aitos.xenon.account.api.domain.vo.*;
 import com.aitos.xenon.account.domain.AccountReward;
 import com.aitos.xenon.account.mapper.AccountRewardMapper;
 import com.aitos.xenon.account.service.AccountRewardService;
@@ -48,6 +45,11 @@ public class AccountRewardServiceImpl implements AccountRewardService {
     @Override
     public List<AccountRewardStatisticsDayVo> statisticsRewardByDay(String address, LocalDateTime startTime, LocalDateTime endTime) {
         return accountRewardMapper.statisticsRewardByDay(address,startTime,endTime);
+    }
+
+    @Override
+    public List<AccountRewardStatisticsByOwnerVo> statisticsRewardsByOwnerAddress(String ownerAddress, LocalDateTime startTime, LocalDateTime endTime) {
+        return accountRewardMapper.statisticsRewardsByOwnerAddress(ownerAddress,startTime,endTime);
     }
 
 

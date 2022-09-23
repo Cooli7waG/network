@@ -1,6 +1,7 @@
 package com.aitos.xenon.account.service;
 
 import com.aitos.xenon.account.api.domain.dto.AccountRewardSearchDto;
+import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsByOwnerVo;
 import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsDayVo;
 import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsVo;
 import com.aitos.xenon.account.api.domain.vo.AccountRewardVo;
@@ -41,4 +42,13 @@ public interface AccountRewardService {
      * @return
      */
     List<AccountRewardStatisticsDayVo> statisticsRewardByDay(String address, LocalDateTime startTime, LocalDateTime endTime);
+
+    /**
+     * 根据owner地址统计每个miner奖励
+     * @param ownerAddress
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    List<AccountRewardStatisticsByOwnerVo> statisticsRewardsByOwnerAddress(String ownerAddress, LocalDateTime startTime, LocalDateTime endTime);
 }

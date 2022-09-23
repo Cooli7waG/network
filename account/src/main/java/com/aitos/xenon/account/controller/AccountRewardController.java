@@ -3,6 +3,7 @@ package com.aitos.xenon.account.controller;
 import com.aitos.xenon.account.api.domain.dto.AccountRewardSearchDto;
 import com.aitos.xenon.account.api.domain.dto.AccountRewardStatisticsDayDto;
 import com.aitos.xenon.account.api.domain.dto.AccountRewardStatisticsDto;
+import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsByOwnerVo;
 import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsDayVo;
 import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsVo;
 import com.aitos.xenon.account.api.domain.vo.AccountRewardVo;
@@ -48,6 +49,11 @@ public class AccountRewardController {
         return Result.ok(poggRewardMinerPage);
     }
 
+    @PostMapping("/statisticsRewardsByOwnerAddress")
+    public Result<List<AccountRewardStatisticsByOwnerVo>> statisticsRewardsByOwnerAddress(@RequestBody AccountRewardStatisticsDto accountRewardStatisticsDto){
+        List<AccountRewardStatisticsByOwnerVo> list=accountRewardService.statisticsRewardsByOwnerAddress(accountRewardStatisticsDto.getOwnerAddress(), accountRewardStatisticsDto.getStartTime(), accountRewardStatisticsDto.getEndTime());
+        return Result.ok(list);
+    }
 
     /**
      * 按天统计每天的奖励数

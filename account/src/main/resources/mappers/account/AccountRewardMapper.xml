@@ -34,4 +34,10 @@
         group by date_format(create_time,'%Y-%m-%d')
         order by dataDate asc
     </select>
+    <select id="statisticsRewardsByOwnerAddress"
+            resultType="com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsByOwnerVo">
+        SELECT address ,SUM(amount) as reward FROM `account_reward`
+        where owner_address =#{ownerAddress} and create_time between #{startTime} and #{endTime}
+        group by address
+    </select>
 </mapper>
