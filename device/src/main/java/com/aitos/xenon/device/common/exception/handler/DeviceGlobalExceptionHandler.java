@@ -7,6 +7,8 @@ import com.aitos.xenon.core.exceptions.account.PayerAccountNotEnoughException;
 import com.aitos.xenon.core.exceptions.account.PayerAccountNotExistException;
 import com.aitos.xenon.core.exceptions.device.DeviceExistedException;
 import com.aitos.xenon.core.model.Result;
+import com.aitos.xenon.device.common.exception.MinerSingleNumberException;
+import com.aitos.xenon.device.common.exception.MinerTotalNumberException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -71,5 +73,31 @@ public class DeviceGlobalExceptionHandler
                                                       HttpServletRequest request)
     {
         return Result.failed(ApiStatus.BUSINESS_PAYER_ACCOUNT_NOT_ENOUGH);
+    }
+
+    /**
+     * miner 总量超出 限制
+     * @param e
+     * @param request
+     * @return
+     */
+    @ExceptionHandler(MinerTotalNumberException.class)
+    public Result handleMinerTotalNumberException(PayerAccountNotEnoughException e,
+                                                      HttpServletRequest request)
+    {
+        return Result.failed(ApiStatus.BUSINESS_DEVICE_GMAE_MINER_TOTAL_NUMBER);
+    }
+
+    /**
+     * 单个用户可申请miner量超出限制
+     * @param e
+     * @param request
+     * @return
+     */
+    @ExceptionHandler(MinerSingleNumberException.class)
+    public Result handleMinerSingleNumberException(PayerAccountNotEnoughException e,
+                                                  HttpServletRequest request)
+    {
+        return Result.failed(ApiStatus.BUSINESS_DEVICE_GMAE_MINER_SINGLE_NUMBER);
     }
 }

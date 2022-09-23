@@ -51,4 +51,7 @@ public interface DeviceMapper {
      */
     List<DeviceVo> getMinerListByOwner(@Param("address")String address);
 
+    int countByMinerType(@Param("minerType")int minerType);
+
+    int countByAddressAndMinerType(@Param("ownerAddress")String ownerAddress,@Param("minerType") int minerType);
 }

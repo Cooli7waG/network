@@ -43,7 +43,7 @@ public class AirDropRecord extends BaseModel {
     /**
      * 设备能力
      */
-    private String capabilities;
+    private Integer capabilities;
     /**
      * 设备型号
      */

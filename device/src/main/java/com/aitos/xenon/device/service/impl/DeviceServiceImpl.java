@@ -74,7 +74,6 @@ public class DeviceServiceImpl implements DeviceService {
         accountRegisterDto.setNonce(0L);
         Result result=remoteAccountService.register(accountRegisterDto);
         if(result.getCode()!= ApiStatus.SUCCESS.getCode()){
-
            throw new DeviceExistedException("设备账户已经存在");
         }
 
@@ -127,11 +126,11 @@ public class DeviceServiceImpl implements DeviceService {
         device.setAddress(deviceBindDto.getMinerAddress());
         device.setOwnerAddress(deviceBindDto.getOwnerAddress());
 
-        DeviceLocationDto deviceLocationDto=deviceBindDto.getLocation();
-        device.setLocationType(deviceLocationDto.getLocationType());
-        device.setLatitude(deviceLocationDto.getLatitude());
-        device.setLongitude(deviceLocationDto.getLongitude());
-        device.setH3index(deviceLocationDto.getH3index());
+        DeviceLocationDto location = deviceBindDto.getLocation();
+        device.setLocationType(location.getLocationType());
+        device.setLatitude(Double.valueOf(location.getLatitude()));
+        device.setLongitude(Double.valueOf(location.getLongitude()));
+        device.setH3index(location.getH3index());
 
         DeviceInfoDto minerInfo = deviceBindDto.getMinerInfo();
         device.setEnergy(minerInfo.getEnergy());
@@ -142,6 +141,12 @@ public class DeviceServiceImpl implements DeviceService {
         device.setUpdateTime(LocalDateTime.now());
         device.setStatus(BusinessConstants.DeviceStatus.BOUND);
         deviceMapper.bind(device);
+        //更新缓存的miner地理位置
+        try{
+            this.getMinerLocation();
+        }catch (Exception e){
+            log.error("更新地理位置失败：{}",e.getMessage());
+        }
 
         Result<Long> blockVoResult= remoteBlockService.getBlockHeight();
         if(blockVoResult.getCode()!= ApiStatus.SUCCESS.getCode()){
@@ -260,5 +265,15 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public List<DeviceVo> getMinerListByOwner(String address) {
         return deviceMapper.getMinerListByOwner(address);
+    }
+
+    @Override
+    public int countByMinerType(int minerType) {
+        return deviceMapper.countByMinerType(minerType);
+    }
+
+    @Override
+    public int countByAddressAndMinerType(String ownerAddress, int minerType) {
+        return deviceMapper.countByAddressAndMinerType(ownerAddress,minerType);
     }
 }
