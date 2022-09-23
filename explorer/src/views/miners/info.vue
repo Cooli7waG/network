@@ -315,7 +315,10 @@ export default {
           trigger: 'axis',
           axisPointer: {
             type: 'shadow'
-          }
+          },
+          formatter: function (params){
+            return params[0].name+"<br/>Reward:"+ Number(Number(params[0].value).toFixed(3)).toLocaleString()
+          },
         },
         legend: {
           data: histogramData.legendData

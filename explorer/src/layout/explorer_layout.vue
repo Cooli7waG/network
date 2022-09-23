@@ -1,10 +1,10 @@
 <template>
   <el-container>
-    <el-header style="z-index: 999">
+    <el-header>
       <Menus/>
     </el-header>
     <el-container style="margin-top:-1px;">
-      <el-main>
+      <el-main style="overflow: auto;">
         <router-view />
       </el-main>
       <el-footer>
@@ -29,7 +29,6 @@ body {
   margin: 0;
   width: 100%;
   min-width: 320px;
-  min-height: 100vh;
   line-height: 1.4;
   font-size: 16px;
   font-weight: 400;

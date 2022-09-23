@@ -36,6 +36,20 @@ export async function personalSign(message) {
     return sign;
 }
 
+export async function ethSign(message){
+    try {
+        // eslint-disable-next-line no-undef
+        const ethResult = await ethereum.request({
+            method: 'eth_sign',
+            params: [getMetaMaskLoginUserAddress(), message],
+        });
+        return ethResult;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
 export async function personalEcRecover(message,sign) {
     // eslint-disable-next-line no-undef
     const ecRecoverAddress = await ethereum.request({

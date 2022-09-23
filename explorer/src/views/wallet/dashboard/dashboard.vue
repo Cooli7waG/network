@@ -8,7 +8,7 @@
           <span>Total Miner</span>
         </div>
         <div class="card-col" style="background: -webkit-linear-gradient(left, #FFBD9D , #FF5809);">
-          <div>{{user.earningMint}}</div>
+          <div>{{Number(Number(user.earningMint).toFixed(3)).toLocaleString()}}</div>
           <span>Mining Reward</span>
         </div>
         <div class="card-col" style="background: -webkit-linear-gradient(left, #BBFFBB , #28FF28);">
@@ -308,7 +308,7 @@ export default {
         align: app.config.align,
         verticalAlign: app.config.verticalAlign,
         rotate: app.config.rotate,
-        formatter: '{c}  {name|{a}}',
+        formatter: '{c}',
         fontSize: 16,
         rich: {
           name: {}
@@ -319,10 +319,13 @@ export default {
           trigger: 'axis',
           axisPointer: {
             type: 'shadow'
-          }
+          },
+          formatter: function (params){
+            return params[0].name+"<br/>Reward:"+ Number(Number(params[0].value).toFixed(3)).toLocaleString()
+          },
         },
         legend: {
-          data: ['Reward']
+          data: ['Reward'],
         },
         toolbox: {
           show: true,
@@ -345,15 +348,17 @@ export default {
         xAxis: [
           {
             type: 'category',
-            axisTick: { show: true },
+            axisTick: { show: false },
             data: labels,
             axisLabel: {
               interval: 0,
               rotate: rotateX
-            }
+            },
           }
         ],
-        yAxis: [{type: 'value'}],
+        yAxis: [{
+          type: 'value'
+        }],
         series: [
           {
             name: 'reward',
@@ -426,7 +431,10 @@ export default {
           trigger: 'axis',
           axisPointer: {
             type: 'shadow'
-          }
+          },
+          formatter: function (params){
+            return params[0].name+"<br/>Reward:"+ Number(Number(params[0].value).toFixed(3)).toLocaleString()
+          },
         },
         legend: {
           data: histogramData.legendData

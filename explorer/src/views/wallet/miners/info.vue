@@ -312,8 +312,6 @@ export default {
         legendData: [],
         series: []
       }
-      //
-      console.log("this.data.query.minerAddress:"+this.$route.params.address)
       const data = {
         "address": this.$route.params.address,
         "startTime": time.startTime,
@@ -389,7 +387,10 @@ export default {
           trigger: 'axis',
           axisPointer: {
             type: 'shadow'
-          }
+          },
+          formatter: function (params){
+            return params[0].name+"<br/>Reward:"+ Number(Number(params[0].value).toFixed(3)).toLocaleString()
+          },
         },
         legend: {
           data: histogramData.legendData

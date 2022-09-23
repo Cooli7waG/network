@@ -69,14 +69,14 @@
             <el-row>
               <el-col :span="11" class="balance-div">
                 <div><span style="color: #72767b;font-size: 12px">Mining Reward</span></div>
-                <div><span style="font-size: 18px">{{user.earningMint}}</span></div>
+                <div><span style="font-size: 18px">{{Number(Number(user.earningMint).toFixed(3)).toLocaleString()}}</span></div>
               </el-col>
               <el-col :span="2" class="balance-div">
 
               </el-col>
               <el-col :span="11" class="balance-div">
                 <div><span style="color: #72767b;font-size: 12px">AKRE Balance</span></div>
-                <div><span style="font-size: 18px">{{user.balance}}</span></div>
+                <div><span style="font-size: 18px">{{Number(Number(user.balance).toFixed(3)).toLocaleString()}}</span></div>
               </el-col>
               <el-col :span="24" class="transfer-btn" @click="transferBalance">
                 <span style="font-size: 16px;line-height: 30px">Withdraw Mining Reward</span>
@@ -143,14 +143,15 @@
 <script>
 import {formatString, getTokenFixed} from "@/utils/data_format";
 import {
-  addToken,
+  addToken, personalSign,
   getMetaMaskLoginUserAddress,
   loginWithMetaMask, isPrivacyPolicy,
-  removeMetaMaskUserAddress, switchNetwork, setPrivacyPolicy,
+  removeMetaMaskUserAddress, switchNetwork, setPrivacyPolicy
 } from "@/api/metamask_utils";
-import {findByAddress} from "@/api/account";
+import {accountInfo, withdraw} from "@/api/account";
 import {toEther} from "@/utils/utils";
 import MetaMaskOnboarding from '@metamask/onboarding';
+import {balanceOf, etherWithdraw, getTransactionStatus} from '@/api/contract_utils'
 
 export default {
   name: 'WalletMenus',
@@ -166,6 +167,7 @@ export default {
       isShow: true,
       loadBalance: false,
       userAddress: undefined,
+      isInit: false,
       user:{
         earningMint:0,
         balance:0
@@ -177,20 +179,78 @@ export default {
     this.listenMetaMask();
   },
   methods: {
-    transferBalance(){
-      this.$message.warning("coming soon...")
+    async transferBalance() {
+      //this.$message.warning("coming soon...")
+      let balance = await balanceOf()
+      console.log("balanceOf Result:" +balance)
+      //this.handleWithdraw();
+    },
+    handleWithdraw(){
+      this.loadBalance = true;
+      accountInfo(getMetaMaskLoginUserAddress()).then(async (result) => {
+        if (result.code == 0) {
+          const form = await this.handlePersonalSign(result.data.earningMint);
+          console.log("withdraw request data:"+JSON.stringify(form))
+          withdraw(form).then(async rsp => {
+            console.log(rsp)
+            if(rsp.code == 0){
+              let metaTx = rsp.metaTx;
+              let contract = rsp.contract;
+              console.log("withdraw result --> metaTx:"+metaTx+"  contract:"+contract)
+              //await etherWithdraw(value, nonce, v, r, s)
+            }else {
+              const value = 1000;
+              const nonce = 1;
+              const v = 28
+              const r = '0x2b41351720b54e91ce0c2fad28f7a3de0414638291f6fe16ef4b0ea59604f444';
+              const s = '0x26d0e211e02fdaef70bbc1fefdc4f3434de7b80b8cb079a776ccfe406f3e659b';
+              //await withdrawWithContract(100,0,27,'0x0fce78e5fa0cb9462fb96ad193cc26f4c3338ad61d84afdde48712042a97bdd3','0x098694d0a11ac16f9dbba46c7cea58a956183c180ed7abab3b06367469907c3c')
+              //await withdrawWithContract(1, 188, 123123, 123213, 123213);
+              let hash = await etherWithdraw(value, nonce, v, r, s)
+              console.info("withdraw hash Result hash:"+hash)
+              this.$message.info("The withdraw has been submitted. Please wait...")
+              let status = await getTransactionStatus(hash);
+              console.log('Transaction Status: ' + status);
+              if(status==0){
+                this.$message.error("withdraw failed")
+              }else {
+                this.$message.success("withdraw success,Please check your wallet!")
+              }
+            }
+          })
+        }
+        this.loadBalance = false;
+      }).catch((err) =>{
+        console.log(err);
+        this.loadBalance = false;
+      });
+    },
+    async handlePersonalSign(amount) {
+      const form = {
+        address: getMetaMaskLoginUserAddress(),
+        amount: amount
+      }
+      let message = JSON.stringify(form);
+      console.log("Withdraw Personal Sign Message:"+message)
+      const requestSig = await personalSign(message);
+      console.log("Withdraw Personal Sign Result:" + requestSig)
+      form.requestSig = requestSig
+      return form;
     },
     loadFindByAddress(){
-      this.loadBalance = true;
+      if(!this.isInit){
+        this.loadBalance = true;
+      }
       const userAddress = getMetaMaskLoginUserAddress();
       if(userAddress == undefined || userAddress == null){
         return;
       }
-      findByAddress(getMetaMaskLoginUserAddress()).then((result)=>{
+      accountInfo(getMetaMaskLoginUserAddress()).then((result)=>{
         if(result.code == 0){
           this.user.earningMint = result.data.earningMint.toLocaleString();
           const fixed = getTokenFixed(result.data.balance);
           this.user.balance = toEther(result.data.balance,fixed);
+          this.isInit = true
         }
         this.loadBalance = false;
       }).catch((err) =>{
