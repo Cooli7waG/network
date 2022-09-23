@@ -226,7 +226,7 @@ export default {
         console.log("loadMinerStatistics error:"+err);
       });
     }
-    const styleFn = function (f, res) {
+    const styleFn = function (f) {
       switch ("color") {
           /*case 'point':{
             var radius = Math.round(100000/res +0.5) * Math.min(1,f.get('features').length/max);
@@ -432,10 +432,8 @@ export default {
   backdrop-filter: saturate(180%) blur(20px);
 }
 .leftView{
-  z-index: 9999;
   position:absolute;
   top: 0px;
-  height: 100%;
 }
 .leftViewChange{
   width: 20px;
@@ -446,25 +444,7 @@ export default {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   cursor: pointer;
-  line-height: 50px;
-}
-.btn_xenon {
-  text-align: center;
-  cursor: pointer;
-  background-color: aliceblue !important;
-}
-.btn_xenon:hover {
-  background-color: rgb(83, 168, 255) !important;
-}
-.login_select {
-  height: 45px;
-  line-height: 45px;
-  background-color: aliceblue;
-  padding-right: 20px;
-  padding-left: 6px;
-  border-radius: 5px;
-  margin-top: 10px;
-  z-index: 99;
+  line-height: 55px;
 }
 
 .el-drawer__open .el-drawer.ltr {

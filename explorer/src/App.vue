@@ -5,12 +5,9 @@
 </template>
 
 <script>
-import Menus from '@/components/ExplorerMenus.vue'
+
 export default {
   name: 'App',
-  components: {
-    Menus
-  }
 }
 </script>
 
