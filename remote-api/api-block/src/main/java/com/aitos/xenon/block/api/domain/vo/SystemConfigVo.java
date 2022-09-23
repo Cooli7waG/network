@@ -1,10 +1,10 @@
-package com.aitos.xenon.block.domain;
+package com.aitos.xenon.block.api.domain.vo;
 
-import com.aitos.xenon.core.model.BaseModel;
 import lombok.Data;
 
 @Data
-public class SystemConfig extends BaseModel {
+public class SystemConfigVo {
+
     /**
      * commit epoch
      */
@@ -17,31 +17,6 @@ public class SystemConfig extends BaseModel {
      * 每60个块有资格获得1次奖励
      */
     private int perRewardBlocks;
-    /**
-     * game miner系数
-     */
-    @Deprecated
-    private float gameMinerCoefficient;
-    /**
-     * api miner 系数
-     */
-    @Deprecated
-    private float apiMinerCoefficient;
-    /**
-     * virtual miner系数
-     */
-    @Deprecated
-    private float virtualMinerCoefficient;
-    /**
-     * Standard PV Miner 系数
-     */
-    @Deprecated
-    private float standardPvMinerCoefficient;
-    /**
-     * Lite PV Miner
-     */
-    @Deprecated
-    private float litePvMinerCoefficient;
     /**
      * 每个周期奖励token数量
      */

@@ -131,6 +131,11 @@ public interface BusinessConstants
          */
         int TX_TRANSFER=10;
 
+        /**
+         * TX_WITHDRAW
+         */
+        int TX_WITHDRAW=11;
+
     }
     /**
      * pogg commit 状态

@@ -61,6 +61,8 @@ public enum ApiStatus implements ConstantsCode {
     BUSINESS_AIRDROPDEVICE_CLAIM_EXPIRED(3012,"airdrop device is claim expired"),
     BUSINESS_OWNER_BIND_APPLY_SIGN_ERROR(3013,"The signature of the owner binding application is incorrect"),
     BUSINESS_DEVICE_MAKER_INFO_ERROR(3014,"maker information error"),
+    BUSINESS_DEVICE_GMAE_MINER_TOTAL_NUMBER(3015,"Total miner exceeds limit"),
+    BUSINESS_DEVICE_GMAE_MINER_SINGLE_NUMBER(3016,"The amount of miners that a single user can apply for exceeds the limit"),
 
 
 
@@ -75,6 +77,9 @@ public enum ApiStatus implements ConstantsCode {
     BUSINESS_FOUNDATION_SIGN_ERROR(4008,"foundation signature error"),
     BUSINESS_ACCOUNT_REWARD_SEARCH_DAY_RANGE_ERROR(4009,"account reward days range error"),
     BUSINESS_ACCOUNT_MAKER_NOT_EXIST(4010,"maker account is not exist"),
+    BUSINESS_ACCOUNT_SIGN_ERROR(4011,"maker account signature error"),
+    BUSINESS_ACCOUNT_BLANCE_INSUFFICIENT(4012,"Insufficient account balance"),
+    BUSINESS_ACCOUNT_NONCE_MISMATCH_PATTERN(4013,"nonce pattern mismatch"),
 
 
     // pogg相关

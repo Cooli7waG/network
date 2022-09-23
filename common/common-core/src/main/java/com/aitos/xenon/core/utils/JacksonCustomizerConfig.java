@@ -1,5 +1,6 @@
 package com.aitos.xenon.core.utils;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -12,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -31,6 +34,12 @@ public class JacksonCustomizerConfig {
             builder.serializerByType(Date.class, new DateSerializer());
             builder.deserializerByType(LocalDateTime.class, new LocalDateTimeDeserializer());
             builder.deserializerByType(Date.class, new DateDeserializer());
+
+            builder.serializerByType(BigDecimal.class, new BigDecimalSerializer());
+            builder.deserializerByType(BigDecimal.class,new BigDecimalDeserializer());
+
+            builder.serializerByType(BigInteger.class, new BigIntegerSerializer());
+            builder.deserializerByType(BigInteger.class,new BigIntegerDeserializer());
         };
     }
 
@@ -98,6 +107,47 @@ public class JacksonCustomizerConfig {
             }else{
                 return null;
             }
+        }
+    }
+
+    public static class BigDecimalSerializer extends JsonSerializer<BigDecimal>{
+        @Override
+        public void serialize(BigDecimal value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+            if (value != null){
+                jsonGenerator.writeString(value.stripTrailingZeros().toPlainString());
+            }
+        }
+    }
+
+    public static class BigDecimalDeserializer extends JsonDeserializer<BigDecimal>{
+        @Override
+        public BigDecimal deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
+            String text = jsonParser.getText();
+            if(StringUtils.hasText(text)){
+                return new BigDecimal(text);
+            }
+            return null;
+        }
+    }
+
+
+    public static class BigIntegerSerializer extends JsonSerializer<BigInteger>{
+        @Override
+        public void serialize(BigInteger value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+            if (value != null){
+                jsonGenerator.writeString(value.toString());
+            }
+        }
+    }
+
+    public static class BigIntegerDeserializer extends JsonDeserializer<BigInteger>{
+        @Override
+        public BigInteger deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
+            String text = jsonParser.getText();
+            if(StringUtils.hasText(text)){
+                return new BigInteger(text);
+            }
+            return null;
         }
     }
 }
