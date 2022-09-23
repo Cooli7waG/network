@@ -17,5 +17,12 @@ public class PoggReportSubtotalStatistics {
      */
     private Integer minerType;
 
-    private int   total;
+    /**
+     * 总的记录 数
+     */
+    private int   totalRecord;
+    /**
+     * 统计区间电量
+     */
+    private long energyGeneration;
 }

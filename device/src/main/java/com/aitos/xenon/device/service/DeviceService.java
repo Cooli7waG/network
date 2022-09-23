@@ -49,4 +49,19 @@ public interface DeviceService {
      * @return
      */
     List<DeviceVo> getMinerListByOwner(String address);
+
+    /**
+     * 按miner类型统计数量
+     * @param minerType
+     * @return
+     */
+    int countByMinerType(int minerType);
+
+    /**
+     * 按miner类型统计数量
+     * @param ownerAddress
+     * @param minerType
+     * @return
+     */
+    int countByAddressAndMinerType(String ownerAddress,int minerType);
 }

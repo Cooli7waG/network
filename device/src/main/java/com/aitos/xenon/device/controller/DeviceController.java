@@ -98,10 +98,10 @@ public class DeviceController {
         String minerAddress=paramsObject.getString("minerAddress");
         String minerSignature=paramsObject.getString("minerSignature");
 
+        paramsObject.remove("payerAddress");
         paramsObject.remove("payerSignature");
         String payerData=paramsObject.toJSONString();
         log.info("onboard.payerData:{}",payerData);
-        paramsObject.remove("payerAddress");
         paramsObject.remove("minerSignature");
         String minerData=paramsObject.toJSONString();
         log.info("onboard.minerData:{}",minerData);

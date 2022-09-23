@@ -133,7 +133,7 @@ public class PoggServiceImpl implements PoggService {
             log.info("subtotalStatisticsList.size={}",subtotalStatisticsList.size());
             //获得有资格的miner
             List<PoggReportSubtotalStatistics> qualifiedMinerList = subtotalStatisticsList.parallelStream()
-                    .filter(item -> processAwardEligibility(poggCommit.getPrivateKey(), item.getAddress(), item.getTotal()))
+                    .filter(item -> processAwardEligibility(poggCommit.getPrivateKey(), item.getAddress(), item.getTotalRecord()))
                     .collect(Collectors.toList());
             log.info("qualifiedMinerList.size={}",qualifiedMinerList.size());
             if (qualifiedMinerList.size() > 0) {
@@ -142,7 +142,7 @@ public class PoggServiceImpl implements PoggService {
 
                 //计算每个miner获得的奖励
                 List<PoggRewardDetail> rewards = qualifiedMinerList.stream().map(item -> {
-                    BigDecimal awardNumber = rewardCalculation(systemConfig, totalRewardWeight, item.getMinerType(), item.getTotal());
+                    BigDecimal awardNumber = rewardCalculation(systemConfig, totalRewardWeight, item.getMinerType(), item.getTotalRecord(),item.getEnergyGeneration());
                     PoggRewardDetail poggRewardDetail = new PoggRewardDetail();
                     poggRewardDetail.setAddress(item.getAddress());
                     poggRewardDetail.setOwnerAddress(item.getOwnerAddress());
@@ -208,24 +208,16 @@ public class PoggServiceImpl implements PoggService {
         return seed.compareTo(new BigInteger("0")) == 0;
     }
 
+    public static void main(String[] args) {
+        System.out.println(Math.pow(1000000, 1.0/5));
+    }
     /**
      * 计算系数
      *
      * @return
      */
-    private float calCoefficient(SystemConfig systemConfig, Integer minerType) {
-        if (minerType.equals(BusinessConstants.DeviceMinerType.GAME_MINER)) {
-            return systemConfig.getGameMinerCoefficient();
-        } else if (minerType.equals(BusinessConstants.DeviceMinerType.API_MINER)) {
-            return systemConfig.getApiMinerCoefficient();
-        } else if (minerType.equals(BusinessConstants.DeviceMinerType.STANDARD_PV_MINER)) {
-            return systemConfig.getStandardPvMinerCoefficient();
-        } else if (minerType.equals(BusinessConstants.DeviceMinerType.LITE_PV_MINER)) {
-            return systemConfig.getLitePvMinerCoefficient();
-        } else if (minerType.equals(BusinessConstants.DeviceMinerType.VIRTUAL_MINER)) {
-            return systemConfig.getVirtualMinerCoefficient();
-        }
-        return 0;
+    private double calCoefficient(SystemConfig systemConfig, Integer minerType,long energyGeneration) {
+       return Math.pow(energyGeneration, 1.0/5);
     }
 
     /**
@@ -233,7 +225,7 @@ public class PoggServiceImpl implements PoggService {
      */
     public BigDecimal calTotalRewardWeight(SystemConfig systemConfig, List<PoggReportSubtotalStatistics> qualifiedMinerList) {
         BigDecimal totalRewardWeight = qualifiedMinerList.stream()
-                .map(item -> BigDecimal.valueOf(calCoefficient(systemConfig, item.getMinerType()) * item.getTotal())).reduce(BigDecimal::add)
+                .map(item -> BigDecimal.valueOf(calCoefficient(systemConfig, item.getMinerType(),item.getEnergyGeneration()) * item.getTotalRecord())).reduce(BigDecimal::add)
                 .orElse(BigDecimal.ZERO);
         return totalRewardWeight;
     }
@@ -243,10 +235,10 @@ public class PoggServiceImpl implements PoggService {
      *
      * @param minerRecordTotal
      */
-    public BigDecimal rewardCalculation(SystemConfig systemConfig, BigDecimal totalRewardWeight, Integer minerType, Integer minerRecordTotal) {
+    public BigDecimal rewardCalculation(SystemConfig systemConfig, BigDecimal totalRewardWeight, Integer minerType, Integer minerRecordTotal, long energyGeneration) {
 
         //系数
-        float coefficient = calCoefficient(systemConfig, minerType);
+        double coefficient = calCoefficient(systemConfig, minerType,energyGeneration);
 
         //单个miner 的奖励权重
         BigDecimal minerRewardWeight = BigDecimal.valueOf(coefficient * minerRecordTotal);

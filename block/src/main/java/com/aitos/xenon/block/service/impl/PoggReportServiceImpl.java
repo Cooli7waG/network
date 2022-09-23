@@ -80,6 +80,7 @@ public class PoggReportServiceImpl implements PoggReportService {
         poggReportSubtotal.setMinerType(poggReportDto.getMinerType());
         poggReportSubtotal.setEpoch(poggReportDto.getEpoch());
         poggReportSubtotal.setRecordNum(poggReportDto.getGreenDataList().size());
+        poggReportSubtotal.setTotalEnergyGeneration(poggReportDto.getGreenDataList().get(0).getTotal());
 
         this.saveOrUpdate(poggReportSubtotal);
 

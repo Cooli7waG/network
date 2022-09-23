@@ -7,6 +7,8 @@ import com.aitos.xenon.account.api.domain.dto.AccountRegisterDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionDto;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
 import com.aitos.xenon.block.api.RemoteBlockService;
+import com.aitos.xenon.block.api.RemoteSystemConfigService;
+import com.aitos.xenon.block.api.domain.vo.SystemConfigVo;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.constant.RandomLocation;
@@ -24,6 +26,8 @@ import com.aitos.xenon.device.api.RemoteGameMinerService;
 import com.aitos.xenon.device.api.domain.dto.*;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.aitos.xenon.device.api.domain.vo.GameMiner;
+import com.aitos.xenon.device.common.exception.MinerSingleNumberException;
+import com.aitos.xenon.device.common.exception.MinerTotalNumberException;
 import com.aitos.xenon.device.domain.AirDropRecord;
 import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.mapper.AirDropRecordMapper;
@@ -67,6 +71,8 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
     private RemoteDeviceService remoteDeviceService;
     @Autowired
     private RemoteGameMinerService remoteGameMinerService;
+    @Autowired
+    private RemoteSystemConfigService remoteSystemConfigService;
 
     @Value("${xenon.web.claim}")
     private String webClaimUrl;
@@ -81,8 +87,8 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
 
         DeviceLocationDto locationDto = airDropDto.getLocation();
         airDropRecord.setLocationType(locationDto.getLocationType());
-        airDropRecord.setLongitude(locationDto.getLongitude());
-        airDropRecord.setLatitude(locationDto.getLatitude());
+        airDropRecord.setLongitude(Double.valueOf(locationDto.getLongitude()));
+        airDropRecord.setLatitude(Double.valueOf(locationDto.getLatitude()));
         airDropRecord.setH3index(locationDto.getH3index());
 
         DeviceInfoDto minerInfo = airDropDto.getMinerInfo();
@@ -199,8 +205,7 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
      * @return
      */
     @Override
-    public String applyGameMiner(String str) {
-        try{
+    public synchronized  String applyGameMiner(String str) {
             ApplyGameMiner applyGameMiner = JSON.parseObject(str, ApplyGameMiner.class);
             // 当需要签名校验时进行验证
             if(applyPersonalSign){
@@ -218,6 +223,21 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
                     throw new MinerApplyException("miner apply failed");
                 }
             }
+            Result<SystemConfigVo> configResult = remoteSystemConfigService.findConfig();
+            if(configResult.getCode()!=ApiStatus.SUCCESS.getCode()){
+                throw new ServiceException("system config exception");
+            }
+            SystemConfigVo systemConfigVo = configResult.getData();
+            int gameMinerCount = deviceMapper.countByMinerType(BusinessConstants.DeviceMinerType.GAME_MINER);
+            if(gameMinerCount>=systemConfigVo.getGameMinerTotalNumber()){
+                throw new MinerTotalNumberException("miner 总量超出 限制");
+            }
+
+            int gameMinerSingleCount = deviceMapper.countByAddressAndMinerType(applyGameMiner.getOwner(),BusinessConstants.DeviceMinerType.GAME_MINER);
+            if(gameMinerSingleCount>=systemConfigVo.getGameMinerSingleNumber()){
+                throw new MinerSingleNumberException("单个用户可申请miner量超出限制");
+            }
+
             // 调用game miner服务生成miner地址进行预注册
             Result<String> gameMinerResult = remoteGameMinerService.register();
             if(gameMinerResult==null || gameMinerResult.getCode() != ApiStatus.SUCCESS.getCode()){
@@ -254,19 +274,19 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
             airDropDto.setVersion(1);
             // 30天
             Result<Long> blockHeight = remoteBlockService.getBlockHeight();
-            airDropDto.setExpiration(blockHeight.getData()+(30*24*60));
+            airDropDto.setExpiration(blockHeight.getData()+(systemConfigVo.getGameMinerApplyValidityPeriod()*24*60));
             // 随机地理位置
             DeviceLocationDto deviceLocationDto = new DeviceLocationDto();
             RandomLocation randomLocation = RandomLocationUtils.getRandomLocation();
             deviceLocationDto.setLocationType(0);
-            deviceLocationDto.setLatitude(randomLocation.getLatitude());
-            deviceLocationDto.setLongitude(randomLocation.getLongitude());
+            deviceLocationDto.setLatitude(randomLocation.getLatitude()+"");
+            deviceLocationDto.setLongitude(randomLocation.getLongitude()+"");
             airDropDto.setLocation(deviceLocationDto);
             log.info("DeviceLocationDto:{}",JSON.toJSONString(deviceLocationDto));
             //TODO 这里填写啥？
             DeviceInfoDto deviceInfoDto = new DeviceInfoDto();
             deviceInfoDto.setAddress(minerAddress);
-            deviceInfoDto.setCapabilities("0");
+            deviceInfoDto.setCapabilities(0);
             deviceInfoDto.setPower(0L);
             deviceInfoDto.setVersion(1);
             deviceInfoDto.setEnergy(1);
@@ -309,10 +329,6 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
             }
             //
             return ApiStatus.SUCCESS.getMsg();
-        }catch (Exception e){
-            log.error("Apply Game Miner Error:{}",e.getMessage());
-            throw new RecoverPublicKeyException(e.getMessage());
-        }
     }
 
     /**
