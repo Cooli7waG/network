@@ -37,11 +37,7 @@
             <el-link @click="()=>{data.query.keyword=scope.row.height;search();}">{{ Number(scope.row.height).toLocaleString()}}</el-link>
           </template>
         </el-table-column>
-        <el-table-column prop="miner" label="Miner Address" width="220" :show-overflow-tooltip=true>
-          <template #default="scope">
-            <router-link :to="'/wallet/miner/'+scope.row.miner">{{scope.row.miner }}</router-link>
-          </template>
-        </el-table-column>
+
         <el-table-column prop="txType" :label="$t('txs.table.txType')" width="180">
           <template #default="scope">
             {{ scope.row.txType ? Constant.TXType[scope.row.txType] : '' }}
@@ -97,7 +93,6 @@ export default {
       minerOptions:[
       ],
       txTypeOptions:[
-        {value:1,label:"TX_Register_miner"},
         {value:2,label:"TX_Onboard_Miner"},
         {value:3,label:"TX_Transfer_Miner"},
         {value:4,label:"TX_Terminate_Miner"},
