@@ -82,7 +82,7 @@ public class DeviceGlobalExceptionHandler
      * @return
      */
     @ExceptionHandler(MinerTotalNumberException.class)
-    public Result handleMinerTotalNumberException(PayerAccountNotEnoughException e,
+    public Result handleMinerTotalNumberException(MinerTotalNumberException e,
                                                       HttpServletRequest request)
     {
         return Result.failed(ApiStatus.BUSINESS_DEVICE_GMAE_MINER_TOTAL_NUMBER);
@@ -95,7 +95,7 @@ public class DeviceGlobalExceptionHandler
      * @return
      */
     @ExceptionHandler(MinerSingleNumberException.class)
-    public Result handleMinerSingleNumberException(PayerAccountNotEnoughException e,
+    public Result handleMinerSingleNumberException(MinerSingleNumberException e,
                                                   HttpServletRequest request)
     {
         return Result.failed(ApiStatus.BUSINESS_DEVICE_GMAE_MINER_SINGLE_NUMBER);

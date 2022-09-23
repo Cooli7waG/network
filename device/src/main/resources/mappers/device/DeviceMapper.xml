@@ -57,11 +57,11 @@
         order by create_time desc
     </select>
     <select id="countByMinerType" resultType="java.lang.Integer">
-        select * from <include refid="tableName"/>
+        select count(*) from <include refid="tableName"/>
         where miner_type=#{minerType}
     </select>
     <select id="countByAddressAndMinerType" resultType="java.lang.Integer">
-        select * from <include refid="tableName"/>
+        select count(*) from <include refid="tableName"/>
         where miner_type=#{minerType} and owner_address=#{ownerAddress}
     </select>
     <update id="bind">
