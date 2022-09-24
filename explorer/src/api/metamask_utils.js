@@ -279,7 +279,7 @@ const TokenInfo_MAINNET = {
     tokenSymbol : 'AKRE'
 }
 const TokenInfo_TESTNET = {
-    address : '0x1006690DBb985523502688d6bBb50d109F12cE09',
+    address : '0xf2D4C9C2A9018F398b229D812871bf2B316D50E1',
     //image : 'https://metamask.github.io/test-dapp/metamask-fox.svg',
     decimalUnits : 18,
     tokenSymbol : 'AKRE'

@@ -204,14 +204,11 @@ export default {
           withdraw(form).then(async rsp => {
             console.log(rsp)
             if (rsp.code == 0) {
-              let value = rsp.originData.value;
-              let nonce = rsp.originData.nonce;
-              let v = rsp.sig.v;
-              let r = rsp.sig.r;
-              let s = rsp.sig.s;
+              let originData = rsp.data.originData;
+              let sig = rsp.data.sig;
               console.log("withdraw server result:" + JSON.stringify(rsp.data))
               try {
-                let hash = await etherWithdraw(value, nonce, v, r, s)
+                let hash = await etherWithdraw(""+originData.value, originData.nonce, sig.v, "0x"+sig.r, "0x"+sig.s)
                 console.info("withdraw hash Result hash:" + hash)
                 this.$message.info("The withdraw has been submitted. Please wait...")
                 let status = await getTransactionStatus(hash);
