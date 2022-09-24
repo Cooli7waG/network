@@ -14,6 +14,7 @@ const Constant={
         8: i18n.global.t('common.constant.tXType.8'),
         9: i18n.global.t('common.constant.tXType.9'),
         10: i18n.global.t('common.constant.tXType.10'),
+        11: i18n.global.t('common.constant.tXType.11'),
     },
     /**
      * miner type

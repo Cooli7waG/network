@@ -37,7 +37,8 @@ export default {
                 7:"TX_Commit_PoGG",
                 8:"TX_Report_PoGG",
                 9:"TX_Reward_PoGG",
-                10:"TX_Transfer"
+                10:"TX_Transfer",
+                11:"TX_Withdraw"
             },
         }
     },

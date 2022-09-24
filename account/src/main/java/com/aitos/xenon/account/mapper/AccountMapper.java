@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,4 +29,6 @@ public interface AccountMapper {
     List<Account> findListByIds(@Param("idsList")List<Long> idsList);
 
     void updateEarning(@Param("rewards")List<AccountReward>  accountRewardList,@Param("updateTime") LocalDateTime updateTime);
+
+    void withdraw(@Param("address")String address, @Param("amount")BigDecimal amount,@Param("updateTime")LocalDateTime updateTime);
 }

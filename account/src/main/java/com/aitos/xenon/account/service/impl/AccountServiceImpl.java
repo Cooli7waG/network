@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,17 +45,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountVo findByAddress(String address) {
-        try {
             AccountVo account = accountMapper.findByAddress(address);
-            if (account != null) {
-                BigInteger blance = erc20Service.balanceOf(account.getAddress()).send();
-                account.setBalance(blance.toString());
-            }
-            return account;
-        } catch (Exception e) {
-            log.error("error:{}", e);
-        }
-        return null;
+        return account;
     }
 
     @Override
@@ -62,17 +54,6 @@ public class AccountServiceImpl implements AccountService {
         try {
             Page<AccountVo> page = new Page<AccountVo>(accountSearchDto.getOffset(), accountSearchDto.getLimit());
             IPage<AccountVo> pageResult = accountMapper.list(page, accountSearchDto);
-            List<String> addressList = pageResult.getRecords().stream().map(accountVo -> accountVo.getAddress()).collect(Collectors.toList());
-            List<BigInteger> list = erc20Service.balanceOf_multi(addressList).send();
-            for (AccountVo accountVo : pageResult.getRecords()) {
-                for (int i = 0; i < addressList.size(); i++) {
-                    String publickey = addressList.get(i);
-                    if (publickey.equals(accountVo.getAddress())) {
-                        accountVo.setBalance(list.get(i).toString());
-                        break;
-                    }
-                }
-            }
             return pageResult;
         } catch (Exception e) {
             log.error("error:{}", e);
@@ -119,5 +100,10 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void updateEarning(List<AccountReward>  accountRewardList) {
         accountMapper.updateEarning(accountRewardList,LocalDateTime.now());
+    }
+
+    @Override
+    public void withdraw(String address, BigDecimal amount,LocalDateTime updateTime) {
+        accountMapper.withdraw(address,amount,updateTime);
     }
 }
