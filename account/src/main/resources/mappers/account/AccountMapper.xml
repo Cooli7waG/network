@@ -49,6 +49,14 @@
             #{item.address}
         </foreach>
     </update>
+    <update id="withdraw">
+        update <include refid="tableName"/>
+            set earning_mint=earning_mint-#{amount},
+            withdraw_amount=withdraw_amount+#{amount},
+            nonce=nonce+1,
+            update_time=#{updateTime}
+        where address=#{address}
+    </update>
 
     <select id="findListByPage" resultType="com.aitos.xenon.account.domain.Account">
         select * from <include refid="tableName"/>
@@ -79,5 +87,6 @@
     <select id="findListByIds" resultType="com.aitos.xenon.account.domain.Account">
         select * from <include refid="tableName"/> where id in <foreach collection="idsList" open="(" close=")" separator="," item="id">#{id}</foreach>
     </select>
+
 
 </mapper>

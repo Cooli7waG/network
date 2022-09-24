@@ -1,6 +1,5 @@
 package com.aitos.xenon.account.api.domain.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -9,6 +8,8 @@ import java.time.LocalDateTime;
 public class AccountRewardStatisticsDto {
 
     private String address;
+
+    private String ownerAddress;
 
     private LocalDateTime startTime;
 

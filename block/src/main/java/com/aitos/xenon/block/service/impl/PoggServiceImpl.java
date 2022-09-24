@@ -198,13 +198,9 @@ public class PoggServiceImpl implements PoggService {
         ecdhBytes=XenonCrypto.doECDH(privateKey,publickKey);*/
 
         BigInteger x = new BigInteger(ecdhBytes).multiply(new BigInteger(minerRecordTotal.toString()));
-        System.out.println("x=" + x);
         byte[] sha256Bytes = DigestUtils.sha256(x.toByteArray());
-        System.out.println("sha256Bytes=" + new BigInteger(sha256Bytes));
 
         BigInteger seed = new BigInteger(sha256Bytes).remainder(new BigInteger(perRewardEligibilityBlocks + ""));
-
-        System.out.println(seed);
         return seed.compareTo(new BigInteger("0")) == 0;
     }
 

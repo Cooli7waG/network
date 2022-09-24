@@ -30,6 +30,11 @@ public class AccountVo {
      * 总服务收入
      */
     private BigDecimal earningService;
+
+    /**
+     * 总体现数量
+     */
+    private BigDecimal withdrawAmount;
     /**
      * miner数量
      */

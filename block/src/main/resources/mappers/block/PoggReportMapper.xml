@@ -38,7 +38,7 @@
                                           miner_type,
                                           epoch,
                                           record_num,
-                                          total_energy_generation
+                                          total_energy_generation,
                                           create_time,
                                           update_time)
         VALUES (#{address}, #{ownerAddress}, #{minerType}, #{epoch}, #{recordNum},#{totalEnergyGeneration}, #{createTime}, #{createTime})
@@ -59,15 +59,6 @@
     </select>
 
     <select id="findSubtotalStatisticsList" resultType="com.aitos.xenon.block.domain.PoggReportSubtotalStatistics">
-        /*SELECT address, owner_address, miner_type, sum(record_num) as total
-        FROM `pogg_report_subtotal`
-        where epoch &gt;= #{startEpoch}
-          and epoch &lt;= #{endEpoch}
-          and address
-            in (select address
-                from pogg_report_subtotal
-                where epoch &gt;= #{startEpoch} and epoch &lt;= #{endEpoch} and record_num &gt; 0)
-        group by address, owner_address, miner_type*/
         SELECT address, owner_address, miner_type,sum(record_num) as totalRecord,total as energyGeneration
         from (
             SELECT id,address, owner_address, miner_type,epoch,record_num,

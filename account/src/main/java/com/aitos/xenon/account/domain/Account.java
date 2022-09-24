@@ -28,4 +28,9 @@ public class Account extends BaseModel {
      * 总服务收入
      */
     private BigDecimal earningService;
+
+    /**
+     * 总体现数量
+     */
+    private BigDecimal withdrawAmount;
 }

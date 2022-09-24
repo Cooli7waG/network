@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AccountService {
@@ -33,4 +34,6 @@ public interface AccountService {
     BmtStatisticsVo bmtStatistics();
 
     void updateEarning(List<AccountReward>  accountRewardList);
+
+    void withdraw(String address, BigDecimal amount, LocalDateTime updateTime);
 }

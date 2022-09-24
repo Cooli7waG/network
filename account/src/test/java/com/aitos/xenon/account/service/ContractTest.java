@@ -6,9 +6,19 @@ import com.aitos.common.crypto.ecdsa.Ecdsa;
 import com.aitos.common.crypto.ecdsa.EcdsaKeyPair;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.web3j.crypto.Credentials;
+import org.web3j.crypto.RawTransaction;
+import org.web3j.crypto.TransactionEncoder;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
+import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
+import org.web3j.utils.Numeric;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -61,13 +71,56 @@ public class ContractTest {
         }*/
     }
 
+    @Autowired
+    private Web3j web3j;
+    @Value("${web3.contractAddress}")
+    private String contractAddress;
+
+    @Value("${foundation.web3PrivateKey}")
+    private String web3PrivateKey;
+
+    @Value("${foundation.web3PublicKey}")
+    private String web3PublickKey;
+
+    @Test
+    public void test_nonce() {
+        try {
+            EthGetTransactionCount ethGetTransactionCount = web3j.ethGetTransactionCount(
+                    contractAddress, DefaultBlockParameterName.LATEST).send();
+            BigInteger nonce = ethGetTransactionCount.getTransactionCount();
+            System.out.println("nonce=" + nonce);
+
+            Credentials credentials = Credentials.create(web3PrivateKey);
+
+
+            BigInteger value = Convert.toWei("1.0", Convert.Unit.ETHER).toBigInteger();
+            BigInteger gasPrice = BigInteger.valueOf(0);
+            BigInteger gasLimit = BigInteger.valueOf(0);
+
+            RawTransaction rawTransaction  = RawTransaction.createEtherTransaction(
+                    nonce, gasPrice, gasLimit,
+                    "0x0a81121ad13a7f5974a2237c76c949179e088ace",
+                    value);
+            //sign
+            byte[] txSignedBytes = TransactionEncoder.signMessage(rawTransaction, credentials);
+            String txSigned = Numeric.toHexString(txSignedBytes);
+            //send
+            EthSendTransaction ethSendTx = web3j
+                    .ethSendRawTransaction(txSigned)
+                    .send();
+            String txHash = ethSendTx.getTransactionHash();
+            System.out.println(txHash);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Test
     public void test_balanceOf() {
         try {
             EcdsaKeyPair ecdsaKeyPair = Ecdsa.genKeyPair();
 
-            String address=Ecdsa.getAddress(ecdsaKeyPair.getPublicKey());
-            BigInteger balanceOf = erc20Service.balanceOf(address).send();
+            BigInteger balanceOf = erc20Service.balanceOf("0x0a81121ad13a7f5974a2237c76c949179e088ace").send();
             System.out.println(balanceOf);
 
             System.out.println("balanceOf=" + balanceOf);

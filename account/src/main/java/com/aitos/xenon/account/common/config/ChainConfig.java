@@ -37,13 +37,18 @@ public class ChainConfig {
     @Value("${foundation.web3PublicKey}")
     private String web3PublickKey;
 
-
+    @Bean
+    @Scope("prototype")
+    public Web3j web3j()  {
+        Web3j web3j = Web3j.build(new HttpService(web3Url));
+        return web3j;
+    }
 
     @Bean
     @Scope("prototype")
     public Erc20Service erc20Service() throws IOException {
 
-        Web3j web3j = Web3j.build(new HttpService(web3Url));
+        Web3j web3j = web3j();
         Credentials credentials = Credentials.create(web3PrivateKey);
 
         BigInteger gasPrice = web3j.ethGasPrice().send().getGasPrice();

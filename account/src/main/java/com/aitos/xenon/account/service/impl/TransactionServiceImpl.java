@@ -134,8 +134,8 @@ public class TransactionServiceImpl implements TransactionService {
                     accountRewardList.add(accountReward);
                 }
                 //调用合约发送奖励
-                TransactionReceipt transactionReceipt = erc20Service.rewardMiner_multi(addressList, rewardList).send();
-                log.info("erc20.transactionReceipt={}",transactionReceipt.getTransactionHash());
+                //TransactionReceipt transactionReceipt = erc20Service.rewardMiner_multi(addressList, rewardList).send();
+                //log.info("erc20.transactionReceipt={}",transactionReceipt.getTransactionHash());
 
                 //奖励明细记录
                 poggRewardDto.getRewards().forEach(item->{
