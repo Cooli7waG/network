@@ -8,6 +8,8 @@ export default {
             airdropEventNotStart:"The airdrop event will start on September 1, please look forward to it!",
             notLoginWithMetaMask:"Please login to metamask and try again!",
             LoginWithMetaMaskFailed:"login with metamask failed, please try again!",
+            PleaseEnterYourEmail:"Please enter your email",
+            PleaseEnterTheCorrectEmailAddress:"Please enter the correct email address",
         },
         button:{
             back:"Back"
@@ -48,6 +50,7 @@ export default {
         accounts:"Accounts",
         blocks:"Blocks",
         txs:"Transactions",
+        withdraw:"Withdraw",
         login:"Login with MetaMask",
     },
     dashboard: {
@@ -80,7 +83,11 @@ export default {
             hash:"Transaction Hash",
             height:"Block Height",
             txType:"Transaction Type",
-            txTime:"Timestamp"
+            amount:"Amount",
+            nonce:"Nonce",
+            status:"Status",
+            txTime:"Timestamp",
+            operation:"Operation"
         },
         msg:{
 

@@ -8,8 +8,7 @@
       <div class="mt-4">
         <el-input
             v-model="data.query.keyword" :placeholder="$t('txs.query.searchPlaceHolder')"
-            class="input-with-select"
-        >
+            class="input-with-select" v-on:keydown.enter="search">
           <template #prepend>
             <el-select v-model="data.query.select" placeholder="Select" style="width: 115px">
               <el-option :label="$t('txs.query.searchType.1')" value="1"/>
@@ -67,9 +66,10 @@ import Constant from '@/utils/constant.js'
 import {formatDate, formatString} from '@/utils/data_format.js'
 import {transactionList} from '@/api/transaction.js'
 import {onMounted, reactive} from "vue";
-import {useRoute, useRouter} from 'vue-router'
+import {useRoute} from 'vue-router'
 
 export default {
+  name:"transaction-list",
   props: {
     msg: String
   },

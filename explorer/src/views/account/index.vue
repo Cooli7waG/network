@@ -6,7 +6,7 @@
   <el-row :gutter="24">
     <el-col :span="20">
       <div class="mt-4">
-        <el-input v-model="data.query.address" :placeholder="$t('account.query.searchPlaceHolder')">
+        <el-input v-model="data.query.address" :placeholder="$t('account.query.searchPlaceHolder')" v-on:keydown.enter="search">
           <template #append>
             <el-button type="primary" @click="search">{{$t('account.query.searchButton')}}</el-button>
           </template>
@@ -77,6 +77,7 @@ import { useRouter } from 'vue-router'
 import {toEther} from '@/utils/utils.js'
 import Constant from '@/utils/constant.js'
 export default {
+  name:"account-list",
   props: {
     msg: String
   },

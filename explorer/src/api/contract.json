@@ -1,5 +1,4 @@
 {
-  "contractAddress": "0x2463615a135147C4be7F70309EF9cb0C1fB33C1A",
   "erc20Abi": {
     "balanceOf": [{
       "inputs": [
@@ -58,6 +57,25 @@
       "name": "withdraw",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    }],
+    "nonces": [{
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "nonces",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     }]
   }

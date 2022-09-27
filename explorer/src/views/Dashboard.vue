@@ -2,59 +2,57 @@
   <el-row :gutter="24" class="main_div">
     <el-col :span="24" style="margin-bottom: -20px;padding-right: 0px !important;">
       <div id="map" class="map"></div>
-      <div class="leftView">
-        <el-row style="height: 100%">
-          <el-col v-show="data.leftShow" :span="23" class="leftContext">
-            <div style="color: #FFFFFF;padding: 10px">
-              <h3>Welcome to</h3>
-              <h2>Arkreen Explorer</h2>
-              Arkreen Explorer is a Block Explorer and Analytics Platform for Arkreen, a Decentralized Renewable Energy Resources Network.
-            </div>
-            <div style="height: 100%;background-color: #FFFFFF;padding-inline-end: 20px;">
-              <el-col style="padding-top: 10px;padding-left: 15px">
-                <el-col :span="24" style="height: calc((100% / 2) - 50px );margin-top: 20px">
-                  <el-card class="box-card">
-                    <div class="text item">
-                      <div class="label">{{ $t('dashboard.miners') }}</div>
-                      <div class="content">{{ data.minerStatistics.miners }}</div>
-                    </div>
-                    <div class="text item">
-                      <div class="label">{{ $t('dashboard.totalPowerLow') }}</div>
-                      <div class="content">{{ formatPower(data.minerStatistics.totalPowerLow) }}</div>
-                    </div>
-                    <div class="text item">
-                      <div class="label">{{ $t('dashboard.totalChargeVol') }}</div>
-                      <div class="content">{{ data.minerStatistics.totalChargeVol }}</div>
-                    </div>
-                  </el-card>
-                </el-col>
-                <el-col :span="24" style="margin-top: 15px;height: calc((100% / 2) - 65px )">
-                  <el-card class="box-card">
-                    <div class="text item">
-                      <div class="label">{{ $t('dashboard.uSDBmtMarketPrice') }}</div>
-                      <div class="content">${{ Number(data.blockchainstats.usdbmtMarketPrice).toFixed(2) }}</div>
-                    </div>
-                    <div class="text item">
-                      <div class="label">{{ $t('dashboard.totalBMTMarket') }}</div>
-                      <div class="content">${{ data.blockchainstats.totalBMTMarket }}</div>
-                    </div>
-                    <div class="text item">
-                      <div class="label">{{ $t('dashboard.tokenSupply') }}</div>
-                      <div class="content">{{ data.blockchainstats.tokenSupply }}/{{ data.blockchainstats.totalBMTMarket }}</div>
-                    </div>
-                  </el-card>
-                </el-col>
+      <el-row class="leftView">
+        <el-col v-show="data.leftShow" :span="23" class="leftContext">
+          <div style="color: #FFFFFF;padding: 10px">
+            <h3>Welcome to</h3>
+            <h2>Arkreen Explorer</h2>
+            Arkreen Explorer is a Block Explorer and Analytics Platform for Arkreen, a Decentralized Renewable Energy Resources Network.
+          </div>
+          <div class="data-info">
+            <el-col style="padding-top: 10px;padding-left: 15px;padding-inline-end: 15px">
+              <el-col :span="24" style="height: calc((100% / 2) - 50px );margin-top: 20px;">
+                <el-card class="box-card" >
+                  <div class="text item">
+                    <div class="label">{{ $t('dashboard.miners') }}</div>
+                    <div class="content">{{ data.minerStatistics.miners }}</div>
+                  </div>
+                  <div class="text item">
+                    <div class="label">{{ $t('dashboard.totalPowerLow') }}</div>
+                    <div class="content">{{ formatPower(data.minerStatistics.totalPowerLow) }}</div>
+                  </div>
+                  <div class="text item">
+                    <div class="label">{{ $t('dashboard.totalChargeVol') }}</div>
+                    <div class="content">{{ data.minerStatistics.totalChargeVol }}</div>
+                  </div>
+                </el-card>
               </el-col>
-            </div>
-          </el-col>
-          <el-col :span="1" style="margin-top: 120px">
-            <div class="leftViewChange">
-              <el-icon v-if="data.leftShow" @click="closeOrOpen" style="height: 90%;"><DArrowLeft /></el-icon>
-              <el-icon v-else @click="closeOrOpen" style="height: 90%;"><DArrowRight /></el-icon>
-            </div>
-          </el-col>
-        </el-row>
-      </div>
+              <el-col :span="24" style="margin-top: 15px;height: calc((100% / 2) - 65px )">
+                <el-card class="box-card">
+                  <div v-show="data.showMarket" class="text item">
+                    <div class="label">{{ $t('dashboard.uSDBmtMarketPrice') }}</div>
+                    <div class="content">${{ Number(data.blockchainstats.usdbmtMarketPrice).toFixed(2) }}</div>
+                  </div>
+                  <div v-show="data.showMarket" class="text item">
+                    <div class="label">{{ $t('dashboard.totalBMTMarket') }}</div>
+                    <div class="content">${{ data.blockchainstats.totalBMTMarket }}</div>
+                  </div>
+                  <div class="text item">
+                    <div class="label">{{ $t('dashboard.tokenSupply') }}</div>
+                    <div class="content">{{ data.blockchainstats.tokenSupply }}/{{ data.blockchainstats.totalBMTMarket }}</div>
+                  </div>
+                </el-card>
+              </el-col>
+            </el-col>
+          </div>
+        </el-col>
+        <el-col :span="1" style="margin-top: 120px">
+          <div class="leftViewChange">
+            <el-icon v-if="data.leftShow" @click="closeOrOpen" style="height: 90%;"><DArrowLeft /></el-icon>
+            <el-icon v-else @click="closeOrOpen" style="height: 90%;"><DArrowRight /></el-icon>
+          </div>
+        </el-col>
+      </el-row>
     </el-col>
   </el-row>
   <div v-show="data.minersDrawer" tabindex="-1" class="el-drawer__wrapper">
@@ -206,6 +204,7 @@ export default {
       map: null,
       max: 5,
       min: 1,
+      showMarket:false
     })
     const loadBlockchainstats = () => {
       getBlockchainstats().then((result) => {
@@ -435,9 +434,17 @@ export default {
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
 }
+.data-info{
+  position:absolute;
+  background-color: #FFFFFF;
+  width: 383.33px;
+  top: 210px;
+  bottom: 0px;
+}
 .leftView{
   position:absolute;
   top: 0px;
+  bottom: -22px;
 }
 .leftViewChange{
   width: 20px;
