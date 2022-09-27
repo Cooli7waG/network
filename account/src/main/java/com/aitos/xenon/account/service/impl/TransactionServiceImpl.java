@@ -1,24 +1,19 @@
 package com.aitos.xenon.account.service.impl;
 
-import com.aitos.blockchain.web3j.Erc20Service;
 import com.aitos.xenon.account.api.domain.dto.PoggRewardDetailDto;
 import com.aitos.xenon.account.api.domain.dto.PoggRewardDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionSearchDto;
-import com.aitos.xenon.account.api.domain.dto.TransferDto;
-import com.aitos.xenon.account.api.domain.vo.AccountVo;
 import com.aitos.xenon.account.api.domain.vo.TransactionVo;
-import com.aitos.xenon.account.domain.*;
+import com.aitos.xenon.account.domain.AccountReward;
+import com.aitos.xenon.account.domain.Transaction;
+import com.aitos.xenon.account.domain.TransactionReport;
 import com.aitos.xenon.account.mapper.TransactionMapper;
 import com.aitos.xenon.account.service.AccountRewardService;
 import com.aitos.xenon.account.service.AccountService;
 import com.aitos.xenon.account.service.TransactionService;
-import com.aitos.xenon.block.api.domain.dto.PoggGreenDataDto;
-import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.exceptions.ServiceException;
-import com.aitos.xenon.core.model.QueryParams;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +21,13 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,9 +38,6 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionMapper transactionMapper;
 
     @Autowired
-    private Erc20Service erc20Service;
-
-    @Autowired
     private AccountService accountService;
 
     @Autowired
@@ -55,7 +46,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void transaction(Transaction transaction) {
-
         transaction.setStatus(1);
         transaction.setCreateTime(LocalDateTime.now());
         transactionMapper.save(transaction);
@@ -63,39 +53,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void transfer(TransferDto transferDto) {
-
-        try {
-            BigDecimal fee = Convert.fromWei(transferDto.getFee().toString(), Convert.Unit.ETHER);
-           /* TransactionReceipt transactionReceipt=erc20Service.transfer(We3jUtils.toWeb3Address(account.getAddress()),fee.toBigInteger()).send();
-
-            Result<Long> heightResult=remoteBlockService.getBlockHeight();
-            if(heightResult.getCode()== ApiStatus.SUCCESS.getCode()){
-                Transaction transaction=new Transaction();
-                transaction.setHeight(heightResult.getData());
-                transaction.setData(transferDto.getTxData());
-                transaction.setHash(transferDto.getTxHash());
-                transaction.setWeb3TxHash(transactionReceipt.getTransactionHash());
-                transaction.setStatus(transactionReceipt.getStatus());
-                transactionMapper.save(transaction);
-
-                *//*if(transactionReceipt.getStatus().equals("0x1")){
-                    accountService.updateNonce(transferDto.getSignature());
-                }*//*
-            }*/
-        } catch (Exception e) {
-            log.error("transfer.error:{}", e);
-            throw new ServiceException(e.getMessage());
-        }
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
     public String poggReward(PoggRewardDto poggRewardDto) {
         try {
-            List<String> addressList = new ArrayList<>();
-            List<BigInteger> rewardList = new ArrayList<>();
-
             //生成交易数据
             String data = JSON.toJSONString(poggRewardDto);
             String txHash = DigestUtils.sha256Hex(data);
@@ -115,11 +74,6 @@ public class TransactionServiceImpl implements TransactionService {
                     BigDecimal ownerAmount = entry.getValue().stream()
                             .map(item -> item.getAmount()).reduce(BigDecimal::add)
                             .orElse(BigDecimal.ZERO);
-                    addressList.add(ownerAddress);
-
-                    BigDecimal blanceEther = Convert.toWei(ownerAmount, Convert.Unit.ETHER);
-                    rewardList.add(blanceEther.toBigInteger());
-
                     AccountReward  accountReward=new AccountReward();
                     accountReward.setAddress(ownerAddress);
                     accountReward.setAmount(ownerAmount);
@@ -133,10 +87,6 @@ public class TransactionServiceImpl implements TransactionService {
 
                     accountRewardList.add(accountReward);
                 }
-                //调用合约发送奖励
-                //TransactionReceipt transactionReceipt = erc20Service.rewardMiner_multi(addressList, rewardList).send();
-                //log.info("erc20.transactionReceipt={}",transactionReceipt.getTransactionHash());
-
                 //奖励明细记录
                 poggRewardDto.getRewards().forEach(item->{
                     AccountReward  accountReward=new AccountReward();
@@ -193,5 +143,15 @@ public class TransactionServiceImpl implements TransactionService {
         Page<TransactionReport> page = new Page<TransactionReport>(queryParams.getOffset(), queryParams.getLimit());
         IPage<TransactionReport> pageResult = transactionMapper.getTransactionListByOwner(page, queryParams);
         return pageResult;
+    }
+
+    @Override
+    public void reportDataToIpfs() {
+
+    }
+
+    @Override
+    public void blockDataToIpfs() {
+
     }
 }

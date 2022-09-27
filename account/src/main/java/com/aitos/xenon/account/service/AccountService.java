@@ -29,10 +29,6 @@ public interface AccountService {
 
     void updateBalance(Account account);
 
-    BigInteger bmtCirculation();
-
-    BmtStatisticsVo bmtStatistics();
-
     void updateEarning(List<AccountReward>  accountRewardList);
 
     void withdraw(String address, BigDecimal amount, LocalDateTime updateTime);

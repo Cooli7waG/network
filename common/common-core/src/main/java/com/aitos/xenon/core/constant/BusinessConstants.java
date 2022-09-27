@@ -183,4 +183,16 @@ public interface BusinessConstants
         String OWNER_ADDRESS = "ownerAddress";
         String OWNER = "owner";
     }
+
+    /**
+     * token key id
+     */
+    interface TokenKeyId{
+        String REWARD="key_reward_withdraw";
+        String PRIVILEGED="key_privileged_tx";
+        String POLYGON="key_polygon_payer";
+        String MINER_REGISTRY="key_miner_registry";
+        String IPFS="key_ipfs_master";
+        String REC="key_rec_issuing";
+    }
 }

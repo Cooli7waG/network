@@ -1,11 +1,15 @@
 package com.aitos.xenon.device.service.impl;
 
 import com.aitos.common.crypto.ecdsa.Ecdsa;
+import com.aitos.common.crypto.ecdsa.Hash;
 import com.aitos.xenon.account.api.RemoteAccountService;
+import com.aitos.xenon.account.api.RemoteKMSService;
 import com.aitos.xenon.account.api.RemoteTransactionService;
 import com.aitos.xenon.account.api.domain.dto.AccountRegisterDto;
+import com.aitos.xenon.account.api.domain.dto.RemoteKMSSignDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionDto;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
+import com.aitos.xenon.account.api.domain.vo.RemoteKMSSignVo;
 import com.aitos.xenon.block.api.RemoteBlockService;
 import com.aitos.xenon.block.api.RemoteSystemConfigService;
 import com.aitos.xenon.block.api.domain.vo.SystemConfigVo;
@@ -21,6 +25,7 @@ import com.aitos.xenon.core.exceptions.device.RecoverPublicKeyException;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
 import com.aitos.xenon.core.utils.MetaMaskUtils;
+import com.aitos.xenon.core.utils.SignatureProcessor;
 import com.aitos.xenon.device.api.RemoteDeviceService;
 import com.aitos.xenon.device.api.RemoteGameMinerService;
 import com.aitos.xenon.device.api.domain.dto.*;
@@ -39,6 +44,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -73,6 +79,9 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
     private RemoteGameMinerService remoteGameMinerService;
     @Autowired
     private RemoteSystemConfigService remoteSystemConfigService;
+
+    @Autowired
+    private RemoteKMSService remoteKMSService;
 
     @Value("${xenon.web.claim}")
     private String webClaimUrl;
@@ -254,13 +263,21 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
             deviceRegisterDto.setMinerType(BusinessConstants.DeviceMinerType.GAME_MINER);
             deviceRegisterDto.setTxData(applyGameMiner.getPersonalSign());
             //TODO 适配device register 只签名一个字段
-            Result<String> fundationRegister = remoteFundationService.register(deviceRegisterDto.getAddress());
-            log.info("remoteFundationService.register result:{}",JSON.toJSONString(fundationRegister));
-            if(fundationRegister.getCode() != ApiStatus.SUCCESS.getCode()){
-                log.info("remoteFundationService.register error:{}",JSON.toJSONString(fundationRegister));
+            //Result<String> fundationRegister = remoteFundationService.register(deviceRegisterDto.getAddress());
+            byte[] hash = Hash.sha3(deviceRegisterDto.getAddress().getBytes());
+            RemoteKMSSignDto remoteKMSSignDto=new RemoteKMSSignDto();
+            remoteKMSSignDto.setKeyId(BusinessConstants.TokenKeyId.MINER_REGISTRY);
+            remoteKMSSignDto.setHash(Hex.toHexString(hash));
+            remoteKMSSignDto.setRawData(deviceRegisterDto.getAddress());
+            Result<RemoteKMSSignVo> signResult = remoteKMSService.sign(remoteKMSSignDto);
+            log.info("remoteFundationService.register result:{}",JSON.toJSONString(signResult));
+            if(signResult.getCode() != ApiStatus.SUCCESS.getCode()){
+                log.info("remoteFundationService.register error:{}",JSON.toJSONString(signResult));
                 throw new MinerApplyException("miner apply failed");
             }
-            deviceRegisterDto.setFoundationSignature(fundationRegister.getData());
+            RemoteKMSSignVo remoteKMSSignVo = signResult.getData();
+            String sign=SignatureProcessor.signBuild(new SignatureProcessor.Signature(remoteKMSSignVo.getR(),remoteKMSSignVo.getS(),remoteKMSSignVo.getV()));
+            deviceRegisterDto.setFoundationSignature(sign);
             //调用 miner register
             Result deviceRegister = remoteDeviceService.register(deviceRegisterDto);
             if(deviceRegister.getCode() != ApiStatus.SUCCESS.getCode()){
