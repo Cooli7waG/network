@@ -9,6 +9,11 @@ const withdrawContractAddress = '0x139C33cA681b57aC53A288F16726a558E912f6d9'
 //Erc20合约地址
 const tokenContractAddress = '0xf2D4C9C2A9018F398b229D812871bf2B316D50E1'
 
+export async function getBalance() {
+    let balance = await provider.getBalance(getMetaMaskLoginUserAddress());
+    console.log("provider balance:" + balance);
+}
+
 /**
  * 查询代币余额
  * @returns balance

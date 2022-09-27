@@ -6,7 +6,7 @@
   <el-row :gutter="24">
     <el-col :span="20">
       <div class="mt-4">
-        <el-input v-model="data.query.address" :placeholder="$t('miners.query.searchPlaceHolder')">
+        <el-input v-model="data.query.address" :placeholder="$t('miners.query.searchPlaceHolder')"  v-on:keydown.enter="search">
           <template #append>
             <el-button type="primary" @click="search">{{$t('miners.query.searchButton')}}</el-button>
           </template>
@@ -77,6 +77,7 @@ import {onMounted, reactive} from "vue";
 import { useRoute  } from 'vue-router'
 
 export default {
+  name:"miner-list",
   props: {
     msg: String
   },

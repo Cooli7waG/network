@@ -23,9 +23,11 @@
     <el-col :span="4" class="login">
       <div style="float: right;margin-right: 10px" v-show="isShow">
         <div style="line-height: 50px">
-          <el-button type="text" style="color: #FFFFFF" @click="openDrawer">
-            <i class="iconfont icon-qianbao wallet-img"/>
-          </el-button>
+          <el-badge :is-dot="withdrawStatus" style="margin-top: 15px;height: 40px">
+            <el-button type="text" style="color: #FFFFFF;margin-top: -25px" @click="openDrawer">
+              <i class="iconfont icon-qianbao wallet-img"/>
+            </el-button>
+          </el-badge>
         </div>
       </div>
     </el-col>
@@ -72,8 +74,7 @@
             <el-row>
               <el-col :span="11" class="balance-div">
                 <div><span style="color: #72767b;font-size: 12px">Mining Reward</span></div>
-                <div><span
-                    style="font-size: 18px">{{ Number(Number(user.earningMint).toFixed(3)).toLocaleString() }}</span>
+                <div><span style="font-size: 18px">{{ Number(Number(user.earningMint).toFixed(3)).toLocaleString() }}</span>
                 </div>
               </el-col>
               <el-col :span="2" class="balance-div">
@@ -90,8 +91,8 @@
             </el-row>
           </div>
           <div style="text-align: center" v-show="withdrawStatus">
-            <span style="font-size: 12px;color: red">Withdrawal exception:</span>
-            <span style="font-size: 12px;color: red;cursor: pointer;text-decoration-line: underline" @click="gotoRouter('/wallet/withdraw')">deal with </span>
+            <span style="font-size: 12px;color: red">Withdrawal failed: </span>
+            <span style="font-size: 12px;color: red;cursor: pointer;text-decoration-line: underline" @click="gotoRouter('/wallet/withdraw')">retry</span>
           </div>
           <!-- 菜单项 -->
           <div style="margin-top: 25px">
@@ -194,6 +195,7 @@ export default {
   created() {
     this.getInfo();
     this.listenMetaMask();
+    this.loadFindByAddress();
   },
   methods: {
     async checkWithdraw(nonce) {
@@ -223,6 +225,7 @@ export default {
             this.$message.error("Not have earning mint that can be withdraw!")
             return;
           }
+
           const form = await this.handlePersonalSign(result.data.earningMint);
           console.log("withdraw request data:" + JSON.stringify(form))
           if(form == undefined){
@@ -454,6 +457,13 @@ export default {
 }
 </script>
 <style scoped>
+.el-badge__content {
+  height: 5px !important;
+  width: 5px !important;
+  padding: 0;
+  right: 0;
+  border-radius: 50%;
+}
 .notLogin {
   width: 100%;
   height: 850px;
