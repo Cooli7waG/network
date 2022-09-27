@@ -17,6 +17,7 @@
         <el-menu-item index="/wallet">{{ $t('menus.dashboard') }}</el-menu-item>
         <el-menu-item index="/wallet/miners">{{ $t('menus.miners') }}</el-menu-item>
         <el-menu-item index="/wallet/txs">{{ $t('menus.txs') }}</el-menu-item>
+        <el-menu-item index="/wallet/withdraw">{{ $t('menus.withdraw') }}</el-menu-item>
       </el-menu>
     </el-col>
     <el-col :span="4" class="login">
@@ -83,10 +84,14 @@
                 <div><span style="font-size: 18px">{{ Number(Number(user.balance).toFixed(3)).toLocaleString() }}</span>
                 </div>
               </el-col>
-              <el-col :span="24" class="transfer-btn" @click="transferBalance">
-                <span style="font-size: 16px;line-height: 30px">Withdraw Mining Reward</span>
+              <el-col :span="24" class="transfer-btn" @click="transferBalance" :disabled="withdrawStatus">
+                <span style="font-size: 16px;line-height: 30px" >Withdraw Mining Reward</span>
               </el-col>
             </el-row>
+          </div>
+          <div style="text-align: center" v-show="withdrawStatus">
+            <span style="font-size: 12px;color: red">Withdrawal exception:</span>
+            <span style="font-size: 12px;color: red;cursor: pointer;text-decoration-line: underline" @click="gotoRouter('/wallet/withdraw')">deal with </span>
           </div>
           <!-- 菜单项 -->
           <div style="margin-top: 25px">
@@ -161,7 +166,7 @@ import {
 import {accountInfo, withdraw} from "@/api/account";
 import {hexToBytes} from "@/utils/utils";
 import MetaMaskOnboarding from '@metamask/onboarding';
-import {balanceOf, etherWithdraw, getTransactionStatus} from '@/api/contract_utils'
+import {balanceOf, etherNonces, etherWithdraw, getTransactionStatus} from '@/api/contract_utils'
 import bs58 from 'bs58'
 
 export default {
@@ -179,6 +184,7 @@ export default {
       loadBalance: false,
       userAddress: undefined,
       isInit: false,
+      withdrawStatus: false,
       user: {
         earningMint: 0,
         balance: 'loading...'
@@ -190,17 +196,40 @@ export default {
     this.listenMetaMask();
   },
   methods: {
+    async checkWithdraw(nonce) {
+      let newNonce = await etherNonces();
+      if(nonce != newNonce){
+        this.withdrawStatus = true
+      }else {
+        this.withdrawStatus = false
+      }
+    },
     async transferBalance() {
-      let balance = await balanceOf()
-      console.log("balanceOf Result:" + balance)
-      this.handleWithdraw();
+      if(!await switchNetwork("0x13881")){
+        this.$message.error(this.$t('common.msg.metaMaskNetWorkNotFound'));
+        this.loading = false;
+        return;
+      }else {
+        this.handleWithdraw();
+      }
     },
     handleWithdraw() {
       this.loadBalance = true;
       accountInfo(getMetaMaskLoginUserAddress()).then(async (result) => {
         if (result.code == 0) {
+          this.user.earningMint = result.data.earningMint
+          if(result.data.earningMint<=0){
+            this.loadBalance = false;
+            this.$message.error("Not have earning mint that can be withdraw!")
+            return;
+          }
           const form = await this.handlePersonalSign(result.data.earningMint);
           console.log("withdraw request data:" + JSON.stringify(form))
+          if(form == undefined){
+            this.loadBalance = false;
+            this.$message.error("Please unlock metamask and try again!")
+            return;
+          }
           withdraw(form).then(async rsp => {
             console.log(rsp)
             if (rsp.code == 0) {
@@ -243,17 +272,21 @@ export default {
       });
     },
     async handlePersonalSign(amount) {
-      const form = {
-        address: getMetaMaskLoginUserAddress(),
-        amount: amount
+      try {
+        const form = {
+          address: getMetaMaskLoginUserAddress(),
+          amount: amount
+        }
+        let message = JSON.stringify(form);
+        console.log("Withdraw Personal Sign Message:" + message)
+        const requestSig = await personalSign(message);
+        let str = requestSig.substring(2);
+        console.log("Withdraw Personal Sign Result:" + str)
+        form.requestSig = bs58.encode(hexToBytes(str))
+        return form;
+      }catch (err){
+        return undefined;
       }
-      let message = JSON.stringify(form);
-      console.log("Withdraw Personal Sign Message:" + message)
-      const requestSig = await personalSign(message);
-      let str = requestSig.substring(2);
-      console.log("Withdraw Personal Sign Result:" + str)
-      form.requestSig = bs58.encode(hexToBytes(str))
-      return form;
     },
     async loadFindByAddress() {
       if (!this.isInit) {
@@ -267,14 +300,19 @@ export default {
         if (result.code == 0) {
           this.user.earningMint = result.data.earningMint.toLocaleString();
           this.isInit = true
+          this.checkWithdraw(result.data.nonce);
         }
         this.loadBalance = false;
       }).catch((err) => {
         console.log(err);
         this.loadBalance = false;
       });
-      let balance = await balanceOf()
-      this.user.balance = balance / Math.pow(10, 18)
+      try {
+        let balance = await balanceOf()
+        this.user.balance = balance / Math.pow(10, 18)
+      }catch (err){
+        this.user.balance = '0'
+      }
     },
     copyAddress() {
       const input = document.createElement('input')
@@ -308,6 +346,9 @@ export default {
       }
       if (path.startsWith("/wallet/tx/")) {
         return "/wallet/txs"
+      }
+      if (path.startsWith("/wallet/withdraw/")) {
+        return "/wallet/withdraw"
       }
       if (path == "/wallet") {
         return "/wallet"
@@ -398,11 +439,13 @@ export default {
       // 先判断用户是否安装MetaMask
       if (MetaMaskOnboarding.isMetaMaskInstalled()) {
         // eslint-disable-next-line no-undef
-        ethereum.on('accountsChanged', () => {
+        ethereum.on('accountsChanged', async () => {
           if (this.userAddress != undefined) {
             removeMetaMaskUserAddress();
-            //this.$router.push("/wallet");
+            this.userAddress = undefined;
             this.$router.push("/wallet?t=" + new Date().getMilliseconds());
+          } else {
+            this.userAddress = await loginWithMetaMask();
           }
         });
       }

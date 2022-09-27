@@ -4,15 +4,15 @@
     <el-col class="card-hor-style" :lg="24">
       <div style="padding: 5px 10px;">
         <div class="card-col" style="background: -webkit-linear-gradient(left, #C4E1FF , #66B3FF);">
-          <div>{{miner.total}}</div>
+          <div class="numericalView">{{miner.total}}</div>
           <span>Total Miner</span>
         </div>
         <div class="card-col" style="background: -webkit-linear-gradient(left, #FFBD9D , #FF5809);">
-          <div>{{Number(Number(user.earningMint).toFixed(3)).toLocaleString()}}</div>
+          <div class="numericalView">{{Number(Number(user.earningMint).toFixed(3)).toLocaleString()}}</div>
           <span>Mining Reward</span>
         </div>
         <div class="card-col" style="background: -webkit-linear-gradient(left, #BBFFBB , #28FF28);">
-          <div>{{user.balance}}</div>
+          <div class="numericalView">{{Number(user.balance).toLocaleString()}}</div>
           <span>AKRE Balance</span>
         </div>
       </div>
@@ -268,9 +268,14 @@ export default {
         console.log(err);
         this.loadBalance = false;
       });
-      let balance = await balanceOf()
-      let b = balance/Math.pow(10,18)
-      this.user.balance = Number(b).toFixed(3);
+      try {
+        let balance = await balanceOf()
+        let b = balance/Math.pow(10,18)
+        this.user.balance = Number(b).toFixed(3);
+      }catch (err){
+        this.user.balance = '0';
+      }
+
     },
     drawHistogram(data,rotateX){
       const labels = [];
@@ -572,6 +577,10 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.numericalView{
+  font-weight: bold;
+  font-size: 26px;
+}
 .closeDialogLineVisible :hover{
   color: #545c64;
 }
@@ -583,7 +592,7 @@ export default {
 }
 .card-col{
   margin: 10px;
-  width: 250px;
+  width: 260px;
   float: left;
   padding-left: 25px;
   padding-top: 35px;
@@ -592,10 +601,6 @@ export default {
 }
 .card-col span{
   font-size: 25px;
-}
-.card-col div {
-  font-size: 28px;
-  font-weight: bold;
 }
 .card-operate-btn{
   float: right;

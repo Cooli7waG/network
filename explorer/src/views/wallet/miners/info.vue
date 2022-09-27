@@ -153,7 +153,7 @@
         <el-row :gutter="24">
           <el-form ref="queryForm" :inline="true">
             <el-form-item label="TxHash" prop="txHash">
-              <el-input style="width: 240px" v-model="data.page.txHash" placeholder="Please input transaction hash" clearable @keyup.enter.native="handleGetTransaction"/>
+              <el-input style="width: 240px" v-model="data.page.txHash" placeholder="Please input transaction hash" clearable v-on:keydown.enter="handleGetTransaction"/>
             </el-form-item>
             <el-form-item label="TxType" prop="txType">
               <el-select style="width: 260px" v-model="data.page.txType" placeholder="Please select transaction type" clearable @change="handleGetTransaction">
@@ -264,6 +264,7 @@ import {statisticsRewardByDay} from "@/api/walletDashboard";
 import * as echarts from "echarts";
 
 export default {
+  name:'wallet-miner-info',
   components: {},
   props: {
     msg: String

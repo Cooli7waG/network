@@ -88,6 +88,11 @@ const routes = [
                 component: import('@/views/wallet/transaction/index.vue'),
             },
             {
+                path: "withdraw",
+                name: "Withdraw List",
+                component: import('@/views/wallet/withdraw/index.vue'),
+            },
+            {
                 path: "tx/:hash",
                 name: "Transaction Info",
                 component: import('@/views/wallet/transaction/info.vue'),

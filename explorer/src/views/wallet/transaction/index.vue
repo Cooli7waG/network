@@ -1,8 +1,8 @@
 <template>
   <el-row :gutter="24">
-    <el-form :model="data.query" ref="queryForm" :inline="true">
+    <el-form :model="data.query" ref="queryForm" :inline="true" style="padding-left: 15px">
       <el-form-item label="TxHash" prop="txHash">
-        <el-input style="width: 240px" v-model="data.query.txHash" placeholder="Please input transaction hash" clearable @keyup.enter.native="loadTransactionList"/>
+        <el-input style="width: 240px" v-model="data.query.txHash" placeholder="Please input transaction hash" v-on:keydown.enter="loadTransactionList"/>
       </el-form-item>
       <el-form-item label="TxType" prop="txType">
         <el-select style="width: 260px" v-model="data.query.txType" placeholder="Please select transaction type" clearable @change="loadTransactionList">
@@ -62,6 +62,7 @@ import {useRoute} from 'vue-router'
 import {getMetaMaskLoginUserAddress} from "@/api/metamask_utils";
 
 export default {
+  name:'wallte-ransaction-list',
   props: {
     msg: String
   },
@@ -99,6 +100,7 @@ export default {
         {value:5,label:"TX_Airdrop_Miner"},
         {value:6,label:"TX_Claim_Miner"},
         {value:9,label:"TX_Reward_PoGG"},
+        {value:11,label:"TX_Withdraw"},
       ],
       tableList: []
     })
@@ -128,7 +130,7 @@ export default {
       const params = {
         owner: data.query.owner,
         txType: data.query.txType,
-        txHash: data.query.txHash,
+        hash: data.query.txHash,
         offset: data.query.page.currentPage,
         limit: data.query.page.pageSize
       }

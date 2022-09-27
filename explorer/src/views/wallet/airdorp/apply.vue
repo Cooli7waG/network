@@ -16,10 +16,6 @@
       <div class="btnDiv" style="margin-top: 10px">
         <el-button type="primary" @click="submitForm('minerForm')" :disabled="userAddress==null||!applyActive||loading">Request</el-button>
       </div>
-      <!--<div class="btnDiv">
-        <el-button type="success" @click="gotoMinerList" :disabled="userAddress==null||!applyActive">View My Miners
-        </el-button>
-      </div>-->
     </div>
   </el-container>
 
@@ -55,8 +51,8 @@ export default {
       },
       rules: {
         email: [
-          {required: true, trigger: "blur", message: "Please enter your email"},
-          {type: 'email', message: 'Please enter the correct email address', trigger: ['blur', 'change']}
+          {required: true, trigger: "blur", message: this.$t("common.msg.PleaseEnterYourEmail")},
+          {type: 'email', message: this.$t("common.msg.PleaseEnterTheCorrectEmailAddress"), trigger: ['blur', 'change']}
         ]
       },
     };
@@ -74,6 +70,7 @@ export default {
       //
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
+          this.LoadingText = "Applying, please wait...";
           try {
             // 先判断用户是否安装MetaMask
             if(!MetaMaskOnboarding.isMetaMaskInstalled()){
@@ -87,12 +84,20 @@ export default {
               this.loading = false;
               return;
             }
-            this.LoadingText = "Applying, please wait...";
             //
             this.minerForm.owner = this.userAddress;
-            if(this.applyPersonalSign){
-              let message = JSON.stringify(this.minerForm);
-              this.minerForm.personalSign = await personalSign(message);
+            try {
+              if(this.applyPersonalSign){
+                let message = JSON.stringify(this.minerForm);
+                this.minerForm.personalSign = await personalSign(message);
+              }
+            }catch (err){
+              this.loading = false;
+              this.resultMsg = "signature failed,please try again!";
+              if(err.code == 4001){
+                this.resultMsg = "User denied message signature.";
+              }
+              return ;
             }
             //
             applyGameMiner(JSON.stringify(this.minerForm)).then(rsp => {
@@ -140,6 +145,7 @@ export default {
           this.loading = false;
           //this.applyActive =  rsp.data.applyActive;
           this.applyPersonalSign = rsp.data.applyPersonalSign;
+          //this.applyPersonalSign = true;
         } else {
           this.loading = false;
         }
