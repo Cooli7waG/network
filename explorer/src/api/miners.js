@@ -71,6 +71,14 @@ export function claimGameMiner(data){
     })
 }
 
+export function nftsign(data){
+    return request({
+        url: '/device/airdroprecord/nftsign',
+        method: 'post',
+        data:data
+    })
+}
+
 export function getMinerListByOwner(data){
     return request({
         url: '/device/device/getMinerListByOwner/'+data,
