@@ -36,21 +36,10 @@ public class ScheduledService {
             poggService.commit();
         }
     }
-
-    /**
-     * commit
-     * 每小时执行
-     *//*
-    @Scheduled(cron = "0 0 * * * *")
-    @Transactional(rollbackFor = Exception.class)
-    public void poggCommitTask(){
-        log.info("poggCommitTask");
-        poggService.commit();
-    }*/
     /**
      *  奖励计算
      */
-    @Scheduled(cron = "30 0 * * * *")
+    @Scheduled(cron = "${schedule.rewardCalculation}")
     @Transactional(rollbackFor = Exception.class)
     public void rewardCalculationTask(){
         log.info("rewardCalculationTask");
@@ -60,7 +49,7 @@ public class ScheduledService {
     /**
      *  奖励发放
      */
-    @Scheduled(cron = "0 30 * * * *")
+    @Scheduled(cron = "${schedule.giveOutRewards}")
     @Transactional(rollbackFor = Exception.class)
     public void giveOutRewardsTask(){
         log.info("giveOutRewardsTask");

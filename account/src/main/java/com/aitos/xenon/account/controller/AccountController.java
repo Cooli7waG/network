@@ -6,10 +6,7 @@ import com.aitos.common.crypto.ecdsa.Hash;
 import com.aitos.xenon.account.api.RemoteKMSService;
 import com.aitos.xenon.account.api.RemoteTokenService;
 import com.aitos.xenon.account.api.domain.dto.*;
-import com.aitos.xenon.account.api.domain.vo.AccountVo;
-import com.aitos.xenon.account.api.domain.vo.AccountWithdrawVo;
-import com.aitos.xenon.account.api.domain.vo.BmtStatisticsVo;
-import com.aitos.xenon.account.api.domain.vo.TokenServiceSearchNonceVo;
+import com.aitos.xenon.account.api.domain.vo.*;
 import com.aitos.xenon.account.domain.Account;
 import com.aitos.xenon.account.domain.Transaction;
 import com.aitos.xenon.account.domain.TxWithdraw;
@@ -125,18 +122,6 @@ public class AccountController {
         return Result.ok(page);
     }
 
-    @GetMapping("/bmtCirculation")
-    public Result<String> bmtCirculation(){
-        BigInteger value= accountService.bmtCirculation();
-        return Result.ok(value.toString());
-    }
-
-    @GetMapping("/bmtStatistics")
-    public Result<BmtStatisticsVo> bmtStatistics(){
-        BmtStatisticsVo bmtStatisticsVo= accountService.bmtStatistics();
-        return Result.ok(bmtStatisticsVo);
-    }
-
     @PostMapping("/withdraw")
     public Result<HashMap> withdraw(@Validated @RequestBody AccountWithdrawDto accountWithdrawDto){
         log.info("withdraw.params={}",JSON.toJSONString(accountWithdrawDto));
@@ -157,6 +142,7 @@ public class AccountController {
         TokenServiceSearchNonceDto tokenServiceSearchNonceDto=new TokenServiceSearchNonceDto();
         tokenServiceSearchNonceDto.setAccount(accountWithdrawDto.getAddress());
         Result<TokenServiceSearchNonceVo> nonceResult = remoteTokenService.fetchNonce(tokenServiceSearchNonceDto);
+        log.info("nonceResult={}",JSON.toJSONString(nonceResult));
         Long nonce = accountVo.getNonce();
         if(nonceResult.getCode()!=ApiStatus.SUCCESS.getCode()){
             return Result.failed(ApiStatus.ERROR);
@@ -170,34 +156,38 @@ public class AccountController {
         tokenServiceSignatureDto.setNonce(nonce);
         tokenServiceSignatureDto.setValue(accountWithdrawDto.getAmountToDecimal().multiply(new BigDecimal(10).pow(18)).toBigInteger().toString());
         Result<HashMap> withdrawResult = remoteTokenService.withdraw(tokenServiceSignatureDto);
+        log.info("withdrawResult={}",JSON.toJSONString(withdrawResult));
         if(withdrawResult.getCode()!=ApiStatus.SUCCESS.getCode()){
             return Result.failed(ApiStatus.ERROR);
         }
-        log.info("withdrawResult={}",JSON.toJSONString(withdrawResult));
+
 
         //kms签名
-        /*JSONObject withDrawReq=(JSONObject)JSON.toJSON(accountWithdrawDto);
+        JSONObject withDrawReq=(JSONObject)JSON.toJSON(accountWithdrawDto);
         withDrawReq.put("metaTx",withdrawResult.getData());
         String withdrawTxJSON=withDrawReq.toJSONString();
         byte[] hash = Hash.sha3(withdrawTxJSON.getBytes());
         RemoteKMSSignDto remoteKMSSignDto=new RemoteKMSSignDto();
-        remoteKMSSignDto.setKeyId("Privileged_TX_Key");
+        remoteKMSSignDto.setKeyId(BusinessConstants.TokenKeyId.REWARD);
         remoteKMSSignDto.setHash(Hex.toHexString(hash));
         remoteKMSSignDto.setRawData(withdrawTxJSON);
-        Result<String> signResult = remoteKMSService.sign(remoteKMSSignDto);
+        Result<RemoteKMSSignVo> signResult = remoteKMSService.sign(remoteKMSSignDto);
+        log.info("signResult={}",JSON.toJSONString(signResult));
         if(signResult.getCode()!=ApiStatus.SUCCESS.getCode()){
             return Result.failed(ApiStatus.ERROR);
-        }*/
+        }
 
         //生成交易记录
         TxWithdraw txWithdraw=new TxWithdraw();
-        txWithdraw.setWithdrawTxSig("demo");
-        txWithdraw.setWithDrawReq(JSON.toJSONString(accountWithdrawDto));
+        txWithdraw.setWithdrawTxSig(signResult.getData());
+        txWithdraw.setWithDrawReq(accountWithdrawDto);
+        txWithdraw.setMetaTx(withdrawResult.getData());
 
         String jsonData = JSON.toJSONString(txWithdraw);
         String txHash = DigestUtils.sha256Hex(jsonData);
 
         Result<Long> blockHeightResult = remoteBlockService.getBlockHeight();
+        log.info("blockHeightResult={}",JSON.toJSONString(blockHeightResult));
         if(blockHeightResult.getCode()!=ApiStatus.SUCCESS.getCode()){
             return Result.failed(ApiStatus.ERROR);
         }

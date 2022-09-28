@@ -14,8 +14,6 @@ import java.util.List;
 public interface TransactionService {
     void transaction(Transaction transaction);
 
-    void transfer(TransferDto transferDto);
-
     String poggReward(PoggRewardDto poggRewardDto);
 
     Transaction query(String txHash);
@@ -25,4 +23,8 @@ public interface TransactionService {
     List<Transaction> getAll();
 
     IPage<TransactionReport> getTransactionListByOwner(TransactionSearchDto queryParams);
+
+    void reportDataToIpfs();
+
+    void blockDataToIpfs();
 }

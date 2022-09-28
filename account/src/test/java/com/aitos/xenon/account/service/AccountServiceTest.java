@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.codec.Hex;
-import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -60,11 +59,11 @@ public class AccountServiceTest {
 
     @Test
     public void test2(){
-      BigDecimal a1=  Convert.fromWei("500000000000000000000", Convert.Unit.ETHER);
+      /*BigDecimal a1=  Convert.fromWei("500000000000000000000", Convert.Unit.ETHER);
         System.out.println(a1);
 
         BigDecimal a2=  Convert.toWei(a1, Convert.Unit.ETHER);
-        System.out.println(a2);
+        System.out.println(a2);*/
     }
 
     @Test
@@ -91,8 +90,8 @@ public class AccountServiceTest {
     @Test
     public void test_findByAddress(){
 
-        AccountVo byAddress = accountService.findByAddress("0xefe22f370d03ace02f82e379a754b072123e4db2");
-        System.out.println(byAddress);
+        /*AccountVo byAddress = accountService.findByAddress("0xefe22f370d03ace02f82e379a754b072123e4db2");
+        System.out.println(byAddress);*/
     }
 
 
