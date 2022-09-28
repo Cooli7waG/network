@@ -8,7 +8,7 @@
         <el-button type="primary" @click="handleClaimGameMiner" :disabled="userAddress==null">Claim</el-button>
       </div>
       <div v-show="false" class="btnDiv">
-        <el-button type="primary" @click="handleNft" :disabled="userAddress==null">NFT</el-button>
+        <el-button type="primary" @click="testNft" :disabled="userAddress==null">NFT</el-button>
       </div>
     </div>
   </el-container>
@@ -21,7 +21,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="handleClose">Cancel</el-button>
-        <el-button type="primary" @click="mintNft">Yes</el-button>
+        <el-button type="primary" @click="mintNft">Continue</el-button>
       </span>
     </template>
   </el-dialog>
@@ -44,7 +44,7 @@ export default {
       labelPosition: 'top',
       centerDialogVisible: false,
       userAddress: undefined,
-      dialogVisible: undefined,
+      dialogVisible: false,
       dialogMsg: 'Arkreen Network can mint a NFT for your GamingMiner(), do you want continue?',
       minerForm: {
         version: 1,
@@ -71,6 +71,29 @@ export default {
       }else {
         this.$router.push("/wallet/miners")
       }
+    },
+    async testNft(){
+      let bAirDrop = false;
+      let deadline = (Date.now()/1000+(7*24*60*60)).toFixed(0);
+      let v = 28;
+      let r = '0x'+'ddbe771575e279d5b887dca9f953a733c9c5b7d1f236f454e52f91904438772a';
+      let s = '0x'+'1bf4605dc73d294098f3f9aed7b7e98fac51633320aa0a735b3f1511e2c83bc2';
+      let sigRegister = {
+        v,
+        r,
+        s
+      }
+      let hash = await etherGameMinerOnboard(getMetaMaskLoginUserAddress(), this.minerForm.minerAddress, bAirDrop,deadline , sigRegister);
+      console.log("etherGameMinerOnboard result hash:" + hash)
+      this.$message.info("The nft mint has been submitted. Please wait...")
+      let status = await getTransactionStatus(hash);
+      console.log('Transaction Status: ' + status);
+      if (status == 0) {
+        this.$message.error("nft mint failed!")
+      } else {
+        this.$message.success("nft mint success!")
+      }
+      this.$router.push("/wallet/miners")
     },
     async mintNft() {
       let owner = getMetaMaskLoginUserAddress();
