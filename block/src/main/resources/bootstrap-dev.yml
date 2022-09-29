@@ -15,4 +15,5 @@ spring:
         shared-configs:
            - mysql-dev.yml
            - redis-dev.yml
+           - global-params-dev.yml
 

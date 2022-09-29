@@ -64,6 +64,8 @@ public class PoggReportServiceImpl implements PoggReportService {
         }
 
         TransactionDto transactionDto = new TransactionDto();
+        transactionDto.setFromAddress(poggReportDto.getAddress());
+        transactionDto.setOwnerAddress(poggReportDto.getOwnerAddress());
         transactionDto.setHeight(currentBlock.getHeight());
         transactionDto.setData(poggReportDto.getRawDataJSON());
         transactionDto.setHash(txHash);

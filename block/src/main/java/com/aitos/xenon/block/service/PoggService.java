@@ -6,6 +6,7 @@ public interface PoggService {
     void commit();
 
     PoggCommit  findCurrentCommit();
+    PoggCommit  findByEpoch(Long epoch);
     /**
      * 奖励计算
      */
@@ -15,4 +16,6 @@ public interface PoggService {
      * 发放奖励
      */
     void giveOutRewards();
+
+    void blockDataToIpfs();
 }

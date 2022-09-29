@@ -20,19 +20,12 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Autowired
     private StatisticsMapper statisticsMapper;
 
-    @Autowired
-    private RemoteAccountService remoteAccountService;
-
     private final String uSDBmtMarketPrice="1";
 
     @Override
     public BlockChainStatistics blockchainstats() {
-        Result<BmtStatisticsVo> result= remoteAccountService.bmtStatistics();
-        BmtStatisticsVo bmtStatisticsVo=result.getData();
         BlockChainStatistics  blockChainStatistics=new BlockChainStatistics();
         blockChainStatistics.setUSDBmtMarketPrice(uSDBmtMarketPrice);
-        blockChainStatistics.setTotalBMTMarket(bmtStatisticsVo.getTotalBMTMarket());
-        blockChainStatistics.setTokenSupply(bmtStatisticsVo.getTokenSupply());
         return blockChainStatistics;
     }
 

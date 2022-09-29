@@ -6,13 +6,11 @@ import com.aitos.xenon.account.api.RemoteTransactionService;
 import com.aitos.xenon.account.api.domain.dto.PoggRewardDetailDto;
 import com.aitos.xenon.account.api.domain.dto.PoggRewardDto;
 import com.aitos.xenon.account.api.domain.dto.TransactionDto;
+import com.aitos.xenon.block.api.domain.vo.BlockVo;
 import com.aitos.xenon.block.domain.*;
 import com.aitos.xenon.block.mapper.PoggMapper;
 import com.aitos.xenon.block.mapper.PoggRewardMapper;
-import com.aitos.xenon.block.service.BlockService;
-import com.aitos.xenon.block.service.PoggReportService;
-import com.aitos.xenon.block.service.PoggService;
-import com.aitos.xenon.block.service.SystemConfigService;
+import com.aitos.xenon.block.service.*;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.exceptions.ServiceException;
@@ -57,6 +55,9 @@ public class PoggServiceImpl implements PoggService {
 
     @Autowired
     private PoggRewardMapper poggRewardMapper;
+
+    @Autowired
+    private EpochRewardService epochRewardService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -107,6 +108,22 @@ public class PoggServiceImpl implements PoggService {
         return poggMapper.findCurrentCommit();
     }
 
+    @Override
+    public void blockDataToIpfs() {
+
+        PoggCommit currentCommit = this.findCurrentCommit();
+
+        PoggCommit prevPoggCommit = this.findByEpoch(currentCommit.getEpoch() - 1);
+
+        List<BlockVo> listByHeight = blockService.findListByHeight(prevPoggCommit.getHeight(), currentCommit.getHeight());
+
+        //remoteIPFSService.putRECData()
+    }
+    @Override
+    public PoggCommit findByEpoch(Long epoch) {
+        return poggMapper.findByEpoch(epoch);
+    }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -122,6 +139,12 @@ public class PoggServiceImpl implements PoggService {
         //统计自定范围内miner上报的记录数
         long startEpoch = poggCommit.getEpoch() - systemConfig.getCalDataRange();
         long endEpoch = poggCommit.getEpoch();
+
+        EpochReward epochReward = epochRewardService.findByEpoch(poggCommit.getEpoch());
+        if(epochReward==null){
+            return;
+        }
+        systemConfig.setPerEpochTokenNumber(epochReward.getTokenNumber());
 
         String rewardsJson="[]";
         /**
@@ -244,7 +267,7 @@ public class PoggServiceImpl implements PoggService {
 
 
         //每个epoch奖励token数量
-        BigDecimal token = BigDecimal.valueOf(systemConfig.getPerEpochTokenNumber());
+        BigDecimal token = systemConfig.getPerEpochTokenNumber();
 
         //奖励数量
         BigDecimal awardNumber = token.multiply(minerRewardRatio);

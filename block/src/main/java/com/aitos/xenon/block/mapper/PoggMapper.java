@@ -2,6 +2,7 @@ package com.aitos.xenon.block.mapper;
 
 import com.aitos.xenon.block.domain.PoggCommit;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface PoggMapper {
@@ -17,4 +18,6 @@ public interface PoggMapper {
      * @return
      */
     PoggCommit findOverCommit();
+
+    PoggCommit findByEpoch(@Param("epoch") Long epoch);
 }

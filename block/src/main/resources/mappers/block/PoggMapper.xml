@@ -17,6 +17,9 @@
     <select id="findOverCommit" resultType="com.aitos.xenon.block.domain.PoggCommit">
         select * from <include refid="tableName"/> where status=1 order by epoch desc limit 1
     </select>
+    <select id="findByEpoch" resultType="com.aitos.xenon.block.domain.PoggCommit">
+        select * from <include refid="tableName"/> where epoch=#{epoch}
+    </select>
 
     <update id="updateCommit">
         update <include refid="tableName"/> set status=#{status},update_time=#{updateTime} where id=#{id}

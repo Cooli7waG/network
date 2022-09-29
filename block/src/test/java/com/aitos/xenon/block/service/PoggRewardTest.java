@@ -168,7 +168,7 @@ public class PoggRewardTest {
 
 
         //每个epoch奖励token数量
-        BigDecimal token=BigDecimal.valueOf(systemConfig.getPerEpochTokenNumber());
+        BigDecimal token=systemConfig.getPerEpochTokenNumber();
 
         //奖励数量
         BigDecimal awardNumber = token.multiply(minerRewardRatio);

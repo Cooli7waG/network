@@ -3,6 +3,8 @@ package com.aitos.xenon.block.domain;
 import com.aitos.xenon.core.model.BaseModel;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class SystemConfig extends BaseModel {
     /**
@@ -45,7 +47,7 @@ public class SystemConfig extends BaseModel {
     /**
      * 每个周期奖励token数量
      */
-    private float perEpochTokenNumber;
+    private BigDecimal perEpochTokenNumber;
     /**
      * 用户申领GameMiner的有效期为1周
      */

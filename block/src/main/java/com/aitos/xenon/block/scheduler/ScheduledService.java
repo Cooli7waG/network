@@ -55,4 +55,14 @@ public class ScheduledService {
         log.info("giveOutRewardsTask");
         poggService.giveOutRewards();
     }
+
+
+    /**
+     *  上报block交易
+     */
+    @Scheduled(cron = "${schedule.blockDataToIpfs}")
+    public void blockDataToIpfsTask(){
+        log.info("blockDataToIpfsTask");
+        poggService.blockDataToIpfs();
+    }
 }
