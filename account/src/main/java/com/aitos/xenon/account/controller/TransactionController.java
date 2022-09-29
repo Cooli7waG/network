@@ -41,16 +41,6 @@ public class TransactionController {
         return Result.ok();
     }
 
-    @PostMapping("/transfer")
-    public Result transfer(@RequestBody TransferDto transferDto){
-        Boolean verify= Ecdsa.verifyByAddress(foundationPublicKey,transferDto.getPayments().get(0).getPayee(),transferDto.getSignature(), DataCoder.BASE58);
-        if(!verify){
-            return Result.failed(ApiStatus.BUSINESS_TRANSACTION_SIGN_ERROR);
-        }
-        transferDto.setTxData(JSON.toJSONString(transferDto));
-        transactionService.transfer(transferDto);
-        return Result.ok();
-    }
 
     @PostMapping("/poggReward")
     public Result<String> poggReward(@RequestBody PoggRewardDto poggRewardDto){
@@ -80,5 +70,11 @@ public class TransactionController {
         List<TransactionReport>  listVo=BeanConvertor.toList(listPage.getRecords(),TransactionReport.class);
         Page<TransactionReport> page=new Page<>(listPage.getTotal(),listVo);
         return Result.ok(page);
+    }
+
+    @GetMapping("/findHashByHeight")
+    public Result<List<String>> findHashByHeight(@RequestParam("height") Long height){
+        List<String> hashList= transactionService.findHashByHeight(height);
+        return Result.ok(hashList);
     }
 }

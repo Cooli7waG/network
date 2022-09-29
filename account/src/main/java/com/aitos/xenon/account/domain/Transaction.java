@@ -26,4 +26,5 @@ public class Transaction extends BaseModel {
     private Integer txType;
 
     private String fromAddress;
+    private String ownerAddress;
 }

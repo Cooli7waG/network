@@ -26,5 +26,5 @@ public interface TransactionService {
 
     void reportDataToIpfs();
 
-    void blockDataToIpfs();
+    List<String> findHashByHeight(Long height);
 }

@@ -1,8 +1,9 @@
 package com.aitos.xenon.account.service.impl;
 
-import com.aitos.xenon.account.api.domain.dto.PoggRewardDetailDto;
-import com.aitos.xenon.account.api.domain.dto.PoggRewardDto;
-import com.aitos.xenon.account.api.domain.dto.TransactionSearchDto;
+import com.aitos.xenon.account.api.RemoteIPFSService;
+import com.aitos.xenon.account.api.domain.dto.*;
+import com.aitos.xenon.account.api.domain.vo.AccountVo;
+import com.aitos.xenon.account.api.domain.vo.TransactionToIpfsVo;
 import com.aitos.xenon.account.api.domain.vo.TransactionVo;
 import com.aitos.xenon.account.domain.AccountReward;
 import com.aitos.xenon.account.domain.Transaction;
@@ -13,6 +14,7 @@ import com.aitos.xenon.account.service.AccountService;
 import com.aitos.xenon.account.service.TransactionService;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.exceptions.ServiceException;
+import com.aitos.xenon.core.model.Result;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -26,6 +28,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,6 +45,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private AccountRewardService accountRewardService;
+
+    @Autowired
+    private RemoteIPFSService remoteIPFSService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -147,11 +153,42 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public void reportDataToIpfs() {
+        LocalDateTime  startTime=LocalDateTime.now().minusDays(1).withHour(0).withMinute(0).withSecond(0);
+        LocalDateTime endTime=startTime.withHour(23).withMinute(59).withSecond(59);
 
+        AccountSearchDto accountSearchDto=new AccountSearchDto();
+        accountSearchDto.setOffset(1);
+        accountSearchDto.setLimit(100);
+        accountSearchDto.setOffset(1);
+        accountSearchDto.setAccountType(BusinessConstants.AccountType.MINER);
+        long pages = 1;
+        while (accountSearchDto.getOffset()<=pages){
+            IPage<AccountVo> list = accountService.list(accountSearchDto);
+            pages = list.getPages();
+            if(list.getRecords().size()>0){
+                for (AccountVo accountVo : list.getRecords()) {
+                   List<TransactionToIpfsVo> transactionVoList= transactionMapper.findReportData(accountVo.getAddress(),startTime,endTime);
+                   if(transactionVoList.size()>0){
+                       IPFSPutDto iPFSPutDto=new IPFSPutDto();
+                       iPFSPutDto.setDate(startTime.toLocalDate());
+                       iPFSPutDto.setOwnerAddress(transactionVoList.get(0).getOwnerAddress());
+                       iPFSPutDto.setMinerAddress(accountVo.getAddress());
+                       iPFSPutDto.setData(transactionVoList);
+
+                       log.info("ipfs.push.params={}",JSON.toJSONString(iPFSPutDto));
+                       Result result = remoteIPFSService.putRECData(iPFSPutDto);
+                       log.info("ipfs.push.result={}",result);
+                   }
+                }
+                accountSearchDto.setOffset(accountSearchDto.getOffset()+1);
+            }else{
+                break;
+            }
+        }
     }
 
     @Override
-    public void blockDataToIpfs() {
-
+    public List<String> findHashByHeight(Long height) {
+        return transactionMapper.findHashByHeight(height);
     }
 }

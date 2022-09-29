@@ -81,6 +81,9 @@
             <if test="queryParams.address!=null and queryParams.address!=''">
                 a.address=#{queryParams.address}
             </if>
+            <if test="queryParams.accountType!=null">
+               and a.account_type=#{queryParams.accountType}
+            </if>
         </where>
         order by a.create_time desc
     </select>

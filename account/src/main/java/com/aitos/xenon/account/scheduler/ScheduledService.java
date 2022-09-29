@@ -23,13 +23,4 @@ public class ScheduledService {
         transactionService.reportDataToIpfs();
     }
 
-    /**
-     *  上报block交易
-     */
-    @Scheduled(cron = "${schedule.blockDataToIpfs}")
-    @Transactional(rollbackFor = Exception.class)
-    public void blockDataToIpfsTask(){
-        log.info("reportDataToIpfsTask");
-        transactionService.blockDataToIpfs();
-    }
 }
