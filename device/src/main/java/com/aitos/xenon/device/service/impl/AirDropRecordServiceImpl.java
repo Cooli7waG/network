@@ -266,7 +266,7 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
             //Result<String> fundationRegister = remoteFundationService.register(deviceRegisterDto.getAddress());
             byte[] hash = Hash.sha3(deviceRegisterDto.getAddress().getBytes());
             RemoteKMSSignDto remoteKMSSignDto=new RemoteKMSSignDto();
-            remoteKMSSignDto.setKeyId(BusinessConstants.TokenKeyId.MINER_REGISTRY);
+            remoteKMSSignDto.setKeyId(BusinessConstants.TokenKeyId.PRIVILEGED);
             remoteKMSSignDto.setHash(Hex.toHexString(hash));
             remoteKMSSignDto.setRawData(deviceRegisterDto.getAddress());
             Result<RemoteKMSSignVo> signResult = remoteKMSService.sign(remoteKMSSignDto);
@@ -276,7 +276,7 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
                 throw new MinerApplyException("miner apply failed");
             }
             RemoteKMSSignVo remoteKMSSignVo = signResult.getData();
-            String sign=SignatureProcessor.signBuild(new SignatureProcessor.Signature(remoteKMSSignVo.getR(),remoteKMSSignVo.getS(),remoteKMSSignVo.getV()));
+            String sign=SignatureProcessor.signBuild(new SignatureProcessor.Signature(remoteKMSSignVo.getR(),remoteKMSSignVo.getS(),remoteKMSSignVo.getRecid()));
             deviceRegisterDto.setFoundationSignature(sign);
             //调用 miner register
             Result deviceRegister = remoteDeviceService.register(deviceRegisterDto);
@@ -310,12 +310,25 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
 
             airDropDto.setMinerInfo(deviceInfoDto);
             String airJson = JSON.toJSONString(airDropDto);
-            Result<String> airdropResult = remoteFundationService.airdrop(airJson);
-            log.info("remoteFundationService.airdrop result:{}",airdropResult.getData());
-            String airdropSign = airdropResult.getData();
+
+            byte[] hash2 = Hash.sha3(airJson.getBytes());
+            RemoteKMSSignDto remoteKMSSignDto2=new RemoteKMSSignDto();
+            remoteKMSSignDto2.setKeyId(BusinessConstants.TokenKeyId.PRIVILEGED);
+            remoteKMSSignDto2.setHash(Hex.toHexString(hash2));
+            remoteKMSSignDto2.setRawData(deviceRegisterDto.getAddress());
+            Result<RemoteKMSSignVo> signResult2 = remoteKMSService.sign(remoteKMSSignDto2);
+            log.info("remoteFundationService.register signResult2:{}",JSON.toJSONString(signResult2));
+            if(signResult2.getCode() != ApiStatus.SUCCESS.getCode()){
+                log.info("remoteFundationService.register error:{}",JSON.toJSONString(signResult2));
+                throw new MinerApplyException("miner apply failed");
+            }
+            RemoteKMSSignVo remoteKMSSignVo2 = signResult2.getData();
+            String sign2=SignatureProcessor.signBuild(new SignatureProcessor.Signature(remoteKMSSignVo2.getR(),remoteKMSSignVo2.getS(),remoteKMSSignVo2.getRecid()));
+
+            log.info("remoteFundationService.airdrop result:{}",signResult2.getData());
             JSONObject jsonObject=JSONObject.parseObject(airJson, Feature.OrderedField);
             //
-            jsonObject.put("signature",airdropSign);
+            jsonObject.put("signature",sign2);
             String deviceAirdropStr = jsonObject.toJSONString();
             log.info("remoteFundationService.airdrop str:{}",airJson);
             log.info("remoteDeviceService.airdrop str:{}",deviceAirdropStr);

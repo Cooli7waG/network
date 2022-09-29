@@ -2,14 +2,18 @@ package com.aitos.xenon.device.controller;
 
 import com.aitos.common.crypto.coder.DataCoder;
 import com.aitos.common.crypto.ecdsa.Ecdsa;
+import com.aitos.xenon.account.api.RemoteTokenService;
+import com.aitos.xenon.account.api.domain.dto.TokenServiceNftSignDto;
 import com.aitos.xenon.block.api.RemoteBlockService;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.model.Result;
+import com.aitos.xenon.core.utils.BeanConvertor;
 import com.aitos.xenon.core.utils.Location;
 import com.aitos.xenon.core.utils.MetaMaskUtils;
 import com.aitos.xenon.device.api.domain.dto.AirDropDto;
 import com.aitos.xenon.device.api.domain.dto.ClaimDto;
+import com.aitos.xenon.device.api.domain.dto.NftSignDto;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.aitos.xenon.device.domain.AirDropRecord;
 import com.aitos.xenon.device.domain.Device;
@@ -30,6 +34,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 
@@ -45,6 +51,9 @@ public class AirDropRecordController {
     private DeviceService deviceService;
     @Autowired
     private RemoteBlockService blockService;
+
+    @Autowired
+    private RemoteTokenService remoteTokenService;
 
     @Value("${foundation.publicKey}")
     private String foundationPublicKey;
@@ -156,5 +165,17 @@ public class AirDropRecordController {
         map.put("applyActive",applyActive);
         map.put("applyPersonalSign",applyPersonalSign);
         return Result.ok(map);
+    }
+
+    @PostMapping("/nftsign")
+    public Result nftsign(@RequestBody NftSignDto nftSignDto){
+        TokenServiceNftSignDto tokenServiceNftSignDto= BeanConvertor.toBean(nftSignDto,TokenServiceNftSignDto.class);
+
+        long timestamp = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()/1000+7*24*60*60;
+        tokenServiceNftSignDto.setDeadline(timestamp);
+        log.info("nftSignature.params={}",JSON.toJSONString(tokenServiceNftSignDto));
+        Result<HashMap> nftSignatureResult = remoteTokenService.getNFTSignature(tokenServiceNftSignDto);
+        log.info("nftSignatureResult={}",JSON.toJSONString(nftSignatureResult));
+        return nftSignatureResult;
     }
 }
