@@ -1,14 +1,13 @@
 import { createWebHistory, createRouter } from "vue-router";
 
 import Console from "@/views/console/index.vue";
-import ExplorerLayout from '@/layout/explorer_layout.vue'
-import WalletLayout from '@/layout/wallet_layout.vue'
 
 const routes = [
+
     {
         path: "/",
         name: "ExplorerLayout",
-        component: ExplorerLayout,
+        component: import('@/layout/explorer_layout.vue'),
         children: [
             {
                 path: "",
@@ -55,7 +54,7 @@ const routes = [
     {
         path: "/wallet",
         name: "WalletLayout",
-        component: WalletLayout,
+        component: import('@/layout/wallet_layout.vue'),
         children: [
             {
                 path: "",
@@ -142,6 +141,11 @@ const routes = [
                 component: () => import('@/views/tools/virtualminer.vue')
             }
         ]
+    },
+    {
+        path: "/error",
+        name: "error",
+        component: import('@/views/error.vue')
     }
 ];
 
@@ -149,6 +153,19 @@ const router = createRouter({
     history: createWebHistory(),
     //history: createWebHashHistory(),
     routes,
+});
+
+router.beforeEach((to, from, next) => { //全局钩子函数
+    to.matched.some((route) => {
+        if (!window.ethereum && route.path !== '/error') {
+            next('/error')
+        }else if (window.ethereum && route.path === '/error') {
+            next('/')
+        } else {
+            next();
+        }
+    });
+
 });
 
 export default router;

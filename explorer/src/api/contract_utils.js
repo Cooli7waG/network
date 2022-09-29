@@ -2,14 +2,22 @@ import {getMetaMaskLoginUserAddress} from "@/api/metamask_utils";
 import {erc20Abi,ArkreenRewardAbi,ArkreenNTFAbi} from "@/api/contract.json";
 import {ethers} from 'ethers';
 
-// eslint-disable-next-line no-undef
-const provider = new ethers.providers.Web3Provider(ethereum)
-//提现合约地址
-const withdrawContractAddress = '0x139C33cA681b57aC53A288F16726a558E912f6d9'
-//Erc20合约地址
-const tokenContractAddress = '0xf2D4C9C2A9018F398b229D812871bf2B316D50E1'
-//NTF合约地址
-const ntfContractAddress = '0xe980d0b94D62372c63821Acf7436Ae124276dd8f'
+let provider=null;
+let withdrawContractAddress=null;
+let tokenContractAddress=null;
+let ntfContractAddress=null;
+
+if(window.ethereum){
+    // eslint-disable-next-line no-undef
+     provider = new ethers.providers.Web3Provider(window.ethereum)
+    //提现合约地址
+     withdrawContractAddress = '0x139C33cA681b57aC53A288F16726a558E912f6d9'
+    //Erc20合约地址
+     tokenContractAddress = '0xf2D4C9C2A9018F398b229D812871bf2B316D50E1'
+    //NTF合约地址
+     ntfContractAddress = '0xe980d0b94D62372c63821Acf7436Ae124276dd8f'
+}
+
 
 /**
  * 查询原生币余额
