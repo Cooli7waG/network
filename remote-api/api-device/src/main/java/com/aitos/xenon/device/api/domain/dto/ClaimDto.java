@@ -10,8 +10,6 @@ public class ClaimDto {
     private String minerAddress;
 
     private String ownerAddress;
-    /**
-     * 基金会签名
-     */
-    private String signature;
+
+    private String txHash;
 }

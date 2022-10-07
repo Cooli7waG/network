@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @FeignClient(name = "account")
 public interface RemoteTransactionService {
 
@@ -41,4 +43,12 @@ public interface RemoteTransactionService {
      */
     @GetMapping("/transaction/query")
     Result<TransactionVo> query(@RequestParam("txHash") String txHash);
+
+    /**
+     * 根据height查询hash列表
+     * @param height
+     * @return
+     */
+    @GetMapping("/transaction/findHashByHeight")
+    Result<List<String>> findHashByHeight(@RequestParam("height") Long height);
 }

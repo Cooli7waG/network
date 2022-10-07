@@ -18,6 +18,4 @@ public class BaseModel implements Serializable {
     private Long updateBy;
     private Integer delFlag;
 
-    private Long tenantId;
-
 }

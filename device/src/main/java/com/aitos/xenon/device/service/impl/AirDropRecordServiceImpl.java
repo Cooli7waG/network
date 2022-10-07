@@ -4,6 +4,7 @@ import com.aitos.common.crypto.ecdsa.Ecdsa;
 import com.aitos.common.crypto.ecdsa.Hash;
 import com.aitos.xenon.account.api.RemoteAccountService;
 import com.aitos.xenon.account.api.RemoteKMSService;
+import com.aitos.xenon.account.api.RemoteTokenService;
 import com.aitos.xenon.account.api.RemoteTransactionService;
 import com.aitos.xenon.account.api.domain.dto.AccountRegisterDto;
 import com.aitos.xenon.account.api.domain.dto.RemoteKMSSignDto;
@@ -71,8 +72,6 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
     private RemoteAccountService remoteAccountService;
     @Autowired
     private DeviceMapper deviceMapper;
-    @Autowired
-    private RemoteFundationService remoteFundationService;
     @Autowired
     private RemoteDeviceService remoteDeviceService;
     @Autowired
@@ -179,8 +178,26 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
         if(blockVoResult.getCode()!= ApiStatus.SUCCESS.getCode()){
             throw new ServiceException(blockVoResult.getMsg());
         }
+
+        HashMap<String,Object> signatureData=new HashMap<>();
+        signatureData.put("ownerAddress",claimDto.getOwnerAddress());
+        signatureData.put("minerAddress",claimDto.getMinerAddress());
+        String dataJson = JSON.toJSONString(signatureData);
+        byte[] hash = Hash.sha3(dataJson.getBytes());
+        RemoteKMSSignDto remoteKMSSignDto=new RemoteKMSSignDto();
+        remoteKMSSignDto.setKeyId(BusinessConstants.TokenKeyId.PRIVILEGED);
+        remoteKMSSignDto.setHash(Hex.toHexString(hash));
+        remoteKMSSignDto.setRawData(dataJson);
+        Result<RemoteKMSSignVo> signResult = remoteKMSService.sign(remoteKMSSignDto);
+        log.info("claim.signResult:{}",JSON.toJSONString(signResult));
+        if(signResult.getCode() != ApiStatus.SUCCESS.getCode()){
+            throw new ServiceException("miner apply failed");
+        }
+        RemoteKMSSignVo remoteKMSSignVo = signResult.getData();
+        String sign=SignatureProcessor.signBuild(new SignatureProcessor.Signature(remoteKMSSignVo.getR(),remoteKMSSignVo.getS(),remoteKMSSignVo.getRecid()));
         //记录交易信息
-        String txData= JSON.toJSONString(claimDto);
+        signatureData.put("signature",sign);
+        String txData= JSON.toJSONString(signatureData);
         String txHash= DigestUtils.sha256Hex(txData);
 
         TransactionDto transactionDto=new TransactionDto();

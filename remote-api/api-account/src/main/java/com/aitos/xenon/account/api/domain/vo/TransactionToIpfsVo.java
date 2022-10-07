@@ -1,13 +1,15 @@
 package com.aitos.xenon.account.api.domain.vo;
 
+import com.aitos.xenon.core.json.LocalDateTimeSerializer;
+import com.aitos.xenon.core.utils.JacksonCustomizerConfig;
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
-public class TransactionVo {
+public class TransactionToIpfsVo {
 
-    private Long id;
     /**
      * 交易所在块高
      */
@@ -23,13 +25,14 @@ public class TransactionVo {
      */
     private String data;
 
-    private Integer status;
-
     private Integer txType;
 
+    @JSONField(serialize = false)
     private String fromAddress;
+    @JSONField(serialize = false)
     private String ownerAddress;
 
+    @JSONField(serializeUsing = LocalDateTimeSerializer.class)
     private LocalDateTime createTime;
 
 }

@@ -29,5 +29,6 @@ public class TransactionDto  {
 
     private String fromAddress;
 
-    private Long accountId;
+    private String ownerAddress;
+
 }

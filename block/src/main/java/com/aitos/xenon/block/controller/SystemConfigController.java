@@ -22,7 +22,7 @@ public class SystemConfigController {
 
     @GetMapping("/findConfig")
     public Result<SystemConfigVo> findConfig(){
-        SystemConfig config = systemConfigService.findConfig(false);
+        SystemConfig config = systemConfigService.findConfig(true);
         SystemConfigVo  systemConfigVo= BeanConvertor.toBean(config,SystemConfigVo.class);
         return Result.ok(systemConfigVo);
     }

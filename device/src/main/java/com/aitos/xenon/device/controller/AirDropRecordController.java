@@ -11,10 +11,12 @@ import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
 import com.aitos.xenon.core.utils.Location;
 import com.aitos.xenon.core.utils.MetaMaskUtils;
+import com.aitos.xenon.device.api.RemoteGameMinerService;
 import com.aitos.xenon.device.api.domain.dto.AirDropDto;
 import com.aitos.xenon.device.api.domain.dto.ClaimDto;
 import com.aitos.xenon.device.api.domain.dto.NftSignDto;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
+import com.aitos.xenon.device.api.domain.vo.GameMiner;
 import com.aitos.xenon.device.domain.AirDropRecord;
 import com.aitos.xenon.device.domain.Device;
 import com.aitos.xenon.device.service.AirDropRecordService;
@@ -54,6 +56,8 @@ public class AirDropRecordController {
 
     @Autowired
     private RemoteTokenService remoteTokenService;
+    @Autowired
+    private RemoteGameMinerService remoteGameMinerService;
 
     @Value("${foundation.publicKey}")
     private String foundationPublicKey;
@@ -107,21 +111,9 @@ public class AirDropRecordController {
     @PostMapping("/claim")
     public Result claim(@RequestBody String body) throws Exception {
         log.info("claim.body:{}",body);
-        JSONObject jsonObject=JSONObject.parseObject(body, Feature.OrderedField);
-        String signature = jsonObject.getString("signature");
-        jsonObject.remove("signature");
-        String jsonData=jsonObject.toJSONString();
-        //
         ClaimDto claimDto=JSON.parseObject(body,ClaimDto.class);
         log.info("ClaimDto owner address:{}",claimDto.getOwnerAddress());
-        //
-        byte[] message = MetaMaskUtils.getMessage(jsonData);
-        byte[] srcPublicKey = Ecdsa.getPublicKey(message,signature);
-        Boolean verify = Ecdsa.verifyByPublicKey(srcPublicKey,message,signature);
-        //Boolean verify= Ecdsa.verifyByAddress(srcPublicKey,message,signature, null);
-        if(!verify){
-            return Result.failed(ApiStatus.VALIDATE_SIGN_FAILED);
-        }
+
         //检查设备状态
         Device device = deviceService.findByAddress(claimDto.getMinerAddress());
         if(device==null){
@@ -139,7 +131,20 @@ public class AirDropRecordController {
             return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_CLAIM_EXPIRED);
         }
         airDropRecordService.claim(claimDto);
-        return Result.ok();
+
+
+        GameMiner gameMiner = new GameMiner();
+        gameMiner.setAddress(claimDto.getMinerAddress());
+         device = deviceService.findByAddress(claimDto.getMinerAddress());
+        gameMiner.setLatitude(device.getLatitude());
+        gameMiner.setLongitude(device.getLongitude());
+
+        Result start = remoteGameMinerService.start(gameMiner);
+        log.info("remoteGameMinerService.start:{}",JSON.toJSONString(start));
+        if(start.getCode() != ApiStatus.SUCCESS.getCode()){
+            Result.ok();
+        }
+        return Result.failed();
     }
 
     @PostMapping("/gameminer/apply")

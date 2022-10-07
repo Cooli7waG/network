@@ -16,5 +16,5 @@ public interface RemoteIPFSService {
     Result putRECData(@RequestBody IPFSPutDto ipfsPutDto);
 
     @PostMapping("/getRECCid/v1")
-    Result putRECData(@RequestBody IPFSSearchDto ipfsSearchDto);
+    Result getRECCid(@RequestBody IPFSSearchDto ipfsSearchDto);
 }

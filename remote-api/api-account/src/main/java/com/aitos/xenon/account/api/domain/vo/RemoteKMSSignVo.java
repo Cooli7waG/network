@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class RemoteKMSSignVo {
 
-    private Integer v;
+    private Integer recid;
 
     private String r;
 
