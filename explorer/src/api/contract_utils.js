@@ -11,7 +11,7 @@ if(window.ethereum){
     // eslint-disable-next-line no-undef
      provider = new ethers.providers.Web3Provider(window.ethereum)
     //提现合约地址
-     withdrawContractAddress = '0x139C33cA681b57aC53A288F16726a558E912f6d9'
+     withdrawContractAddress = '0x8c847aeEE49Df0218BcaDbF8072a8C8C0d7a181F'
     //Erc20合约地址
      tokenContractAddress = '0xf2D4C9C2A9018F398b229D812871bf2B316D50E1'
     //NTF合约地址
