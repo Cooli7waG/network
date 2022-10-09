@@ -136,7 +136,7 @@
     </el-empty>
   </div>
   <!-- 用户隐私协议对话框 -->
-  <el-dialog v-model="dialogVisible" :show-close=false title="" width="30%" center style="z-index: 999">
+  <el-dialog v-model="dialogVisible" :show-close=false title="" width="30%" center>
     <div style="text-align: center;margin-top: -20px">
       <h1>Welcome to ARKREEN</h1>
     </div>
@@ -169,6 +169,7 @@ import {hexToBytes} from "@/utils/utils";
 import MetaMaskOnboarding from '@metamask/onboarding';
 import {balanceOf, etherNonces, etherWithdraw, getTransactionStatus} from '@/api/contract_utils'
 import bs58 from 'bs58'
+import {getExplorerInfo} from "@/api/browserUtils";
 
 export default {
   name: 'WalletMenus',
@@ -364,6 +365,7 @@ export default {
     },
     getInfo() {
       this.userAddress = getMetaMaskLoginUserAddress();
+      getExplorerInfo()
     },
     async addAkreToken() {
       const result = await addToken();

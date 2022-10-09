@@ -1,4 +1,5 @@
 import Buffer from "vue-buffer";
+import {tokenContractAddress} from "@/api/contract_utils";
 
 export function getMetaMaskLoginUserAddress() {
     return  window.localStorage.getItem('MateMaskAddress')
@@ -250,9 +251,9 @@ export async function addToken(){
         params: {
             type: 'ERC20',
             options: {
-                address:TokenInfo_TESTNET.address,
-                symbol: TokenInfo_TESTNET.tokenSymbol,
-                decimals: TokenInfo_TESTNET.decimalUnits
+                address:TokenInfo.address,
+                symbol: TokenInfo.tokenSymbol,
+                decimals: TokenInfo.decimalUnits
             },
         },
     });
@@ -268,19 +269,21 @@ export function setPrivacyPolicy(flag){
     window.localStorage.setItem('isPrivacyPolicy', flag?"true":"false");
 }
 
+export function isCheckBrowser(){
+    let isCheckBrowser = window.localStorage.getItem('isCheckBrowser')
+    return isCheckBrowser == "true"?true:false;
+}
+
+export function setCheckBrowser(flag){
+    window.localStorage.setItem('isCheckBrowser', flag?"true":"false");
+}
+
 /**
  * Token 信息
  * @type {{image: string, address: number, tokenSymbol: string, decimalUnits: number}}
  */
-const TokenInfo_MAINNET = {
-    address : 18,
-    image : 'https://metamask.github.io/test-dapp/metamask-fox.svg',
-    decimalUnits : 4,
-    tokenSymbol : 'AKRE'
-}
-const TokenInfo_TESTNET = {
-    address : '0xf2D4C9C2A9018F398b229D812871bf2B316D50E1',
-    //image : 'https://metamask.github.io/test-dapp/metamask-fox.svg',
+const TokenInfo = {
+    address : tokenContractAddress,
     decimalUnits : 18,
     tokenSymbol : 'AKRE'
 }

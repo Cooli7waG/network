@@ -65,7 +65,7 @@ export function applyGameMiner(data){
 
 export function claimGameMiner(data){
     return request({
-        url: '/device/airdroprecord/gameminer/claim',
+        url: '/device/airdroprecord/claim',
         method: 'post',
         data:data
     })

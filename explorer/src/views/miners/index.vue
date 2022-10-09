@@ -44,10 +44,10 @@
         </el-table-column>
         <el-table-column prop="earningMint" :label="$t('miners.table.earningMint')">
           <template #default="scope">
-            {{Number(scope.row.earningMint).toLocaleString()}}
+            {{Number(scope.row.earningMint).toLocaleString()}} AKRE
           </template>
         </el-table-column>
-        <el-table-column prop="earningService" :label="$t('miners.table.earningService')"  />
+        <!--<el-table-column prop="earningService" :label="$t('miners.table.earningService')"  />-->
         <el-table-column prop="power" :label="$t('miners.table.power')">
           <template #default="scope">
             {{formatPowerNotUnit(scope.row.power)}}
