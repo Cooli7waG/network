@@ -49,9 +49,10 @@ public class BlockServiceImpl implements BlockService {
         if(block==null){
             newBlock.setHeight(1L);
             newBlock.setBlockIntervalTime(0L);
+            newBlock.setParentHash(block.getHash());
         }else{
             newBlock.setHeight(block.getHeight()+1);
-            newBlock.setParentHash(block.getHash());
+
             newBlock.setCreateTime(LocalDateTime.now());
             Duration duration = Duration.between(block.getCreateTime(), newBlock.getCreateTime());
             newBlock.setBlockIntervalTime(duration.toSeconds());
@@ -71,6 +72,7 @@ public class BlockServiceImpl implements BlockService {
             log.info("block.json={}",json);
             String txHash = DigestUtils.sha256Hex(json);
             block.setHash(txHash);
+            newBlock.setParentHash(block.getHash());
 
             blockMapper.updateMerkleRoot(block.getHeight(),block.getHash(),merkleRoot);
         }

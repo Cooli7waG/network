@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -170,7 +171,7 @@ public class TransactionServiceImpl implements TransactionService {
                    List<TransactionToIpfsVo> transactionVoList= transactionMapper.findReportData(accountVo.getAddress(),startTime,endTime);
                    if(transactionVoList.size()>0){
                        IPFSPutDto iPFSPutDto=new IPFSPutDto();
-                       iPFSPutDto.setDate(startTime.toLocalDate());
+                       iPFSPutDto.setDate(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(startTime.toLocalDate()));
                        iPFSPutDto.setOwnerAddress(transactionVoList.get(0).getOwnerAddress());
                        iPFSPutDto.setMinerAddress(accountVo.getAddress());
                        iPFSPutDto.setData(transactionVoList);

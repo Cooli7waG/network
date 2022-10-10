@@ -2,6 +2,7 @@ package com.aitos.xenon.account.api;
 
 
 import com.aitos.xenon.account.api.domain.dto.TokenServiceNftSignDto;
+import com.aitos.xenon.account.api.domain.dto.TokenServiceNftTokenIdDto;
 import com.aitos.xenon.account.api.domain.dto.TokenServiceSearchNonceDto;
 import com.aitos.xenon.account.api.domain.dto.TokenServiceSignatureDto;
 import com.aitos.xenon.account.api.domain.vo.TokenServiceSearchNonceVo;
@@ -23,5 +24,8 @@ public interface RemoteTokenService {
 
     @PostMapping("/GetNFTSignature")
     Result<HashMap> getNFTSignature(@RequestBody TokenServiceNftSignDto tokenServiceNftSignDto);
+
+    @PostMapping("/GetNFTTokenId")
+    Result<HashMap<String,String>> getNFTTokenId(@RequestBody TokenServiceNftTokenIdDto tokenServiceNftTokenIdDto);
 
 }

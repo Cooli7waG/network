@@ -20,8 +20,6 @@ public class ScheduledService {
     @Autowired
     private PoggService poggService;
 
-    private static int POGG_COMMIT_EPOCH=60;
-    private int index=0;
     /**
      * 产生区块和挑战
      */
@@ -30,8 +28,8 @@ public class ScheduledService {
     public void genBlockTask(){
         log.info("block create");
         blockService.genBlock();
-        index=LocalDateTime.now().getMinute()+1;
-        if(index%POGG_COMMIT_EPOCH==0){
+        int minute=LocalDateTime.now().getMinute();
+        if(minute==0){
             log.info("poggCommitTask");
             poggService.commit();
         }

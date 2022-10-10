@@ -1,9 +1,7 @@
 package com.aitos.xenon.account.api;
 
 
-import com.aitos.xenon.account.api.domain.dto.IPFSPutDto;
-import com.aitos.xenon.account.api.domain.dto.IPFSSearchDto;
-import com.aitos.xenon.account.api.domain.dto.RemoteKMSSignDto;
+import com.aitos.xenon.account.api.domain.dto.*;
 import com.aitos.xenon.core.model.Result;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,4 +15,10 @@ public interface RemoteIPFSService {
 
     @PostMapping("/getRECCid/v1")
     Result getRECCid(@RequestBody IPFSSearchDto ipfsSearchDto);
+
+    @PostMapping("/putBlockData/v1")
+    Result putBlockData(@RequestBody IPFSPutBlockDto iPFSPutBlockDto);
+
+    @PostMapping("/getBlockCid/v1")
+    Result<String> getBlockCid(@RequestBody IPFSSearchBlockCidDto iPFSSearchBlockCidDto);
 }

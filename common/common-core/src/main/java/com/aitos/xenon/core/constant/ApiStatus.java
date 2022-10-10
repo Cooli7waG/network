@@ -63,6 +63,7 @@ public enum ApiStatus implements ConstantsCode {
     BUSINESS_DEVICE_MAKER_INFO_ERROR(3014,"maker information error"),
     BUSINESS_DEVICE_GMAE_MINER_TOTAL_NUMBER(3015,"Total miner exceeds limit"),
     BUSINESS_DEVICE_GMAE_MINER_SINGLE_NUMBER(3016,"The amount of miners that a single user can apply for exceeds the limit"),
+    BUSINESS_NFT_CASTING_FAILED(3017,"nft casting failed"),
 
 
 
