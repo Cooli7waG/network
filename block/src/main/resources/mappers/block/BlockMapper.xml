@@ -25,7 +25,7 @@
     </select>
     <select id="findListByHeight" resultType="com.aitos.xenon.block.api.domain.vo.BlockVo">
         select * from <include refid="tableName"/>
-                      where  height &lt;= #{startHeight} and height &gt;= #{endHeight}
+                      where  height &gt;= #{startHeight} and height &lt; #{endHeight}
                       order by height asc
     </select>
 

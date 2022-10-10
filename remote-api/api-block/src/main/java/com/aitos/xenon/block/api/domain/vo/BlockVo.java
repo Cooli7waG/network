@@ -6,15 +6,20 @@ import java.time.LocalDateTime;
 
 @Data
 public class BlockVo {
+       private Long id;
+       private String hash;
        private  Long height;
+
        /**
-        * Transaction 数量
+        * 成块间隔，上一个块成块时间到本次成块时间间隔
         */
-       private int amountTransaction;
-       /**
-        * 成块间隔
-        */
-       private int blockIntervalTime;
+       private Long blockIntervalTime;
+
+       private String parentHash;
+
+       private String merkleRoot;
 
        private LocalDateTime createTime;
+
+       private LocalDateTime updateTime;
 }

@@ -10,8 +10,7 @@ import java.util.List;
 @Data
 public class IPFSPutDto {
 
-    @JSONField(format = "yyyy-MM-dd")
-    private LocalDate date;
+    private String date;
 
     private String ownerAddress;
 

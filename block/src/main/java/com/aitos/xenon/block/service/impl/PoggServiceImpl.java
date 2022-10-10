@@ -2,10 +2,9 @@ package com.aitos.xenon.block.service.impl;
 
 import com.aitos.common.crypto.ecdsa.Ecdsa;
 import com.aitos.common.crypto.ecdsa.EcdsaKeyPair;
+import com.aitos.xenon.account.api.RemoteIPFSService;
 import com.aitos.xenon.account.api.RemoteTransactionService;
-import com.aitos.xenon.account.api.domain.dto.PoggRewardDetailDto;
-import com.aitos.xenon.account.api.domain.dto.PoggRewardDto;
-import com.aitos.xenon.account.api.domain.dto.TransactionDto;
+import com.aitos.xenon.account.api.domain.dto.*;
 import com.aitos.xenon.block.api.domain.vo.BlockVo;
 import com.aitos.xenon.block.domain.*;
 import com.aitos.xenon.block.mapper.PoggMapper;
@@ -31,6 +30,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -58,6 +58,9 @@ public class PoggServiceImpl implements PoggService {
 
     @Autowired
     private EpochRewardService epochRewardService;
+
+    @Autowired
+    private RemoteIPFSService remoteIPFSService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -117,7 +120,18 @@ public class PoggServiceImpl implements PoggService {
 
         List<BlockVo> listByHeight = blockService.findListByHeight(prevPoggCommit.getHeight(), currentCommit.getHeight());
 
-        //remoteIPFSService.putRECData()
+        if(listByHeight.size()==0){
+            return;
+        }
+        String blockRange=listByHeight.get(0).getHeight()+"-"+listByHeight.get(listByHeight.size()-1).getHeight();
+        IPFSPutBlockDto iPFSPutBlockDto =new IPFSPutBlockDto();
+        iPFSPutBlockDto.setBlockRange(blockRange);
+        iPFSPutBlockDto.setDateTime(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(listByHeight.get(0).getCreateTime()));
+
+        List<IPFSPutBlockDataDto> blockDataDtoList=BeanConvertor.toList(listByHeight,IPFSPutBlockDataDto.class);
+        iPFSPutBlockDto.setData(blockDataDtoList);
+        Result putBlockDataResult = remoteIPFSService.putBlockData(iPFSPutBlockDto);
+        log.info("putBlockDataResult={}",JSON.toJSONString(putBlockDataResult));
     }
     @Override
     public PoggCommit findByEpoch(Long epoch) {
