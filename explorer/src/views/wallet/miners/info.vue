@@ -8,7 +8,7 @@
         </el-breadcrumb>
       </el-col>
       <el-col :span="12" style="padding-left: 50px">
-        <span>Reward Trend</span>
+        <span>Reward History</span>
       </el-col>
     </el-row>
   </div>
@@ -49,12 +49,12 @@
           </el-row>
           <el-row :gutter="20">
             <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.earningMint') }}:</el-col>
-            <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">{{ formatToken(data.device.earningMint) }}</el-col>
+            <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">{{ formatToken(data.device.earningMint) }} AKRE</el-col>
           </el-row>
-          <el-row :gutter="20">
+          <!--<el-row :gutter="20">
             <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.earningService') }}:</el-col>
             <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">{{ formatToken(data.device.earningService) }}</el-col>
-          </el-row>
+          </el-row>-->
           <el-row :gutter="20">
             <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.power') }}:</el-col>
             <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">{{ formatPower(data.device.avgPower/1000/ 1000) }}</el-col>

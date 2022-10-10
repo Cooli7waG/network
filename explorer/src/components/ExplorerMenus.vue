@@ -35,7 +35,7 @@
 import {formatString} from "@/utils/data_format";
 
 export default {
-  name: 'Menus',
+  name: 'ExplorerMenus',
   props: {
     msg: String
   },

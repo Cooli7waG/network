@@ -123,7 +123,7 @@ import Circle from "ol/style/Circle"
 import Select from "ol/interaction/Select"
 import View from "ol/View"
 export default {
-  name: 'Dashboard',
+  name: 'DashboardIndex',
   props: {
     msg: String
   },

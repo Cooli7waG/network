@@ -157,15 +157,18 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => { //全局钩子函数
     to.matched.some((route) => {
-        if (!window.ethereum && route.path !== '/error') {
-            next('/error')
+        if(route.path.indexOf("/wallet") == 0){
+            if(!window.ethereum){
+                next('/error')
+            }else {
+                next();
+            }
         }else if (window.ethereum && route.path === '/error') {
             next('/')
-        } else {
+        }else {
             next();
         }
     });
-
 });
 
 export default router;

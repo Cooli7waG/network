@@ -114,15 +114,6 @@ export default {
       },
       minerOptions:[
       ],
-      txTypeOptions:[
-        {value:2,label:"TX_Onboard_Miner"},
-        {value:3,label:"TX_Transfer_Miner"},
-        {value:4,label:"TX_Terminate_Miner"},
-        {value:5,label:"TX_Airdrop_Miner"},
-        {value:6,label:"TX_Claim_Miner"},
-        {value:9,label:"TX_Reward_PoGG"},
-        {value:11,label:"TX_Withdraw"},
-      ],
       tableList: [],
       shortcuts : [
         {
@@ -203,6 +194,7 @@ export default {
         }
         //
         let newNonce = await etherNonces();
+        console.log("etherNonces:"+newNonce)
         this.query.owner = MateMaskAddress;
         const params = {
           address: this.query.owner,

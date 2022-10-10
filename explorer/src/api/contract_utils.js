@@ -4,18 +4,18 @@ import {ethers} from 'ethers';
 
 let provider=null;
 let withdrawContractAddress=null;
-let tokenContractAddress=null;
+export let tokenContractAddress=null;
 let ntfContractAddress=null;
 
 if(window.ethereum){
     // eslint-disable-next-line no-undef
      provider = new ethers.providers.Web3Provider(window.ethereum)
     //提现合约地址
-     withdrawContractAddress = '0x8c847aeEE49Df0218BcaDbF8072a8C8C0d7a181F'
+     withdrawContractAddress = '0x26EF44535eE3F4eC77C9Bb3eDEdBD23563AA445a'
     //Erc20合约地址
-     tokenContractAddress = '0xf2D4C9C2A9018F398b229D812871bf2B316D50E1'
+     tokenContractAddress = '0x58a9EDa0b47d81f5151f7B28d91462C323345f7B'
     //NTF合约地址
-     ntfContractAddress = '0xe980d0b94D62372c63821Acf7436Ae124276dd8f'
+     ntfContractAddress = '0xc4f795514586275c799729af5ae7113bdb7ccc86'
 }
 
 
@@ -47,9 +47,10 @@ export async function balanceOf() {
  * @returns txhash
  */
 export async function etherWithdraw(value,nonce,v,r,s){
+    console.log("withdrawContractAddress:"+withdrawContractAddress)
     const arkreenContract = new ethers.Contract(withdrawContractAddress, ArkreenRewardAbi.withdraw, provider.getSigner());
     const address = getMetaMaskLoginUserAddress();
-    let result = await arkreenContract.withdraw(address,value,nonce,v,r,s,{gasPrice: '0x9af8da43', gasLimit: '0x186a0'})
+    let result = await arkreenContract.withdraw(address,value,nonce,v,r,s)
     return result.hash;
 }
 
@@ -93,8 +94,22 @@ export async function getTransactionReceipt(hash){
  */
 export async function etherGameMinerOnboard(owner,miner,bAirDrop,deadline,sigRegister){
     const arkreenContract = new ethers.Contract(ntfContractAddress, ArkreenNTFAbi.GameMinerOnboard, provider.getSigner());
-    const address = getMetaMaskLoginUserAddress();
-    let result = await arkreenContract.GameMinerOnboard(address,miner,bAirDrop,deadline,sigRegister,{gasPrice: '0x9af8da43', gasLimit: '0x186a0'})
+    let result = await arkreenContract.GameMinerOnboard(owner,miner,bAirDrop,deadline,sigRegister)
     return result.hash;
 }
+
+export async function getMinerTokenID(miner){
+    const arkreenContract = new ethers.Contract(ntfContractAddress, ArkreenNTFAbi.getMinerTokenID, provider);
+    let result = await arkreenContract.getMinerTokenID(getMetaMaskLoginUserAddress(),miner)
+    console.log(result)
+    return result;
+}
+
+export async function getNftBalanceOf(){
+    const arkreenContract = new ethers.Contract(ntfContractAddress, ArkreenNTFAbi.balanceOf, provider);
+    let result = await arkreenContract.balanceOf(getMetaMaskLoginUserAddress())
+    return result.toString();
+}
+
+let gas = {gasPrice: '0x9af8da43', gasLimit: '0x186a0'}
 

@@ -13,27 +13,25 @@
     </div>
   </el-container>
   <el-dialog
-      v-model="dialogVisible"
-      title="For NFT enthusiasts"
+      v-model="dialogWaitNftVisible"
+      title="Please wait..."
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
       width="35%"
-      :before-close="handleClose">
-    <span>{{dialogMsg}}</span>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="handleClose">Cancel</el-button>
-        <el-button type="primary" @click="mintNft">Continue</el-button>
-      </span>
-    </template>
+      :show-close="false">
+    <div style="text-align: center"><el-icon class="is-loading" style="font-size: 36px"><Loading /></el-icon></div>
+    <div style="margin-top: 30px">
+      <span>NFT is minting for you. Please do not close or refresh the browser. This process takes about 30-120 seconds. Please wait...</span>
+    </div>
   </el-dialog>
 </template>
 
 <script>
 import {claimGameMiner,nftsign} from "@/api/miners";
 import {Base64} from "js-base64";
-import {getMetaMaskLoginUserAddress, personalSign} from "@/api/metamask_utils";
-import {etherGameMinerOnboard, getTransactionStatus} from "@/api/contract_utils";
+import {getMetaMaskLoginUserAddress} from "@/api/metamask_utils";
+import {etherGameMinerOnboard, getNftBalanceOf, getTransactionStatus} from "@/api/contract_utils";
 import MetaMaskOnboarding from "@metamask/onboarding";
-import {ElMessageBox } from 'element-plus'
 
 export default {
   name: 'Claim GameMiner',
@@ -45,7 +43,8 @@ export default {
       centerDialogVisible: false,
       userAddress: undefined,
       dialogVisible: false,
-      dialogMsg: 'Arkreen Network can mint a NFT for your GamingMiner(), do you want continue?',
+      dialogWaitNftVisible: false,
+      isCheckNftMiner: false,
       minerForm: {
         version: 1,
         ownerAddress: undefined,
@@ -59,43 +58,18 @@ export default {
     this.handleGetMinerAddress();
   },
   methods: {
-    handleClose(){
-      if(this.isDialog){
-        ElMessageBox.alert('取消铸造后可在Miner列表中重新铸造！', '提示', {
-          confirmButtonText: 'OK',
-          showClose:false,
-          callback: () => {
-            this.$router.push("/wallet/miners")
-          },
-        })
-      }else {
-        this.$router.push("/wallet/miners")
-      }
-    },
     async testNft(){
-      let bAirDrop = false;
-      let deadline = (Date.now()/1000+(7*24*60*60)).toFixed(0);
-      let v = 28;
-      let r = '0x'+'ddbe771575e279d5b887dca9f953a733c9c5b7d1f236f454e52f91904438772a';
-      let s = '0x'+'1bf4605dc73d294098f3f9aed7b7e98fac51633320aa0a735b3f1511e2c83bc2';
-      let sigRegister = {
-        v,
-        r,
-        s
-      }
-      let hash = await etherGameMinerOnboard(getMetaMaskLoginUserAddress(), this.minerForm.minerAddress, bAirDrop,deadline , sigRegister);
-      console.log("etherGameMinerOnboard result hash:" + hash)
-      this.$message.info("The nft mint has been submitted. Please wait...")
-      let status = await getTransactionStatus(hash);
-      console.log('Transaction Status: ' + status);
-      if (status == 0) {
-        this.$message.error("nft mint failed!")
-      } else {
-        this.$message.success("nft mint success!")
-      }
-      this.$router.push("/wallet/miners")
+      let hash = "0xcf8d12769b46cab7d059f894b8ff79c5c49eee539ac41c77ae41c330d2901bb6";
+      this.submitForm(hash);
     },
     async mintNft() {
+      if(this.isCheckNftMiner){
+        let count = await getNftBalanceOf();
+        if(count>0){
+          this.$message.error("game miner nft count should be 0")
+          return;
+        }
+      }
       let owner = getMetaMaskLoginUserAddress();
       let miner = this.minerForm.minerAddress;
       let data = {
@@ -105,33 +79,26 @@ export default {
       nftsign(data).then(async rsp => {
         if (rsp.code == 0) {
           let bAirDrop = false;
-          let v = rsp.data.v;
-          let r = '0x' + rsp.data.r;
-          let s = '0x' + rsp.data.s;
-          let sigRegister = {
-            v,
-            r,
-            s
-          }
-          let hash = await etherGameMinerOnboard(owner, miner, bAirDrop, rsp.data.deadline, sigRegister);
-          console.log("etherGameMinerOnboard result hash:" + hash)
-          this.$message.info("The nft mint has been submitted. Please wait...")
+          let sig = rsp.data.sig;
+          let originData = rsp.data.originData;
+          let v = sig.v;
+          let r = '0x' + sig.r;
+          let s = '0x' + sig.s;
+          let sigRegister = {v, r, s}
+          let hash = await etherGameMinerOnboard(owner, miner, bAirDrop, originData.deadline, sigRegister);
+          this.dialogWaitNftVisible = true;
           let status = await getTransactionStatus(hash);
-          console.log('Transaction Status: ' + status);
+          this.dialogWaitNftVisible = false;
           if (status == 0) {
             this.$message.error("nft mint failed!")
           } else {
             this.$message.success("nft mint success!")
+            this.submitForm(hash);
           }
-          this.$router.push("/wallet/miners")
         } else {
           this.$message.error("mint failed:" + rsp.msg);
         }
       })
-    },
-    handleNft() {
-      this.dialogMsg = 'Arkreen Network can mint a NFT for your GamingMiner('+this.minerForm.minerAddress+'), do you want continue?',
-      this.dialogVisible = true;
     },
     handleGetMinerAddress() {
       let str = this.$route.params.address;
@@ -139,22 +106,20 @@ export default {
       this.minerForm.minerAddress = obj.minerAddress;
       this.minerForm.ownerAddress = obj.ownerAddress;
     },
-    async submitForm() {
-      // 先判断用户是否安装MetaMask
-      if (!MetaMaskOnboarding.isMetaMaskInstalled()) {
-        this.$message.error(this.$t('common.msg.metaMaskNotFound'));
-        return;
-      }
+    submitForm(txHash) {
       this.loading = true;
       try {
-        let message = '{"version":1,"ownerAddress":"' + this.minerForm.ownerAddress + '","minerAddress":"' + this.minerForm.minerAddress + '"}'
-        this.minerForm.signature = await personalSign(message);
-        message = '{"version":1,"ownerAddress":"' + this.minerForm.ownerAddress + '","minerAddress":"' + this.minerForm.minerAddress + '","signature":"' + this.minerForm.signature + '"}'
+        let message = {
+          version:1,
+          ownerAddress: this.minerForm.ownerAddress,
+          minerAddress: this.minerForm.minerAddress,
+          txHash: txHash
+        }
         claimGameMiner(message).then(rsp => {
           this.minerForm.signature = undefined;
           if (rsp.code == 0) {
             this.$message.success("game miner claim success!");
-            this.handleNft();
+            this.$router.push("/wallet/miners")
           } else {
             this.$message.error(rsp.msg);
           }
@@ -165,12 +130,17 @@ export default {
       this.loading = false;
     },
     handleClaimGameMiner() {
+      // 先判断用户是否安装MetaMask
+      if (!MetaMaskOnboarding.isMetaMaskInstalled()) {
+        this.$message.error(this.$t('common.msg.metaMaskNotFound'));
+        return;
+      }
       this.$confirm('Click "OK" to confirm the receipt', 'Tips', {
         confirmButtonText: 'OK',
         cancelButtonText: 'Cancel',
         type: 'warning'
       }).then(() => {
-        this.submitForm();
+        this.mintNft();
       }).catch(() => {
 
       });

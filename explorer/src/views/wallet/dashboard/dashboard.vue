@@ -5,15 +5,15 @@
       <div style="padding: 5px 10px;">
         <div class="card-col" style="background: -webkit-linear-gradient(left, #C4E1FF , #66B3FF);">
           <div class="numericalView">{{miner.total}}</div>
-          <span>Total Miner</span>
+          <span>{{ $t('walletDashboard.TotalMiners') }}</span>
         </div>
         <div class="card-col" style="background: -webkit-linear-gradient(left, #FFBD9D , #FF5809);">
           <div class="numericalView">{{Number(Number(user.earningMint).toFixed(3)).toLocaleString()}}</div>
-          <span>Mining Reward</span>
+          <span>{{ $t('walletDashboard.MiningReward') }}</span>
         </div>
         <div class="card-col" style="background: -webkit-linear-gradient(left, #BBFFBB , #28FF28);">
           <div class="numericalView">{{Number(user.balance).toLocaleString()}}</div>
-          <span>AKRE Balance</span>
+          <span>{{ $t('walletDashboard.AKREBalance') }}</span>
         </div>
       </div>
     </el-col>
@@ -30,10 +30,10 @@
                 </span>
                 <template #dropdown>
                   <el-dropdown-menu>
-                    <el-dropdown-item @click="handleStatisticsRewardByDay(7)">Last 7 days</el-dropdown-item>
-                    <el-dropdown-item @click="handleStatisticsRewardByDay(15)">Last 15 days</el-dropdown-item>
-                    <el-dropdown-item @click="handleStatisticsRewardByDay(30)">Last 30 days</el-dropdown-item>
-                    <el-dropdown-item @click="handleStatisticsRewardByDay(90)">Last 90 days</el-dropdown-item>
+                    <el-dropdown-item @click="handleStatisticsRewardByDay(7)">{{ $t('walletDashboard.Last7days') }}</el-dropdown-item>
+                    <el-dropdown-item @click="handleStatisticsRewardByDay(15)">{{ $t('walletDashboard.Last15days') }}</el-dropdown-item>
+                    <el-dropdown-item @click="handleStatisticsRewardByDay(30)">{{ $t('walletDashboard.Last30days') }}</el-dropdown-item>
+                    <el-dropdown-item @click="handleStatisticsRewardByDay(90)">{{ $t('walletDashboard.Last90days') }}</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
@@ -58,9 +58,10 @@
                 </span>
                 <template #dropdown>
                   <el-dropdown-menu>
-                    <el-dropdown-item @click="handleMinerPieStatisticsRewardByDay(7)">Last 7 days</el-dropdown-item>
-                    <el-dropdown-item @click="handleMinerPieStatisticsRewardByDay(15)">Last 15 days</el-dropdown-item>
-                    <el-dropdown-item @click="handleMinerPieStatisticsRewardByDay(30)">Last 30 days</el-dropdown-item>
+                    <el-dropdown-item @click="handleMinerPieStatisticsRewardByDay(7)">{{ $t('walletDashboard.Last7days') }}</el-dropdown-item>
+                    <el-dropdown-item @click="handleMinerPieStatisticsRewardByDay(15)">{{ $t('walletDashboard.Last15days') }}</el-dropdown-item>
+                    <el-dropdown-item @click="handleMinerPieStatisticsRewardByDay(30)">{{ $t('walletDashboard.Last30days') }}</el-dropdown-item>
+                    <el-dropdown-item @click="handleMinerPieStatisticsRewardByDay(90)">{{ $t('walletDashboard.Last90days') }}</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
@@ -123,9 +124,9 @@ export default {
       loadBalance:false,
       loadMinerBalance:false,
       loadingHistogram:false,
-      RewardTrendTitle:"Reward Trend - Last 15 Days",
+      RewardTrendTitle:"Reward History - Last 15 Days",
       dialogLineVisible:false,
-      RewardPercentageTitle:"Miner Reward Percentage - Last 15 Days",
+      RewardPercentageTitle:"Miner Reward(%) - Last 15 Days",
       minerRewardTitle:" Reward Percentage - Last 15 Days",
       miner : {
         address:undefined,
@@ -184,7 +185,8 @@ export default {
           if(rsp.data.length > 7){
             rotateX = -40
           }
-          this.RewardTrendTitle = "Reward Trend - Last "+day+" Days";
+          let RewardHistory = this.$t("walletDashboard.RewardHistory")
+          this.RewardTrendTitle = RewardHistory.replace('7',day)
           this.drawHistogram(rsp.data,rotateX);
         } else {
           console.log("get statisticsRewardByDay error!")
@@ -193,7 +195,6 @@ export default {
       this.loadBalance = false
     },
     async handleMinerStatisticsRewardByDay(day) {
-      //
       this.minerRewardTitle = this.miner.address + " - Last "+day+" Days"
       this.loadMinerBalance = true;
       let time = this.timeFormat(day);
@@ -491,7 +492,8 @@ export default {
         "endTime": time.endTime
       }
       statisticsRewardsByOwnerAddress(params).then(result => {
-        this.RewardPercentageTitle = "Miner Reward Percentage - Last "+day+" Days"
+        let RewardPercentage = this.$t("walletDashboard.RewardPercentage")
+        this.RewardPercentageTitle = RewardPercentage.replace('7',day)
         const pieData = {
           legendData: [],
           series: []
@@ -553,7 +555,7 @@ export default {
               show: true,
               position: 'outside',
               formatter: function (params){
-                return getAddress(params.name)
+                return params.percent+"%"
               }
             },
             emphasis: {
