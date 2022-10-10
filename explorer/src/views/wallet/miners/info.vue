@@ -175,7 +175,7 @@
               />
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="handleGetTransaction">搜索</el-button>
+              <el-button type="primary" @click="handleSearchTransaction">搜索</el-button>
             </el-form-item>
           </el-form>
         </el-row>
@@ -262,6 +262,7 @@ import {Point} from "ol/geom";
 import {Vector as VectorSource} from "ol/source";
 import {statisticsRewardByDay} from "@/api/walletDashboard";
 import * as echarts from "echarts";
+import {getWalletMinerPageInfo, setWalletMinerPageInfo} from "@/api/browserUtils";
 
 export default {
   name:'wallet-miner-info',
@@ -274,6 +275,21 @@ export default {
     this.handleMinerStatisticsRewardByDay(15);
   },
   methods: {
+    handleGetPageInfo(){
+      let pageInfo = getWalletMinerPageInfo()
+      this.data.page.limit = Number(pageInfo.pageSize)
+      this.data.page.offset = Number(pageInfo.currentPage)
+      let url = window.location.href;
+      let urlArr = url.split("#");
+      url = urlArr[0]+(pageInfo.type==undefined?"#report":"#"+pageInfo.type)
+      history.pushState('','',url)
+    },
+    handleSetPageInfo(pageSize,currentPage){
+      let url = window.location.href;
+      let urlArr = url.split("#");
+      let type = (urlArr[1] == undefined?"report":urlArr[1])
+      setWalletMinerPageInfo(pageSize,currentPage,type)
+    },
     timeFormat(offset){
       let date = new Date()
       let startMonth = date.getUTCMonth()+1
@@ -435,6 +451,7 @@ export default {
       this.showMap(latitude,longitude);
     },
     handleGetList(){
+      this.handleGetPageInfo();
       let url = window.location.href;
       if(url.endsWith("#reward")){
         this.data.activeName = "reward"
@@ -449,6 +466,7 @@ export default {
     },
     pageSizeChange(pageSize) {
       this.data.page.limit = pageSize
+      this.handleSetPageInfo(this.data.page.limit,1)
       if(this.data.page.tag == 1){
         this.data.reportLoading = true;
         this.handleGetReport();
@@ -462,6 +480,7 @@ export default {
     },
     pageCurrentChange(currentPage) {
       this.data.page.offset = currentPage
+      this.handleSetPageInfo(this.data.page.limit,this.data.page.offset)
       if(this.data.page.tag == 1){
         this.data.reportLoading = true;
         this.handleGetReport();
@@ -506,6 +525,7 @@ export default {
         url = urlArr[0]+"#transaction"
         history.pushState('','',url)
       }
+      this.handleSetPageInfo(this.data.page.limit,1)
     },
     handleGetReport(){
       this.data.page.address = this.$route.params.address;
@@ -522,6 +542,12 @@ export default {
         this.data.rewardData = rsp.data.items
         this.data.rewardLoading = false;
       })
+    },
+    handleSearchTransaction(){
+      this.data.page.limit = 25
+      this.data.page.offset = 1
+      this.handleSetPageInfo(this.data.page.limit,this.data.page.offset)
+      this.handleGetTransaction();
     },
     handleGetTransaction(){
       this.data.page.address = this.$route.params.address;

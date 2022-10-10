@@ -17,8 +17,8 @@
   <el-row :gutter="24">
     <el-col :span="24">
       <el-pagination
-          v-model:currentPage="data.query.page.currentPage"
-          v-model:page-size="data.query.page.pageSize"
+          :currentPage="data.query.page.currentPage"
+          :page-size="data.query.page.pageSize"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
           :total="data.query.page.total"
@@ -54,8 +54,7 @@
 import { formatDate } from '@/utils/data_format.js'
 import {list} from '@/api/block.js'
 import {onMounted, reactive} from "vue";
-import { useRouter } from 'vue-router'
-import {toEther} from '@/utils/utils.js'
+import {useRoute, useRouter} from 'vue-router'
 import Constant from '@/utils/constant.js'
 export default {
   props: {
@@ -70,7 +69,11 @@ export default {
     }
   },
   setup(){
-
+    const router = useRouter();
+    const changUrl = () =>{
+      let url = router.currentRoute.value.path;
+      router.push({path:url,query:{pageSize:data.query.page.pageSize,currentPage:data.query.page.currentPage}});
+    }
     const data = reactive({
       query:{
         block:'',
@@ -82,15 +85,17 @@ export default {
       },
       tableList :[]
     })
-    const router = useRouter()
 
     const pageSizeChange = (pageSize) => {
-      data.query.page.pageSize=pageSize
-      loadList()
+      data.query.page.pageSize = pageSize
+      data.query.page.currentPage = 1
+      changUrl()
+      loadList();
     }
     const pageCurrentChange = (currentPage) => {
-      data.query.page.currentPage=currentPage
-      loadList()
+      data.query.page.currentPage = currentPage
+      changUrl()
+      loadList();
     }
 
     const search=()=>{
@@ -120,9 +125,10 @@ export default {
         console.log(err);
       });
     }
-
+    const route = useRoute()
     onMounted(() => {
-      console.log("onMounted")
+      data.query.page.currentPage = Number(route.query.currentPage==undefined?1:route.query.currentPage)
+      data.query.page.pageSize = Number(route.query.pageSize==undefined?20:route.query.pageSize)
       loadList()
     })
 

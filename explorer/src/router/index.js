@@ -84,6 +84,7 @@ const routes = [
             {
                 path: "txs",
                 name: "Transaction List",
+                query:{pageSize:20,currentPage:3},
                 component: import('@/views/wallet/transaction/index.vue'),
             },
             {

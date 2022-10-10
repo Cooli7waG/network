@@ -188,6 +188,7 @@ import {Vector as VectorSource} from 'ol/source';
 import {Point} from 'ol/geom';
 import {statisticsRewardByDay} from "@/api/walletDashboard";
 import * as echarts from "echarts";
+import {getWalletMinerPageInfo, setWalletMinerPageInfo} from "@/api/browserUtils";
 //
 export default {
   components: {},
@@ -199,6 +200,21 @@ export default {
     this.handleMinerStatisticsRewardByDay(15);
   },
   methods: {
+    handleGetPageInfo(){
+      let pageInfo = getWalletMinerPageInfo()
+      this.data.page.limit = Number(pageInfo.pageSize)
+      this.data.page.offset = Number(pageInfo.currentPage)
+      let url = window.location.href;
+      let urlArr = url.split("#");
+      url = urlArr[0]+(pageInfo.type==undefined?"#report":"#"+pageInfo.type)
+      history.pushState('','',url)
+    },
+    handleSetPageInfo(pageSize,currentPage){
+      let url = window.location.href;
+      let urlArr = url.split("#");
+      let type = (urlArr[1] == undefined?"report":urlArr[1])
+      setWalletMinerPageInfo(pageSize,currentPage,type)
+    },
     timeFormat(offset){
       let date = new Date()
       let startMonth = date.getUTCMonth()+1
@@ -362,6 +378,7 @@ export default {
       this.showMap(latitude,longitude);
     },
     handleGetList(){
+      this.handleGetPageInfo();
       let url = window.location.href;
       if(url.endsWith("#reward")){
         this.data.activeName = "reward"
@@ -373,6 +390,7 @@ export default {
     },
     pageSizeChange(pageSize) {
       this.data.page.limit = pageSize
+      this.handleSetPageInfo(this.data.page.limit,1)
       if(this.data.page.tag == 1){
         this.data.reportLoading = true;
         this.handleGetReport();
@@ -383,6 +401,7 @@ export default {
     },
     pageCurrentChange(currentPage) {
       this.data.page.offset = currentPage
+      this.handleSetPageInfo(this.data.page.limit,this.data.page.offset)
       if(this.data.page.tag == 1){
         this.data.reportLoading = true;
         this.handleGetReport();
@@ -398,13 +417,8 @@ export default {
         this.data.reportLoading = true;
         this.handleGetReport();
         let url = window.location.href;
-        if(!url.endsWith("#report")){
-          if(url.endsWith("#reward")){
-            url = url.replace("#reward","#report")
-          }else {
-            url = url+"#report";
-          }
-        }
+        let urlArr = url.split("#");
+        url = urlArr[0]+"#report"
         history.pushState('','',url)
       }
       if (tab.props.name == 'reward') {
@@ -412,15 +426,11 @@ export default {
         this.data.rewardLoading = true;
         this.handleGetReward();
         let url = window.location.href;
-        if(!url.endsWith("#reward")){
-          if(url.endsWith("#report")){
-            url = url.replace("#report","#reward")
-          }else {
-            url = url+"#reward";
-          }
-        }
+        let urlArr = url.split("#");
+        url = urlArr[0]+"#reward"
         history.pushState('','',url)
       }
+      this.handleSetPageInfo(this.data.page.limit,1)
     },
     handleGetReport(){
       this.data.page.address = this.$route.params.address;

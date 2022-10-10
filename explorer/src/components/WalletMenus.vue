@@ -171,6 +171,7 @@ import {balanceOf, etherNonces, etherWithdraw, getTransactionStatus} from '@/api
 import bs58 from 'bs58'
 import {getExplorerInfo} from "@/api/browserUtils";
 
+
 export default {
   name: 'WalletMenus',
   props: {

@@ -66,7 +66,7 @@ import Constant from '@/utils/constant.js'
 import {formatDate, formatString} from '@/utils/data_format.js'
 import {transactionList} from '@/api/transaction.js'
 import {onMounted, reactive} from "vue";
-import {useRoute} from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 
 export default {
   name:"transaction-list",
@@ -85,7 +85,7 @@ export default {
     }
   },
   setup() {
-
+    const router = useRouter();
     const data = reactive({
       query: {
         select: "1",
@@ -102,16 +102,24 @@ export default {
 
     const pageSizeChange = (pageSize) => {
       data.query.page.pageSize = pageSize
+      changUrl();
       loadTransactionList()
     }
+
+    const changUrl = () =>{
+      let url = router.currentRoute.value.path;
+      router.push({path:url,query:{pageSize:data.query.page.pageSize,currentPage:data.query.page.currentPage}});
+    }
+
     const pageCurrentChange = (currentPage) => {
       data.query.page.currentPage = currentPage
+      changUrl();
       loadTransactionList()
     }
 
     const search = () => {
       data.query.page.currentPage = 1
-      data.query.page.pageSize = 10
+      changUrl();
       loadTransactionList()
     }
 
@@ -143,6 +151,9 @@ export default {
         data.query.select = "2"
         data.query.keyword = route.params.height;
       }
+      data.query.page.currentPage = Number(route.query.currentPage==undefined?1:route.query.currentPage)
+      data.query.page.pageSize = Number(route.query.pageSize==undefined?20:route.query.pageSize)
+      //
       loadTransactionList()
     })
 

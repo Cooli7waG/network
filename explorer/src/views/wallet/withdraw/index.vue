@@ -178,6 +178,9 @@ export default {
       }
     },
     async loadWithdrawList(){
+      //
+
+      //
       this.listLoad = true;
       if(!await switchNetwork("0x13881")){
         this.$message.error(this.$t('common.msg.metaMaskNetWorkNotFound'));
@@ -234,16 +237,22 @@ export default {
     },
     pageSizeChange(pageSize){
       this.query.page.pageSize = pageSize
+      this.changUrl();
       this.loadWithdrawList()
     },
     pageCurrentChange(currentPage){
       this.query.page.currentPage = currentPage
+      this.changUrl();
       this.loadWithdrawList()
     },
     search(){
       this.query.page.currentPage = 1
-      this.query.page.pageSize = 10
+      this.changUrl();
       this.loadWithdrawList()
+    },
+    changUrl(){
+      let url = this.$router.currentRoute.value.path;
+      this.$router.push({path:url,query:{pageSize:this.query.page.pageSize,currentPage:this.query.page.currentPage}});
     }
   },
   created() {

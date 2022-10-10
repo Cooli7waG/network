@@ -47,3 +47,67 @@ export function getExplorerInfo(){
     console.log("INFO:"+info)
     return info;
 }
+
+export function getMinersPageSize() {
+    let pageSize = window.localStorage.getItem('MinersPageSize')
+    return pageSize==undefined?20:pageSize;
+}
+
+export function saveMinersPageSize(pageSize) {
+    window.localStorage.setItem('MinersPageSize', pageSize);
+}
+
+export function getMinersCurrentPage() {
+    let currentPage = window.localStorage.getItem('MinersCurrentPage')
+    return currentPage==undefined?1:currentPage;
+}
+
+export function saveMinersCurrentPage(currentPage) {
+    window.localStorage.setItem('MinersCurrentPage', currentPage);
+}
+
+export function getTxsPageSize() {
+    let pageSize = window.localStorage.getItem('TxsPageSize')
+    return pageSize==undefined?20:pageSize;
+}
+
+export function saveTxsPageSize(pageSize) {
+    window.localStorage.setItem('TxsPageSize', pageSize);
+}
+
+export function getTxsCurrentPage() {
+    let currentPage = window.localStorage.getItem('TxsCurrentPage')
+    return currentPage==undefined?1:currentPage;
+}
+
+export function saveTxsCurrentPage(currentPage) {
+    window.localStorage.setItem('TxsCurrentPage', currentPage);
+}
+
+export function getMinerPageInfo() {
+    let pageInfo = window.localStorage.getItem('MinerPageInfo')
+    try {
+        JSON.parse(pageInfo)
+        return pageInfo==undefined?{pageSize:25,currentPage:1,type:"report"}:JSON.parse(pageInfo);
+    }catch (err){
+        return {pageSize:25,currentPage:1,type:"report"};
+    }
+}
+
+export function setMinerPageInfo(pageSize,currentPage,type) {
+    window.localStorage.setItem('MinerPageInfo', '{"pageSize":'+pageSize+',"currentPage":'+currentPage+',"type":"'+type+'"}');
+}
+
+export function getWalletMinerPageInfo() {
+    let pageInfo = window.localStorage.getItem('WalletMinerPageInfo')
+    try {
+        JSON.parse(pageInfo)
+        return pageInfo==undefined?{pageSize:25,currentPage:1,type:"report"}:JSON.parse(pageInfo);
+    }catch (err){
+        return {pageSize:25,currentPage:1,type:"report"};
+    }
+}
+
+export function setWalletMinerPageInfo(pageSize,currentPage,type) {
+    window.localStorage.setItem('WalletMinerPageInfo', '{"pageSize":'+pageSize+',"currentPage":'+currentPage+',"type":"'+type+'"}');
+}

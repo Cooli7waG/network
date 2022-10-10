@@ -74,7 +74,7 @@ import Constant from '@/utils/constant.js'
 import { formatDate,formatString,formatPowerNotUnit } from '@/utils/data_format.js'
 import {deviceList} from '@/api/miners.js'
 import {onMounted, reactive} from "vue";
-import { useRoute  } from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 
 export default {
   name:"miner-list",
@@ -108,13 +108,13 @@ export default {
     }
   },
   setup(){
-
+    const router = useRouter();
     const data = reactive({
       query:{
         address:'',
         page:{
-          currentPage:1,
-          pageSize:20,
+          currentPage: 1,
+          pageSize: 20,
           total:0
         }
       },
@@ -123,20 +123,26 @@ export default {
     const route = useRoute()
 
     const pageSizeChange = (pageSize) => {
-      data.query.page.pageSize=pageSize
+      data.query.page.pageSize = pageSize
+      data.query.page.currentPage = 1
+      changUrl()
       loadDeviceList()
     }
     const pageCurrentChange = (currentPage) => {
-      data.query.page.currentPage=currentPage
+      data.query.page.currentPage = currentPage
+      changUrl()
       loadDeviceList()
     }
 
-    const search=()=>{
-      data.query.page.currentPage=1
-      data.query.page.pageSize=10
+    const search = () => {
+      data.query.page.currentPage = 1
+      changUrl()
       loadDeviceList()
     }
-
+    const changUrl = () =>{
+      let url = router.currentRoute.value.path;
+      router.push({path:url,query:{pageSize:data.query.page.pageSize,currentPage:data.query.page.currentPage}});
+    }
     const loadDeviceList=()=>{
       const params={
         offset:data.query.page.currentPage,
@@ -153,6 +159,8 @@ export default {
 
     onMounted(() => {
       data.query.address=route.params.ownerAddress;
+      data.query.page.currentPage = Number(route.query.currentPage==undefined?1:route.query.currentPage)
+      data.query.page.pageSize = Number(route.query.pageSize==undefined?20:route.query.pageSize)
       loadDeviceList()
     })
 

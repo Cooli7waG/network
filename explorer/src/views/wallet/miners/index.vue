@@ -13,8 +13,8 @@
   <el-row :gutter="24">
     <el-col :span="24">
       <el-pagination
-          v-model:currentPage="data.query.page.currentPage"
-          v-model:page-size="data.query.page.pageSize"
+          :currentPage="data.query.page.currentPage"
+          :page-size="data.query.page.pageSize"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
           :total="data.query.page.total"
@@ -62,10 +62,12 @@
 
 <script>
 import Constant from '@/utils/constant.js'
-import { formatDate,formatString,formatPowerNotUnit,formatElectricityNotUnit } from '@/utils/data_format.js'
+import { formatDate,formatString,formatPowerNotUnit } from '@/utils/data_format.js'
 import {deviceList} from '@/api/miners.js'
 import {onMounted, reactive} from "vue";
 import {getMetaMaskLoginUserAddress} from "@/api/metamask_utils";
+import {useRoute, useRouter} from "vue-router";
+
 export default {
   name:"wallet-miner-list",
   props: {
@@ -81,62 +83,69 @@ export default {
     formatPowerNotUnit() {
       return formatPowerNotUnit
     },
-    formatElectricityNotUnit() {
-      return formatElectricityNotUnit
-    },
     Constant() {
       return Constant
     }
   },
-  setup(){
-
+  setup() {
+    const router = useRouter();
     const data = reactive({
-      query:{
-        address:undefined,
-        page:{
-          currentPage:1,
-          pageSize:20,
-          total:0
+      query: {
+        address: undefined,
+        page: {
+          currentPage: 1,
+          pageSize: 20,
+          total: 0
         }
       },
-      tableList :[]
+      tableList: []
     })
+    const route = useRoute()
+
+    const changUrl = () =>{
+      let url = router.currentRoute.value.path;
+      router.push({path:url,query:{pageSize:data.query.page.pageSize,currentPage:data.query.page.currentPage}});
+    }
 
     const pageSizeChange = (pageSize) => {
-      data.query.page.pageSize=pageSize
+      data.query.page.pageSize = pageSize
+      data.query.page.currentPage = 1
+      changUrl()
       loadDeviceList()
     }
     const pageCurrentChange = (currentPage) => {
-      data.query.page.currentPage=currentPage
+      data.query.page.currentPage = currentPage
+      changUrl()
       loadDeviceList()
     }
 
-    const search=()=>{
-      data.query.page.currentPage=1
-      data.query.page.pageSize=10
+    const search = () => {
+      data.query.page.currentPage = 1
+      changUrl()
       loadDeviceList()
     }
 
-    const loadDeviceList=()=>{
-      if(data.query.address == undefined){
+    const loadDeviceList = () => {
+      if (data.query.address == undefined) {
         return;
       }
-      const params={
-        offset:data.query.page.currentPage,
-        limit:data.query.page.pageSize,
-        address:data.query.address
+      const params = {
+        offset: data.query.page.currentPage,
+        limit: data.query.page.pageSize,
+        address: data.query.address
       }
-      deviceList(params).then((result)=>{
-          data.query.page.total=result.data.total
-          data.tableList=result.data.items
-      }).catch((err) =>{
+      deviceList(params).then((result) => {
+        data.query.page.total = result.data.total
+        data.tableList = result.data.items
+      }).catch((err) => {
         console.log(err);
       });
     }
 
     onMounted(() => {
-      let MateMaskAddress = getMetaMaskLoginUserAddress()
-      data.query.address = MateMaskAddress;
+      data.query.address = getMetaMaskLoginUserAddress();
+      data.query.page.currentPage = Number(route.query.currentPage==undefined?1:route.query.currentPage)
+      data.query.page.pageSize = Number(route.query.pageSize==undefined?20:route.query.pageSize)
       loadDeviceList()
     })
 
