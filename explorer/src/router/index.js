@@ -63,12 +63,12 @@ const routes = [
             },
             {
                 path: "apply",
-                name: "Request a GameMiner",
+                name: "Request a GamingMiner",
                 component: import('@/views/wallet/airdorp/apply.vue'),
             },
             {
                 path: "claim/:address",
-                name: "Claim GameMiner",
+                name: "Claim GamingMiner",
                 component: import('@/views/wallet/airdorp/claim.vue'),
             },
             {

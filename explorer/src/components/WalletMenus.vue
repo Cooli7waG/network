@@ -81,7 +81,7 @@
 
               </el-col>
               <el-col :span="11" class="balance-div">
-                <div><span style="color: #72767b;font-size: 12px">AKRE Balance</span></div>
+                <div><span style="color: #72767b;font-size: 12px">gAKRE Balance</span></div>
                 <div><span style="font-size: 18px">{{ Number(Number(user.balance).toFixed(3)).toLocaleString() }}</span>
                 </div>
               </el-col>
@@ -101,7 +101,7 @@
                 <el-icon>
                   <Promotion/>
                 </el-icon>
-                <span style="margin-left: 5px"><b> Request a GameMiner</b></span>
+                <span style="margin-left: 5px"><b> Request a GamingMiner</b></span>
               </el-col>
             </el-row>
             <el-row class="login_select btn_xenon" @click="gotoRouter('/')">

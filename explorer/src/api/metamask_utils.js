@@ -245,6 +245,8 @@ export async function switchNetwork(cid){
 }
 
 export async function addToken(){
+    let currentRoute = "http://"+window.location.host+"/logo.png";
+    console.log("currentRoute:"+currentRoute)
     // eslint-disable-next-line no-undef
     const result = await ethereum.request({
         method: 'wallet_watchAsset',
@@ -253,7 +255,8 @@ export async function addToken(){
             options: {
                 address:TokenInfo.address,
                 symbol: TokenInfo.tokenSymbol,
-                decimals: TokenInfo.decimalUnits
+                decimals: TokenInfo.decimalUnits,
+                image: currentRoute,
             },
         },
     });
@@ -285,7 +288,7 @@ export function setCheckBrowser(flag){
 const TokenInfo = {
     address : tokenContractAddress,
     decimalUnits : 18,
-    tokenSymbol : 'AKRE'
+    tokenSymbol : 'gAKRE'
 }
 
 /**

@@ -2,7 +2,7 @@
   <el-container style="height: auto">
     <div class="contentDiv" v-loading="loading">
       <div class="titleDiv">Arkreen Website</div>
-      <div class="btnDiv" style="padding: 10px;">Your GameMiner Address :</div>
+      <div class="btnDiv" style="padding: 10px;">Your GamingMiner Address :</div>
       <div class="btnDiv" style="padding: 10px;">{{ minerForm.minerAddress }}</div>
       <div class="btnDiv">
         <el-button type="primary" @click="handleClaimGameMiner" :disabled="userAddress==null">Claim</el-button>
@@ -34,7 +34,7 @@ import {etherGameMinerOnboard, getNftBalanceOf, getTransactionStatus} from "@/ap
 import MetaMaskOnboarding from "@metamask/onboarding";
 
 export default {
-  name: 'Claim GameMiner',
+  name: 'Claim GamingMiner',
   data() {
     return {
       loading: false,
@@ -66,7 +66,7 @@ export default {
       if(this.isCheckNftMiner){
         let count = await getNftBalanceOf();
         if(count>0){
-          this.$message.error("game miner nft count should be 0")
+          this.$message.error("gaming miner nft count should be 0")
           return;
         }
       }
@@ -118,7 +118,7 @@ export default {
         claimGameMiner(message).then(rsp => {
           this.minerForm.signature = undefined;
           if (rsp.code == 0) {
-            this.$message.success("game miner claim success!");
+            this.$message.success("gaming miner claim success!");
             this.$router.push("/wallet/miners")
           } else {
             this.$message.error(rsp.msg);

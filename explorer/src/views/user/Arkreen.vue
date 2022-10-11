@@ -21,7 +21,7 @@
     <div role="dialog" aria-modal="true" aria-label="提示" class="el-dialog el-dialog--center"
          style="margin-top: 15vh; width: 30%;">
       <div class="el-dialog__header">
-        <span class="el-dialog__title">Apply Game Miner</span>
+        <span class="el-dialog__title">Apply Gaming Miner</span>
       </div>
       <div class="el-dialog__body">
         <el-form :model="minerForm" :rules="rules" size="medium" :label-position="labelPosition" ref="minerForm"

@@ -35,7 +35,7 @@
         </el-table-column>
         <el-table-column prop="earningMint" :label="$t('miners.table.earningMint')">
           <template #default="scope">
-            {{Number(scope.row.earningMint).toLocaleString()}} AKRE
+            {{Number(scope.row.earningMint).toLocaleString()}} gAKRE
           </template>
         </el-table-column>
         <!--<el-table-column prop="earningService" :label="$t('miners.table.earningService')"  />-->

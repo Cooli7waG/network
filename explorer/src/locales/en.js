@@ -23,7 +23,7 @@ export default {
                 5:"Maker"
             },
             minerType:{
-                1:"Game Miner",
+                1:"Gaming Miner",
                 2:"Virtual Miner",
                 3:"Api Miner",
                 4:"Lite Pv Miner",
@@ -57,8 +57,8 @@ export default {
         miners: 'Solar Miners',
         totalPowerLow: 'Total Green Power',
         totalChargeVol: 'Total Green Energy Generation',
-        uSDBmtMarketPrice: 'AKRE Market Price',
-        totalBMTMarket: 'AKRE Market Cap',
+        uSDBmtMarketPrice: 'gAKRE Market Price',
+        totalBMTMarket: 'gAKRE Market Cap',
         tokenSupply: 'Circulating Supply/Max Supply',
         tokenCirculatingSupply: 'Circulating Supply',
         tokenMaxSupply: 'Max Supply'
@@ -66,7 +66,7 @@ export default {
     walletDashboard: {
         TotalMiners: 'Total Miners',
         MiningReward: 'Mining Reward',
-        AKREBalance: 'AKRE Balance',
+        AKREBalance: 'gAKRE Balance',
         RewardHistory: 'Reward History - Last 7 Days',
         RewardPercentage: 'Miner Reward(%) - Last 7 Days',
         Last7days: 'Last 7 days',

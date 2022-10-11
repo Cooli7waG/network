@@ -2,7 +2,7 @@
   <el-container style="height: auto">
     <div class="contentDiv" v-loading="loading">
       <div class="titleDiv">Arkreen Website</div>
-      <div class="btnDiv" style="padding: 10px;">You Game Miner Address:</div>
+      <div class="btnDiv" style="padding: 10px;">You Gaming Miner Address:</div>
       <div class="btnDiv" style="padding: 10px;">{{ minerForm.minerAddress }}</div>
       <div class="btnDiv">
         <el-button type="primary" @click="handleClaimGameMiner" :disabled="userAddress==null">Claim</el-button>
@@ -52,7 +52,7 @@ export default {
         claimGameMiner(message).then(rsp => {
           this.minerForm.signature = undefined;
           if(rsp.code == 0){
-            this.$message.success("game miner claim success!");
+            this.$message.success("gaming miner claim success!");
             this.$router.push("/account/" + this.minerForm.ownerAddress)
           }else {
             this.$message.error(rsp.msg);

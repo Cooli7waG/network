@@ -65,7 +65,7 @@
         <section style="height: 100%">
           <div v-show="false" style="color: #FFFFFF">
             <h3>0x4dea3e19583117f7361a93c5cd462d837a846940</h3>
-            <h4>Miner Type: Game Miner</h4>
+            <h4>Miner Type: Gaming Miner</h4>
             <h4>Miner Maker: Arkreen</h4>
             <h4>Owner: 0x4dea3e19583117f7361a93c5cd462d837a846940</h4>
           </div>

@@ -48,7 +48,7 @@
           </el-row>
           <el-row :gutter="20">
             <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.earningMint') }}:</el-col>
-            <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">{{ formatToken(data.device.earningMint) }} AKRE</el-col>
+            <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">{{ formatToken(data.device.earningMint) }} gAKRE</el-col>
           </el-row>
           <!--<el-row :gutter="20">
             <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.earningService') }}:</el-col>

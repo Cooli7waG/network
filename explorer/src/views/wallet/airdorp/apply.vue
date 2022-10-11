@@ -1,7 +1,7 @@
 <template>
   <el-container v-loading="loading" :element-loading-text="LoadingText" style="height: auto">
     <div class="contentDiv">
-      <div class="titleDiv">Request a GameMiner</div>
+      <div class="titleDiv">Request a GamingMiner</div>
       <div class="btnDiv">Please confirm your account address:</div>
       <div class="btnDiv">{{ userAddress }}</div>
       <div class="btnDiv">Please input your email address:</div>
@@ -30,7 +30,7 @@ import {
 import MetaMaskOnboarding from "@metamask/onboarding";
 
 export default {
-  name: 'Request a GameMiner',
+  name: 'Request a GamingMiner',
   data() {
     return {
       loading: false,

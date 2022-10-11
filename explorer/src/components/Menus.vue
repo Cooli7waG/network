@@ -65,7 +65,7 @@
             <el-row class="login_select btn_xenon" @click="gotoApplyGameMiner">
               <el-col :span="24">
                 <i class="iconfont icon-liulanqi" style="color: black"></i>
-                <span style="margin-left: 5px"><b>Apply Game Miner</b></span>
+                <span style="margin-left: 5px"><b>Apply Gaming Miner</b></span>
               </el-col>
             </el-row>
             <el-row class="login_select btn_xenon" @click="gotoBrowser">
