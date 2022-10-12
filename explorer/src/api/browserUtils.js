@@ -111,3 +111,12 @@ export function getWalletMinerPageInfo() {
 export function setWalletMinerPageInfo(pageSize,currentPage,type) {
     window.localStorage.setItem('WalletMinerPageInfo', '{"pageSize":'+pageSize+',"currentPage":'+currentPage+',"type":"'+type+'"}');
 }
+
+export function getGAKREBalance() {
+    let balance = window.localStorage.getItem('GAKREBalance')
+    return balance==undefined?0:balance;
+}
+
+export function setGAKREBalance(balance) {
+    window.localStorage.setItem('GAKREBalance', balance);
+}

@@ -12,7 +12,7 @@
           <span>{{ $t('walletDashboard.MiningReward') }}</span>
         </div>
         <div class="card-col" style="background: -webkit-linear-gradient(left, #BBFFBB , #28FF28);">
-          <div class="numericalView">{{Number(user.balance).toLocaleString()}}</div>
+          <div class="numericalView">{{user.balance}}</div>
           <span>{{ $t('walletDashboard.AKREBalance') }}</span>
         </div>
       </div>
@@ -110,9 +110,10 @@ import {deviceList} from "@/api/miners";
 import {accountInfo} from "@/api/account";
 import {getAddress} from "@/utils/data_format";
 import * as echarts from 'echarts';
-import {balanceOf} from "@/api/contract_utils";
+import {getGAKREBalance} from "@/api/browserUtils";
 
 export default {
+  name:"walletDashboard",
   props: {
     msg: String
   },
@@ -136,15 +137,35 @@ export default {
       user : {
         balance:'loading...',
         earningMint:0
-      }
+      },
+      timerInterval:undefined
     }
   },
   created() {
     this.loadFindByAddress();
     this.handleStatisticsRewardByDay(15);
     this.handleMinerPieStatisticsRewardByDay(15);
+    this.getBalance();
+    this.timer();
+  },
+  unmounted(){
+    window.clearInterval(this.timerInterval)
   },
   methods:{
+    timer() {
+      this.timerInterval = window.setInterval(() => {
+        this.getBalance();
+      }, 5000)
+    },
+    getBalance(){
+      let balance = getGAKREBalance()
+      let oldBalance = this.user.balance;
+      let newBalance = Number(Number(balance).toFixed(3)).toLocaleString();
+      if(oldBalance != newBalance){
+        this.user.balance = newBalance;
+        this.loadFindByAddress();
+      }
+    },
     timeFormat(offset){
       let date = new Date()
       let startMonth = date.getUTCMonth()+1
@@ -258,25 +279,14 @@ export default {
       if (userAddress == undefined || userAddress == null) {
         return;
       }
-      this.loadBalance = true;
       accountInfo(userAddress).then((result) => {
         if (result.code == 0) {
           this.user.earningMint = result.data.earningMint.toLocaleString();
         }
         this.handleGetMinerCount(10);
-        this.loadBalance = false;
       }).catch((err) => {
         console.log(err);
-        this.loadBalance = false;
       });
-      try {
-        let balance = await balanceOf()
-        let b = balance/Math.pow(10,18)
-        this.user.balance = Number(b).toFixed(3);
-      }catch (err){
-        this.user.balance = '0';
-      }
-
     },
     drawHistogram(data,rotateX){
       const labels = [];

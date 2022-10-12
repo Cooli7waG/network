@@ -103,7 +103,7 @@
 
 <script>
 import {getBlockchainstats, getMinerStatistics,getMinerLocation,loadMinersInfo} from '@/api/statistics.js'
-import {onDeactivated, onMounted, reactive} from "vue";
+import {onDeactivated, onMounted, reactive,onUnmounted} from "vue";
 import {toEther} from '@/utils/utils.js'
 import {formatPower, formatElectricity, getTokenFixed, getAddress, formatDate,formatToken} from '@/utils/data_format.js'
 import Constant from '@/utils/constant.js'
@@ -150,14 +150,7 @@ export default {
       return Constant
     }
   },
-  setup: function () {
-    const intervalLet = () => {
-      data.timer = setInterval(() => {
-        loadBlockchainstats()
-        loadMinerStatistics()
-        initMap(data.center,data.zoom);
-      }, 300000)
-    }
+  setup() {
     const showInfo = (miner) => {
       //console.log(JSON.stringify(miner))
       let x = ((miner.longitude * 20037508.34) / 180)-600000
@@ -408,17 +401,15 @@ export default {
         initMap(data.center,data.zoom);
       }, 300000)
     })
-    onDeactivated(()=>{
-      //离开当前组件的生命周期执行的方法
+    onUnmounted(() => {
       window.clearInterval(data.timer);
     })
     return {
       data,
       closeOrOpen,
-      intervalLet,
       showInfo,
     }
-  }
+  },
 }
 </script>
 <style lang="scss" scoped>

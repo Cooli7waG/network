@@ -169,7 +169,7 @@ import {hexToBytes} from "@/utils/utils";
 import MetaMaskOnboarding from '@metamask/onboarding';
 import {balanceOf, etherNonces, etherWithdraw, getTransactionStatus} from '@/api/contract_utils'
 import bs58 from 'bs58'
-import {getExplorerInfo} from "@/api/browserUtils";
+import {getExplorerInfo, setGAKREBalance} from "@/api/browserUtils";
 
 
 export default {
@@ -227,7 +227,6 @@ export default {
             this.$message.error("Not have earning mint that can be withdraw!")
             return;
           }
-
           const form = await this.handlePersonalSign(result.data.earningMint);
           console.log("withdraw request data:" + JSON.stringify(form))
           if(form == undefined){
@@ -254,6 +253,7 @@ export default {
                   this.getInfo();
                   this.loadBalance = true;
                   await this.loadFindByAddress();
+                  //this.$router.go(0);
                 }
               } catch (err) {
                 let str = 'Error: user rejected transaction';
@@ -315,6 +315,7 @@ export default {
       try {
         let balance = await balanceOf()
         this.user.balance = balance / Math.pow(10, 18)
+        setGAKREBalance(this.user.balance)
       }catch (err){
         this.user.balance = '0'
       }

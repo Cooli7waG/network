@@ -1,20 +1,13 @@
 <template>
-  <el-row>
-    <el-col :span="12">
-      <el-breadcrumb style="margin-bottom: 20px;">
-        <el-breadcrumb-item :to="{ path: '/' }">{{ $t('minerinfo.path.home') }}</el-breadcrumb-item>
-        <el-breadcrumb-item :to="{ path: '/miners' }">{{ $t('minerinfo.path.miners') }}</el-breadcrumb-item>
-        <el-breadcrumb-item>{{ $t('minerinfo.path.info') }}</el-breadcrumb-item>
-      </el-breadcrumb>
-    </el-col>
-    <el-col :span="12" style="padding-left: 50px">
-      <span>Reward Trend</span>
-    </el-col>
-  </el-row>
   <div v-if="data.device">
     <div>
       <el-row>
         <el-col :span="12">
+          <el-breadcrumb style="margin-bottom: 20px;">
+            <el-breadcrumb-item :to="{ path: '/' }">{{ $t('minerinfo.path.home') }}</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/miners' }">{{ $t('minerinfo.path.miners') }}</el-breadcrumb-item>
+            <el-breadcrumb-item>{{ $t('minerinfo.path.info') }}</el-breadcrumb-item>
+          </el-breadcrumb>
           <el-row :gutter="20">
             <el-col :xs="12" :sm="10" :md="10" :lg="8" :xl="6">{{ $t('minerinfo.info.address') }}:</el-col>
             <el-col :xs="12" :sm="14" :md="14" :lg="14" :xl="18">{{ data.device.address }}</el-col>
@@ -65,7 +58,7 @@
             </el-col>
           </el-row>
         </el-col>
-        <el-col :span="12" style="padding-left: 50px">
+        <el-col :span="12" style="padding-left: 30px">
           <div id="minerHistogram" style="height:224px;"></div>
         </el-col>
       </el-row>
@@ -327,6 +320,10 @@ export default {
         histogramData.series[index].emphasis.focus = 'series'
       }
       option = {
+        title:{
+          show : true,
+          text : "       Reward History"
+        },
         tooltip: {
           trigger: 'axis',
           axisPointer: {

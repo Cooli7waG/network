@@ -4,13 +4,13 @@
       <el-form-item>
         <span style="margin-right: 8px">Withdraw Time</span>
         <el-date-picker
-            v-model="query.dateRangeValue"
+            v-model="data.query.dateRangeValue"
             type="daterange"
             unlink-panels
             range-separator="To"
             start-placeholder="Start date"
             end-placeholder="End date"
-            :shortcuts="shortcuts"
+            :shortcuts="data.shortcuts"
             format="YYYY-MM-DD"
             value-format="YYYY-MM-DD"
             @change="loadWithdrawList"
@@ -24,15 +24,15 @@
   <el-row :gutter="24">
     <el-col :span="24">
       <el-pagination
-          v-model:currentPage="query.page.currentPage"
-          v-model:page-size="query.page.pageSize"
+          :currentPage="data.query.page.currentPage"
+          :page-size="data.query.page.pageSize"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="query.page.total"
+          :total="data.query.page.total"
           @size-change="pageSizeChange"
           @current-change="pageCurrentChange"
           style="margin-top: 5px"/>
-      <el-table v-loading="listLoad" :data="tableList" stripe border style="width: 100%;margin-top: 5px">
+      <el-table v-loading="data.listLoad" :data="data.tableList" stripe border style="width: 100%;margin-top: 5px">
         <el-table-column prop="hash" :label="$t('txs.table.hash')" width="220" :show-overflow-tooltip=true>
           <template #default="scope">
             <router-link :to="'/wallet/tx/'+scope.row.hash">{{scope.row.hash }}</router-link>
@@ -40,7 +40,7 @@
         </el-table-column>
         <el-table-column prop="height" :label="$t('txs.table.height')" width="180">
           <template #default="scope">
-            <el-link @click="()=>{query.keyword=scope.row.height;search();}">{{ Number(scope.row.height).toLocaleString()}}</el-link>
+            <el-link @click="()=>{data.query.keyword=scope.row.height;search();}">{{ Number(scope.row.height).toLocaleString()}}</el-link>
           </template>
         </el-table-column>
         <el-table-column prop="amount" :label="$t('txs.table.amount')" width="180">
@@ -66,7 +66,7 @@
         </el-table-column>
         <el-table-column prop="operation" :label="$t('txs.table.operation')" style="text-align: center">
           <template #default="scope">
-            <el-button :disabled="btnLoad" v-if="!scope.row.status" type="warning" @click="reWithdraw(scope.row)">Withdraw</el-button>
+            <el-button :disabled="data.btnLoad" v-if="!scope.row.status" type="warning" @click="reWithdraw(scope.row)">Withdraw</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -80,25 +80,17 @@ import {formatDate, formatString} from '@/utils/data_format.js'
 import {getMetaMaskLoginUserAddress, switchNetwork} from "@/api/metamask_utils";
 import {etherNonces, etherWithdraw, getTransactionStatus} from "@/api/contract_utils";
 import {transactionList} from "@/api/transaction";
+import {onMounted, reactive} from "vue";
+import {useRoute} from "vue-router";
 
 export default {
   name:"wallet-withdraw",
   props: {
     msg: String
   },
-  computed: {
-    formatDate() {
-      return formatDate
-    },
-    formatString() {
-      return formatString
-    },
-    Constant() {
-      return Constant
-    }
-  },
-  data(){
-    return {
+  setup(){
+    const route = useRoute()
+    const data = reactive({
       listLoad:false,
       btnLoad:false,
       query: {
@@ -144,13 +136,31 @@ export default {
           },
         },
       ]
+    });
+    onMounted(() => {
+      data.query.page.pageSize = Number(route.query.pageSize==undefined?20:route.query.pageSize)
+      data.query.page.currentPage = Number(route.query.currentPage==undefined?1:route.query.currentPage)
+    })
+    return {
+      data
+    }
+  },
+  computed: {
+    formatDate() {
+      return formatDate
+    },
+    formatString() {
+      return formatString
+    },
+    Constant() {
+      return Constant
     }
   },
   methods:{
     async reWithdraw(row) {
-      this.btnLoad = true;
+      this.data.btnLoad = true;
       if(!await switchNetwork("0x13881")){
-        this.btnLoad = false;
+        this.data.btnLoad = false;
         this.$message.error(this.$t('common.msg.metaMaskNetWorkNotFound'));
         return;
       }else {
@@ -166,53 +176,49 @@ export default {
             this.$message.success("withdraw success,Please check your wallet!")
             await this.loadWithdrawList();
           }
-          this.btnLoad = false;
+          this.data.btnLoad = false;
         } catch (err) {
           let str = 'Error: user rejected transaction';
           if (err.toString().indexOf(str) != -1) {
             this.$message.warning("user rejected transaction")
           }
           console.log(err)
-          this.btnLoad = false;
+          this.data.btnLoad = false;
         }
       }
     },
     async loadWithdrawList(){
       //
-
-      //
-      this.listLoad = true;
+      this.data.listLoad = true;
       if(!await switchNetwork("0x13881")){
         this.$message.error(this.$t('common.msg.metaMaskNetWorkNotFound'));
-        this.listLoad = false;
+        this.data.listLoad = false;
         return;
       }else {
         if (this.$route.query.keyword) {
-          this.query.keyword = this.$route.query.keyword
+          this.data.query.keyword = this.$route.query.keyword
         }
         let MateMaskAddress = getMetaMaskLoginUserAddress()
         if (MateMaskAddress == undefined || MateMaskAddress == null) {
-          this.listLoad = false;
+          this.data.listLoad = false;
           return;
         }
-        //
-        let newNonce = await etherNonces();
-        console.log("etherNonces:"+newNonce)
-        this.query.owner = MateMaskAddress;
+        this.data.query.owner = MateMaskAddress;
         const params = {
-          address: this.query.owner,
+          address: this.data.query.owner,
           txType: 11,
-          offset: this.query.page.currentPage,
-          limit: this.query.page.pageSize
+          offset: Number(this.$route.query.currentPage==undefined?1:this.$route.query.currentPage),
+          limit: Number(this.$route.query.pageSize==undefined?20:this.$route.query.pageSize)
         }
-        if(this.query.dateRangeValue && this.query.dateRangeValue.length==2){
-          params.startTime = this.query.dateRangeValue[0]
-          params.endTime = this.query.dateRangeValue[1]
+        if(this.data.query.dateRangeValue && this.data.query.dateRangeValue.length==2){
+          params.startTime = this.data.query.dateRangeValue[0]
+          params.endTime = this.data.query.dateRangeValue[1]
         }
+        let newNonce = await etherNonces();
         transactionList(params).then(async (result) => {
           if(result.code == 0){
-            this.tableList = [];
-            this.query.page.total = result.data.total
+            this.data.tableList = [];
+            this.data.query.page.total = result.data.total
             let items = result.data.items;
             for (let key in items) {
               let dataObj = JSON.parse(items[key].data.replace("\\", ""))
@@ -225,34 +231,35 @@ export default {
                 status: dataObj.metaTx.originData.nonce>=newNonce?false:true,
                 data: dataObj
               }
-              this.tableList.push(item)
+              this.data.tableList.push(item)
             }
           }
-          this.listLoad = false;
+          this.data.listLoad = false;
         }).catch((err) => {
-          this.listLoad = false;
+          this.data.listLoad = false;
           console.log(err);
         });
       }
     },
     pageSizeChange(pageSize){
-      this.query.page.pageSize = pageSize
+      this.data.query.page.pageSize = pageSize
+      this.data.query.page.currentPage = 1
       this.changUrl();
       this.loadWithdrawList()
     },
     pageCurrentChange(currentPage){
-      this.query.page.currentPage = currentPage
+      this.data.query.page.currentPage = currentPage
       this.changUrl();
       this.loadWithdrawList()
     },
     search(){
-      this.query.page.currentPage = 1
+      this.data.query.page.currentPage = 1
       this.changUrl();
       this.loadWithdrawList()
     },
     changUrl(){
       let url = this.$router.currentRoute.value.path;
-      this.$router.push({path:url,query:{pageSize:this.query.page.pageSize,currentPage:this.query.page.currentPage}});
+      this.$router.push({path:url,query:{pageSize:this.data.query.page.pageSize,currentPage:this.data.query.page.currentPage}});
     }
   },
   created() {
