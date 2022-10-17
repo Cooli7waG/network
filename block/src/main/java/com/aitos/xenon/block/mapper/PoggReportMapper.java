@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -22,6 +23,8 @@ public interface PoggReportMapper {
 
 
     void saveSubtotal(PoggReportSubtotal poggReportSubtotal);
+
+    long findTotalEnergyGeneration(@Param("startTime")LocalDateTime startTime,@Param("endTime")LocalDateTime endTime,@Param("ownerAddress")String ownerAddress);
 
     IPage<PoggReportDataVo> findReportDataListByPage(@Param("page")Page<PoggReportDataVo> page, @Param("queryParams")PoggReportSearchDto queryParams);
 

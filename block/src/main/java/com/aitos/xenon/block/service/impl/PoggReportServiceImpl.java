@@ -82,7 +82,7 @@ public class PoggReportServiceImpl implements PoggReportService {
         poggReportSubtotal.setMinerType(poggReportDto.getMinerType());
         poggReportSubtotal.setEpoch(poggReportDto.getEpoch());
         poggReportSubtotal.setRecordNum(poggReportDto.getGreenDataList().size());
-        poggReportSubtotal.setTotalEnergyGeneration(poggReportDto.getGreenDataList().get(0).getTotal());
+        poggReportSubtotal.setTotalEnergyGeneration(poggReportDto.getGreenDataList().get(poggReportDto.getGreenDataList().size()-1).getTotal());
 
         this.saveOrUpdate(poggReportSubtotal);
 
@@ -118,6 +118,11 @@ public class PoggReportServiceImpl implements PoggReportService {
     @Override
     public List<PoggReportSubtotalStatistics> findSubtotalStatisticsList(long startEpoch, long endEpoch) {
         return poggReportMapper.findSubtotalStatisticsList(startEpoch, endEpoch);
+    }
+
+    @Override
+    public long findTotalEnergyGeneration(LocalDateTime startTime, LocalDateTime endTime, String ownerAddress) {
+        return poggReportMapper.findTotalEnergyGeneration(startTime,endTime,ownerAddress);
     }
 
     @Override
