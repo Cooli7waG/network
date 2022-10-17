@@ -71,7 +71,7 @@ public class PoggServiceImpl implements PoggService {
         }
         PoggCommit currentPoggCommit = findCurrentCommit();
 
-        long epoch = currentPoggCommit != null ? currentPoggCommit.getEpoch() : 0;
+        long epoch = currentPoggCommit != null ? currentPoggCommit.getEpoch()+1 : 0;
 
         PoggCommit poggCommit = new PoggCommit();
 
@@ -79,7 +79,7 @@ public class PoggServiceImpl implements PoggService {
         poggCommit.setPrivateKey(ecdsaKeyPair.getPrivateKeyHex());
         poggCommit.setPublicKey(ecdsaKeyPair.getAddressHex());
         poggCommit.setHeight(block.getHeight());
-        poggCommit.setEpoch(epoch + 1);
+        poggCommit.setEpoch(epoch);
         poggCommit.setStatus(BusinessConstants.POGGCommitStatus.NOT_OVER);
         poggCommit.setCreateTime(LocalDateTime.now());
         poggMapper.saveCommit(poggCommit);

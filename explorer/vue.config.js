@@ -9,8 +9,9 @@ const name = process.env.VUE_APP_TITLE || 'XENON' // 网页标题
 module.exports = defineConfig({
   transpileDependencies: true,
   lintOnSave: false,
-  publicPath: process.env.NODE_ENV === 'production'? '/': '/',
+  publicPath: process.env.NODE_ENV === 'production'? './': '/',
   productionSourceMap: false,
+  runtimeCompiler: true,
   css: {
     loaderOptions: {
       sass: {

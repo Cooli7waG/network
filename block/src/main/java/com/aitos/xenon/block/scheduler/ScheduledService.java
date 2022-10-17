@@ -1,5 +1,6 @@
 package com.aitos.xenon.block.scheduler;
 
+import com.aitos.xenon.block.domain.Block;
 import com.aitos.xenon.block.service.BlockService;
 import com.aitos.xenon.block.service.PoggService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +28,10 @@ public class ScheduledService {
     @Transactional(rollbackFor = Exception.class)
     public void genBlockTask(){
         log.info("block create");
+        Block currentBlock = blockService.getCurrentBlock();
         blockService.genBlock();
         int minute=LocalDateTime.now().getMinute();
-        if(minute==0){
+        if(minute==0||currentBlock==null){
             log.info("poggCommitTask");
             poggService.commit();
         }

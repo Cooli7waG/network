@@ -22,6 +22,8 @@ public class PoggReportDataVo {
      * 设备采集时间
      */
     private long timestamp;
+
+    private LocalDateTime deviceTime;
     /**
      * 服务器入库时间
      */

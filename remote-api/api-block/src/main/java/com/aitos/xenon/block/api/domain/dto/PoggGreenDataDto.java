@@ -5,7 +5,9 @@ import lombok.Data;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +26,7 @@ public class PoggGreenDataDto {
 
     private long total;
 
+    private LocalDateTime deviceTime;
     private LocalDateTime createTime;
 
     public static List<PoggGreenDataDto> decode(List<String> dataList){
@@ -37,6 +40,9 @@ public class PoggGreenDataDto {
                 poggGreenDataDto.setTimestamp(new BigInteger(Arrays.copyOfRange(data,1,6)).longValue()*1000);
                 poggGreenDataDto.setPower(new BigInteger(Arrays.copyOfRange(data,6,12)).longValue());
                 poggGreenDataDto.setTotal(new BigInteger(Arrays.copyOfRange(data,12,20)).longValue());
+
+                LocalDateTime deviceTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(poggGreenDataDto.getTimestamp()), ZoneId.systemDefault());
+                poggGreenDataDto.setDeviceTime(deviceTime);
                 poggGreenDataDto.setCreateTime(LocalDateTime.now());
                 list.add(poggGreenDataDto);
             });

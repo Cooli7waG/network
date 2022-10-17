@@ -3,22 +3,14 @@ spring:
     nacos:
       discovery:
         # 服务注册地址
-        server-addr: localhost:8848
-        namespace: 7d5b3128-f3d1-423e-824c-b6f4472551f8
+        server-addr: 172.22.32.13:8848
+        namespace: fca915d5-78d4-4042-a3c4-94917a06cbc9
       config:
         # 配置中心地址
-        server-addr: localhost:8848
-        namespace: 7d5b3128-f3d1-423e-824c-b6f4472551f8
+        server-addr: 172.22.32.13:8848
+        namespace: fca915d5-78d4-4042-a3c4-94917a06cbc9
         # 配置文件格式
         file-extension: yml
         # 共享配置
         shared-configs:
-          - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
-  feign:
-    client:
-      config:
-        metaDataClient:
-          connect-timeout: 50000
-          read-timeout: 50000
-    hystrix:
-      enabled: true
+          - redis-pro.yml

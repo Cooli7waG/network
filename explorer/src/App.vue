@@ -8,6 +8,10 @@
 
 export default {
   name: 'App',
+  mounted() {
+    console.log(process.env,'process.env')
+    console.log(process.env.VUE_APP_URL, "VUE_APP_URL");
+  }
 }
 </script>
 

@@ -47,9 +47,9 @@ public class BlockServiceImpl implements BlockService {
 
         Block newBlock=new Block();
         if(block==null){
-            newBlock.setHeight(1L);
+            newBlock.setHeight(0L);
             newBlock.setBlockIntervalTime(0L);
-            newBlock.setParentHash(block.getHash());
+            newBlock.setCreateTime(LocalDateTime.now());
         }else{
             newBlock.setHeight(block.getHeight()+1);
 
