@@ -100,6 +100,11 @@ public class DeviceVo  {
      */
     private Integer status;
 
+    /**
+     * 0：正常,1：未知,2: 异常-超两小时无数据,3: 异常-有光照但上报数据为0
+     */
+    private Integer runStatus;
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;

@@ -105,6 +105,13 @@ public class PoggController {
         return Result.ok(poggReportPage);
     }
 
+    @GetMapping("/lastReport/{address}")
+    public Result<PoggReportDataVo> lastReport(@PathVariable("address") String address){
+        log.info("lastReport.address:{}",address);
+        PoggReportDataVo poggReportDataVo = poggReportService.lastReport(address);
+        return Result.ok(poggReportDataVo);
+    }
+
     @GetMapping("/report/avgPower")
     public Result<Double> avgPower(String address){
         double avgPower = poggReportService.avgPower(address);

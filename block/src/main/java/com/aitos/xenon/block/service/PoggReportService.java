@@ -39,5 +39,10 @@ public interface PoggReportService {
      */
     double avgPower(String ownerAddress);
 
-
+    /**
+     * 根据Miner地址获取最后一条Report数据
+     * @param address
+     * @return
+     */
+    PoggReportDataVo lastReport(String address);
 }

@@ -85,5 +85,9 @@
         group by address, owner_address, miner_type,total
     </select>
 
+    <select id="lastReport" resultType="com.aitos.xenon.block.api.domain.vo.PoggReportDataVo">
+        select * from <include refid="tableName"/> where address=#{address} order by create_time desc LIMIT 1
+    </select>
+
 
 </mapper>

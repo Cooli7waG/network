@@ -103,5 +103,11 @@
     <update id="terminate">
         update <include refid="tableName"/> set terminate=1 where address=#{address}
     </update>
+    <update id="updateMinerRunStatus">
+        update <include refid="tableName"/> set run_status = #{runStatus} where id = #{id}
+    </update>
 
+    <select id="getAllMiner" resultType="com.aitos.xenon.device.api.domain.vo.DeviceVo">
+        select * from <include refid="tableName"/> where status = 2
+    </select>
 </mapper>
