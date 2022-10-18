@@ -12,7 +12,7 @@
         (address,owner_address,hash,height,epoch,power,total,timestamp,device_time,create_time)
         value
         <foreach collection="greenDataList" item="item" separator=",">
-            (#{address},#{ownerAddress},#{hash},#{height},#{epoch},#{item.power},#{item.total},#{item.timestamp},#{item.timestamp},#{item.deviceTime},#{item.createTime})
+            (#{address},#{ownerAddress},#{hash},#{height},#{epoch},#{item.power},#{item.total},#{item.timestamp},#{item.deviceTime},#{item.createTime})
         </foreach>
     </insert>
 
