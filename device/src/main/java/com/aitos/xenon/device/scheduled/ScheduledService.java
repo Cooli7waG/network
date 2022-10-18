@@ -55,18 +55,17 @@ public class ScheduledService {
                 updateMinerRunStatus(deviceVo, BusinessConstants.RunStatus.UNKNOWN);
                 continue;
             }
-            LocalDateTime now = LocalDateTime.now();
+            Date now = new Date();
             SimpleDateFormat sdfTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Result<PoggReportDataVo> poggReportDataVoResult = poggService.lastReport(deviceVo.getAddress());
             if(poggReportDataVoResult.getCode() == ApiStatus.SUCCESS.getCode()){
                 try{
                     PoggReportDataVo data = poggReportDataVoResult.getData();
-                    long nowMilli = now.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
+                    long nowMilli = now.getTime();
                     long reportMilli = data.getCreateTime().toInstant(ZoneOffset.ofHours(0)).toEpochMilli();
                     //
-                    Date date = new Date(nowMilli);
                     Date reportDate = new Date(reportMilli);
-                    log.info("reportDate:{}   checkData:{}",sdfTime.format(reportDate),sdfTime.format(date));
+                    log.info("reportDate:{}   checkData:{}",sdfTime.format(reportDate),sdfTime.format(now));
                     //
                     if(nowMilli-reportMilli>1000*60*60*2){
                         // 超过2小时无数据
