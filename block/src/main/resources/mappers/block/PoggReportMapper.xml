@@ -12,7 +12,7 @@
         (address,owner_address,hash,height,epoch,power,total,timestamp,device_time,create_time)
         value
         <foreach collection="greenDataList" item="item" separator=",">
-            (#{address},#{ownerAddress},#{hash},#{height},#{epoch},#{item.power},#{item.total},#{item.timestamp},#{item.deviceTime},#{item.createTime})
+            (#{address},#{ownerAddress},#{hash},#{height},#{epoch},#{item.power},#{item.total},#{item.timestamp},#{item.timestamp},#{item.deviceTime},#{item.createTime})
         </foreach>
     </insert>
 
@@ -29,6 +29,28 @@
         select * from <include refid="tableName"/>
         where address=#{queryParams.address}
         order by timestamp desc
+    </select>
+
+    <select id="findTotalEnergyGeneration" resultType="long">
+        select sum(total) from (
+            SELECT address, owner_address, total
+            from (
+                SELECT id,address, owner_address,
+                (
+                    FIRST_VALUE(total) OVER (
+                    partition by address, owner_address
+                    ORDER BY create_time desc
+                    ) -
+                    FIRST_VALUE(total) OVER (
+                    partition by address, owner_address
+                    ORDER BY create_time asc
+                    )
+                ) total
+                FROM pogg_report
+                where owner_address=#{ownerAddress} and create_time &gt;= #{startTime} and create_time &lt;= #{endTime}
+            ) t
+            group by address, owner_address,total
+        ) t2
     </select>
 
 
@@ -48,6 +70,7 @@
         set update_time =  #{updateTime},
             record_num  = #{recordNum},
             total_energy_generation=#{totalEnergyGeneration}
+            update_time=#{updateTime}
         where id = #{id}
     </update>
 
@@ -63,11 +86,11 @@
         from (
             SELECT id,address, owner_address, miner_type,epoch,record_num,
             (
-                FIRST_VALUE(id) OVER (
+                FIRST_VALUE(total_energy_generation) OVER (
                 partition by address, owner_address, miner_type
                 ORDER BY epoch desc
                 ) -
-                FIRST_VALUE(id) OVER (
+                FIRST_VALUE(total_energy_generation) OVER (
                 partition by address, owner_address, miner_type
                 ORDER BY epoch asc
                 )

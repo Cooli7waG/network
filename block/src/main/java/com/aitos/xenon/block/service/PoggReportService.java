@@ -7,6 +7,7 @@ import com.aitos.xenon.block.domain.PoggReportSubtotal;
 import com.aitos.xenon.block.domain.PoggReportSubtotalStatistics;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PoggReportService {
@@ -33,6 +34,7 @@ public interface PoggReportService {
      */
     List<PoggReportSubtotalStatistics> findSubtotalStatisticsList(long startEpoch,long endEpoch);
 
+    long findTotalEnergyGeneration(LocalDateTime startTime, LocalDateTime endTime, String ownerAddress);
     /**
      * 计算平均发电功率
      * @return
