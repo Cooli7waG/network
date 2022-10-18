@@ -85,7 +85,6 @@ public class DeviceVo  {
      */
     private String balance;
 
-
     /**
      * 总奖励
      */
