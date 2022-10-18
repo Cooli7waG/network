@@ -109,7 +109,7 @@
     </select>
 
     <select id="lastReport" resultType="com.aitos.xenon.block.api.domain.vo.PoggReportDataVo">
-        select * from <include refid="tableName"/> where address=#{address} order by create_time desc LIMIT 1
+        select * from <include refid="tableName"/> where address=#{address} order by timestamp desc LIMIT 1
     </select>
 
 
