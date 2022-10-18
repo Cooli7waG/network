@@ -280,4 +280,23 @@ public class DeviceServiceImpl implements DeviceService {
     public int countByAddressAndMinerType(String ownerAddress, int minerType) {
         return deviceMapper.countByAddressAndMinerType(ownerAddress,minerType);
     }
+
+    /**
+     * 获取所有miner（已绑定）
+     * @return
+     */
+    @Override
+    public List<DeviceVo> getAllMiner(){
+        return deviceMapper.getAllMiner();
+    }
+
+    /**
+     * 修改miner 运行状态
+     * @param id
+     * @param runStatus
+     */
+    @Override
+    public void updateMinerRunStatus(Long id, int runStatus) {
+        deviceMapper.updateMinerRunStatus(id,runStatus);
+    }
 }

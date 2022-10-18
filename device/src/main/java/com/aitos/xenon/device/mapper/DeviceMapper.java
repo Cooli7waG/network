@@ -54,4 +54,17 @@ public interface DeviceMapper {
     int countByMinerType(@Param("minerType")int minerType);
 
     int countByAddressAndMinerType(@Param("ownerAddress")String ownerAddress,@Param("minerType") int minerType);
+
+    /**
+     * 获取所有miner（已绑定）
+     * @return
+     */
+    List<DeviceVo> getAllMiner();
+
+    /**
+     * 修改miner 运行状态
+     * @param id
+     * @param runStatus
+     */
+    void updateMinerRunStatus(@Param("id")Long id, @Param("runStatus")int runStatus);
 }

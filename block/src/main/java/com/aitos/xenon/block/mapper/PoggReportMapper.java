@@ -35,4 +35,11 @@ public interface PoggReportMapper {
     List<PoggReportSubtotalStatistics> findSubtotalStatisticsList(@Param("startEpoch")long startEpoch,@Param("endEpoch") long endEpoch);
 
     double avgPower(@Param("address")String address);
+
+    /**
+     * 根据Miner地址获取最后一条Report数据
+     * @param address
+     * @return
+     */
+    PoggReportDataVo lastReport(@Param("address")String address);
 }

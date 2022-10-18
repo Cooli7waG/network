@@ -195,4 +195,27 @@ public interface BusinessConstants
         String IPFS="key_ipfs_master";
         String REC="key_rec_issuing";
     }
+
+    interface RunStatus{
+        /**
+         * 正常
+         */
+        int NORMAL = 0;
+        /**
+         * 未知
+         */
+        int UNKNOWN = 1;
+        /**
+         *异常-超两小时无数据
+         */
+        int ABNORMAL_NULL_DATA = 2;
+        /**
+         * 异常-有光照但上报数据为0
+         */
+        int NORMAL_EMPTY_DATA = 3;
+        /**
+         * 没有查询到REPORT数据
+         */
+        int UNKNOWN_NOT_REPORT = 4;
+    }
 }
