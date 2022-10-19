@@ -1,11 +1,9 @@
 package com.aitos.xenon.block.api;
 
+import com.aitos.xenon.block.api.domain.vo.PoggReportDataVo;
 import com.aitos.xenon.core.model.Result;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 
@@ -20,4 +18,7 @@ public interface RemotePoggService {
 
     @GetMapping("/pogg/report/avgPower")
     Result<Double> avgPower(@RequestParam("address") String address);
+
+    @GetMapping("/pogg/lastReport/{address}")
+    Result<PoggReportDataVo> lastReport(@PathVariable("address") String address);
 }

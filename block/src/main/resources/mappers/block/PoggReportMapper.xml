@@ -12,7 +12,7 @@
         (address,owner_address,hash,height,epoch,power,total,timestamp,device_time,create_time)
         value
         <foreach collection="greenDataList" item="item" separator=",">
-            (#{address},#{ownerAddress},#{hash},#{height},#{epoch},#{item.power},#{item.total},#{item.timestamp},#{item.timestamp},#{item.deviceTime},#{item.createTime})
+            (#{address},#{ownerAddress},#{hash},#{height},#{epoch},#{item.power},#{item.total},#{item.timestamp},#{item.deviceTime},#{item.createTime})
         </foreach>
     </insert>
 
@@ -106,6 +106,10 @@
         ) t
         where epoch >= #{startEpoch}
         group by address, owner_address, miner_type,total
+    </select>
+
+    <select id="lastReport" resultType="com.aitos.xenon.block.api.domain.vo.PoggReportDataVo">
+        select * from <include refid="tableName"/> where address=#{address} order by timestamp desc LIMIT 1
     </select>
 
 

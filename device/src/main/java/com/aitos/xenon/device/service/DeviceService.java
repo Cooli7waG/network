@@ -64,4 +64,17 @@ public interface DeviceService {
      * @return
      */
     int countByAddressAndMinerType(String ownerAddress,int minerType);
+
+    /**
+     * 获取所有miner（已绑定）
+     * @return
+     */
+    List<DeviceVo> getAllMiner();
+
+    /**
+     * 修改miner 运行状态
+     * @param id
+     * @param runStatus
+     */
+    void updateMinerRunStatus(Long id, int runStatus);
 }

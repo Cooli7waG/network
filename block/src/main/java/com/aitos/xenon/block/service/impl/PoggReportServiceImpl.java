@@ -129,4 +129,14 @@ public class PoggReportServiceImpl implements PoggReportService {
     public double avgPower(String address) {
         return poggReportMapper.avgPower(address);
     }
+
+    /**
+     * 根据Miner地址获取最后一条Report数据
+     * @param address
+     * @return
+     */
+    @Override
+    public PoggReportDataVo lastReport(String address) {
+        return poggReportMapper.lastReport(address);
+    }
 }
