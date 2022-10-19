@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.account.mapper.AccountRewardMapper">
+
+    <sql id="tableName">account_reward</sql>
+
+    <insert id="batchSave" useGeneratedKeys="true" keyProperty="id">
+        insert into <include refid="tableName"/> (address,account_type,owner_address,amount,hash,height,reward_percent,create_time)
+        value
+            <foreach collection="accountRewardList" item="item"  separator=",">
+                (#{item.address},#{item.accountType},#{item.ownerAddress},#{item.amount},#{item.hash},#{item.height},#{item.rewardPercent},#{item.createTime})
+            </foreach>
+    </insert>
+
+    <select id="statisticsRewards" resultType="java.math.BigDecimal">
+        select IFNULL(sum(amount),0) from  <include refid="tableName"/> where address=#{address}
+        and create_time between #{startTime} and #{endTime}
+    </select>
+    <select id="statisticsTotalRewards"
+            resultType="com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsVo">
+        select IFNULL(sum(amount),0) as totalReward,IFNULL(avg(amount),0) as avgReward from  <include refid="tableName"/> where address=#{address}
+    </select>
+    <select id="findListByPage" resultType="com.aitos.xenon.account.api.domain.vo.AccountRewardVo">
+        select * from <include refid="tableName"/>
+        where address=#{queryParams.address}
+        order by create_time desc
+    </select>
+    <select id="statisticsRewardByDay"
+            resultType="com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsDayVo">
+        SELECT date_format(create_time,'%Y-%m-%d') as dataDate ,SUM(amount) as reward FROM `account_reward`
+        where address =#{address} and create_time between #{startTime} and #{endTime}
+        group by date_format(create_time,'%Y-%m-%d')
+        order by dataDate asc
+    </select>
+    <select id="statisticsRewardsByOwnerAddress"
+            resultType="com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsByOwnerVo">
+        SELECT address ,SUM(amount) as reward FROM `account_reward`
+        where owner_address =#{ownerAddress} and create_time between #{startTime} and #{endTime}
+        group by address
+    </select>
+</mapper>

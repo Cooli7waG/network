@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.device.mapper.DeviceMapper">
+
+    <sql id="tableName">device</sql>
+
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into <include refid="tableName"/> (address,miner_type,maker,create_time)
+        value (#{address},#{minerType},#{maker},#{createTime})
+    </insert>
+
+    <select id="findByAddress" resultType="com.aitos.xenon.device.domain.Device">
+        select * from <include refid="tableName"/>
+        where address=#{address}
+    </select>
+
+    <select id="getMinerListByOwner" resultType="com.aitos.xenon.device.api.domain.vo.DeviceVo">
+        select id,address from <include refid="tableName"/> where owner_address=#{address}
+    </select>
+
+    <select id="getAllMinerLocation" resultType="com.aitos.xenon.device.api.domain.vo.DeviceVo">
+        select address,latitude,longitude from <include refid="tableName"/>
+    </select>
+
+    <select id="list" resultType="com.aitos.xenon.device.api.domain.vo.DeviceVo">
+        select d.*,a.earning_mint,a.earning_service,a.balance from <include refid="tableName"/> d left join account a on d.address=a.address
+          <where>
+              <if test="queryParams.address!=null and queryParams.address!=''">
+                  d.owner_address=#{queryParams.address} or d.address=#{queryParams.address}
+              </if>
+          </where>
+         order by create_time desc
+    </select>
+
+    <select id="getMinersByOwnerAddress" resultType="com.aitos.xenon.device.api.domain.vo.DeviceVo">
+        select d.*,a.earning_mint,a.earning_service from <include refid="tableName"/> d left join account a on d.address=a.address
+          <where>
+              <if test="queryParams.address!=null and queryParams.address!=''">
+                  d.owner_address=#{queryParams.address}
+              </if>
+          </where>
+         order by create_time desc
+    </select>
+
+    <select id="findByOwnerAddress" resultType="com.aitos.xenon.device.domain.Device">
+        select * from <include refid="tableName"/>
+        where owner_address=#{ownerAddress}
+    </select>
+    <select id="queryByMiner" resultType="com.aitos.xenon.device.api.domain.vo.DeviceVo">
+        select d.*,a.earning_mint,a.earning_service,a.balance from <include refid="tableName"/> d left join account a on d.address=a.address
+        <where>
+            d.address=#{minerAddress}
+        </where>
+        order by create_time desc
+    </select>
+    <select id="countByMinerType" resultType="java.lang.Integer">
+        select count(*) from <include refid="tableName"/>
+        where miner_type=#{minerType}
+    </select>
+    <select id="countByAddressAndMinerType" resultType="java.lang.Integer">
+        select count(*) from <include refid="tableName"/>
+        where miner_type=#{minerType} and owner_address=#{ownerAddress}
+    </select>
+    <update id="bind">
+        update <include refid="tableName"/>
+            <set>
+                name=#{name},
+                location_type=#{locationType},
+                latitude=#{latitude},
+                longitude=#{longitude},
+                h3index=#{h3index},
+                owner_address=#{ownerAddress},
+                energy=#{energy},
+                power=#{power},
+                capabilities=#{capabilities},
+                status=#{status},
+                <if test="deviceModel!=null and deviceModel!=''">
+                    device_model=#{deviceModel},
+                </if>
+                <if test="deviceSerialNum!=null and deviceSerialNum!=''">
+                    device_serial_num=#{deviceSerialNum},
+                </if>
+                update_time=#{updateTime}
+            </set>
+        where address=#{address}
+    </update>
+    <update id="update">
+        update <include refid="tableName"/>
+            <set>
+                <if test="totalEnergyGeneration!=null">
+                    total_energy_generation=#{totalEnergyGeneration},
+                </if>
+                <if test="power!=null">
+                    power=#{power},
+                </if>
+                update_time=#{updateTime}
+            </set>
+            where address=#{address}
+    </update>
+    <update id="terminate">
+        update <include refid="tableName"/> set terminate=1 where address=#{address}
+    </update>
+
+</mapper>

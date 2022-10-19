@@ -1,0 +1,26 @@
+# Tomcat
+server:
+  port: 9502
+
+# Spring
+spring:
+  application:
+    # 应用名称
+    name: device
+  main:
+    #允许存在多个Feign调用相同Service的接口
+    allow-bean-definition-overriding: true
+  profiles:
+    # 环境配置
+    active: dev
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+  feign:
+    client:
+      config:
+        default:
+          connectTimeout: 600000
+          readTimeout: 600000
+          loggerLevel: full

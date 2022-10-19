@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.block.mapper.PoggReportMapper">
+
+    <sql id="tableName">pogg_report</sql>
+
+    <insert id="batchSave">
+        insert into
+        <include refid="tableName"/>
+        (address,owner_address,hash,height,epoch,power,total,timestamp,device_time,create_time)
+        value
+        <foreach collection="greenDataList" item="item" separator=",">
+            (#{address},#{ownerAddress},#{hash},#{height},#{epoch},#{item.power},#{item.total},#{item.timestamp},#{item.timestamp},#{item.deviceTime},#{item.createTime})
+        </foreach>
+    </insert>
+
+    <select id="avgPower" resultType="java.lang.Double">
+        select IFNULL(avg(power),0) from
+        (   select power from
+            <include refid="tableName"/> where address =#{address}
+            order by epoch desc
+            limit 168
+        ) t
+    </select>
+
+    <select id="findReportDataListByPage" resultType="com.aitos.xenon.block.api.domain.vo.PoggReportDataVo">
+        select * from <include refid="tableName"/>
+        where address=#{queryParams.address}
+        order by timestamp desc
+    </select>
+
+    <select id="findTotalEnergyGeneration" resultType="long">
+        select sum(total) from (
+            SELECT address, owner_address, total
+            from (
+                SELECT id,address, owner_address,
+                (
+                    FIRST_VALUE(total) OVER (
+                    partition by address, owner_address
+                    ORDER BY create_time desc
+                    ) -
+                    FIRST_VALUE(total) OVER (
+                    partition by address, owner_address
+                    ORDER BY create_time asc
+                    )
+                ) total
+                FROM pogg_report
+                where owner_address=#{ownerAddress} and create_time &gt;= #{startTime} and create_time &lt;= #{endTime}
+            ) t
+            group by address, owner_address,total
+        ) t2
+    </select>
+
+
+    <insert id="saveSubtotal">
+        INSERT INTO pogg_report_subtotal (address,
+                                          owner_address,
+                                          miner_type,
+                                          epoch,
+                                          record_num,
+                                          total_energy_generation,
+                                          create_time,
+                                          update_time)
+        VALUES (#{address}, #{ownerAddress}, #{minerType}, #{epoch}, #{recordNum},#{totalEnergyGeneration}, #{createTime}, #{createTime})
+    </insert>
+    <update id="updateSubtotal">
+        update pogg_report_subtotal
+        set update_time =  #{updateTime},
+            record_num  = #{recordNum},
+            total_energy_generation=#{totalEnergyGeneration}
+            update_time=#{updateTime}
+        where id = #{id}
+    </update>
+
+    <select id="findSubtotalByEpoch" resultType="com.aitos.xenon.block.domain.PoggReportSubtotal">
+        SELECT *
+        FROM `pogg_report_subtotal`
+        where address = #{address}
+          and epoch = #{epoch}
+    </select>
+
+    <select id="findSubtotalStatisticsList" resultType="com.aitos.xenon.block.domain.PoggReportSubtotalStatistics">
+        SELECT address, owner_address, miner_type,sum(record_num) as totalRecord,total as energyGeneration
+        from (
+            SELECT id,address, owner_address, miner_type,epoch,record_num,
+            (
+                FIRST_VALUE(total_energy_generation) OVER (
+                partition by address, owner_address, miner_type
+                ORDER BY epoch desc
+                ) -
+                FIRST_VALUE(total_energy_generation) OVER (
+                partition by address, owner_address, miner_type
+                ORDER BY epoch asc
+                )
+            ) total
+            FROM pogg_report_subtotal
+            where epoch &gt;= #{startEpoch}-1
+            and epoch &lt;= #{endEpoch}
+            and address
+            in (select address
+            from pogg_report_subtotal
+            where epoch &gt;= #{startEpoch}-1 and epoch &lt;= #{endEpoch} and record_num > 0)
+
+        ) t
+        where epoch >= #{startEpoch}
+        group by address, owner_address, miner_type,total
+    </select>
+
+
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.block.mapper.BlockMapper">
+
+    <sql id="tableName">block</sql>
+
+    <insert id="save">
+        insert into <include refid="tableName"/> (parent_hash,height,block_interval_time,create_time)
+        values(#{parentHash},#{height},#{blockIntervalTime},#{createTime})
+    </insert>
+    <update id="updateMerkleRoot">
+        update <include refid="tableName"/> set hash=#{hash},merkle_root=#{merkleRoot} where height=#{height}
+    </update>
+
+    <select id="getCurrentBlock" resultType="com.aitos.xenon.block.domain.Block">
+        select * from <include refid="tableName"/> order by height desc  limit 1
+    </select>
+    <select id="list" resultType="com.aitos.xenon.block.api.domain.vo.BlockVo">
+        select b.*,t.amountTransaction from block b left join
+            (select height,count(1) AS amountTransaction from transaction group by height order by height desc) t
+            on b.height =t.height
+        order by b.create_time desc
+    </select>
+    <select id="findListByHeight" resultType="com.aitos.xenon.block.api.domain.vo.BlockVo">
+        select * from <include refid="tableName"/>
+                      where  height &gt;= #{startHeight} and height &lt; #{endHeight}
+                      order by height asc
+    </select>
+
+</mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.device.mapper.AirDropRecordMapper">
+
+    <sql id="tableName">airdrop_record</sql>
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into <include refid="tableName"/> (owner_address,miner_address,expiration,location_type,latitude,longitude,h3index,
+            energy,power,capabilities,device_model,device_serial_num,status,create_time)
+        value (#{ownerAddress},#{minerAddress},#{expiration},#{locationType},#{latitude},#{longitude},#{h3index},
+            #{energy},#{power},#{capabilities},#{deviceModel},#{deviceSerialNum},#{status},#{createTime})
+    </insert>
+    
+    <update id="claim">
+        update <include refid="tableName"/> set status=1 ,update_time=now() where miner_address=#{minerAddress}
+    </update>
+
+    <select id="findNotClaimedByMinerAddress" resultType="com.aitos.xenon.device.domain.AirDropRecord">
+        select * from <include refid="tableName"/>
+        where miner_address=#{minerAddress} and status=0
+    </select>
+    <select id="findByMinerAddress" resultType="com.aitos.xenon.device.domain.AirDropRecord">
+        select * from <include refid="tableName"/> where miner_address=#{minerAddress}
+    </select>
+</mapper>

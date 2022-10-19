@@ -1,0 +1,18 @@
+# Spring
+spring:
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        server-addr: 172.22.32.13:8848
+        namespace: fca915d5-78d4-4042-a3c4-94917a06cbc9
+      config:
+        # 配置中心地址
+        server-addr: 172.22.32.13:8848
+        namespace: fca915d5-78d4-4042-a3c4-94917a06cbc9
+        # 配置文件格式
+        file-extension: yml
+        # 共享配置
+        shared-configs:
+          #  - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+          - redis-pro.yml

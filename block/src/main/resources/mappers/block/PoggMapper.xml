@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.block.mapper.PoggMapper">
+
+    <sql id="tableName">pogg_commit</sql>
+
+    <insert id="saveCommit">
+        insert into <include refid="tableName"/> (private_key,public_key,epoch,height,status,create_time)
+        value (#{privateKey},#{publicKey},#{epoch},#{height},#{status},#{createTime})
+    </insert>
+
+    <select id="findCurrentCommit" resultType="com.aitos.xenon.block.domain.PoggCommit">
+        select * from <include refid="tableName"/> where status=0 order by epoch desc limit 1
+    </select>
+    <select id="findOverCommit" resultType="com.aitos.xenon.block.domain.PoggCommit">
+        select * from <include refid="tableName"/> where status=1 order by epoch desc limit 1
+    </select>
+    <select id="findByEpoch" resultType="com.aitos.xenon.block.domain.PoggCommit">
+        select * from <include refid="tableName"/> where epoch=#{epoch}
+    </select>
+
+    <update id="updateCommit">
+        update <include refid="tableName"/> set status=#{status},update_time=#{updateTime} where id=#{id}
+    </update>
+</mapper>

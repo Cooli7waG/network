@@ -1,0 +1,71 @@
+{
+  "name": "Xenon",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "dev-build": "vue-cli-service build --mode dev",
+    "test-build": "vue-cli-service build --mode test1",
+    "test2-build": "vue-cli-service build --mode production ",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.0.9",
+    "@metamask/onboarding": "^1.0.1",
+    "@noble/ed25519": "^1.6.1",
+    "axios": "^0.27.2",
+    "bignumber.js": "^9.0.2",
+    "bs58": "^5.0.0",
+    "clipboard": "^2.0.11",
+    "compression-webpack-plugin": "^10.0.0",
+    "core-js": "^3.8.3",
+    "echarts": "^5.3.3",
+    "element-plus": "^2.2.9",
+    "eth-sig-util": "^3.0.1",
+    "ethers": "^5.7.1",
+    "js-base64": "^3.7.2",
+    "js-sha512": "^0.8.0",
+    "nprogress": "^0.2.0",
+    "ol": "^6.15.1",
+    "ol-ext": "^3.2.28",
+    "script-ext-html-webpack-plugin": "^2.1.5",
+    "vue": "^3.2.13",
+    "vue-buffer": "^0.0.1",
+    "vue-i18n": "^9.1.10",
+    "vue-json-viewer": "^2.2.22",
+    "vue-router": "4",
+    "vuex": "^4.0.2",
+    "web3": "^1.8.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.16",
+    "@babel/eslint-parser": "^7.12.16",
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-eslint": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-vue": "^8.0.3",
+    "node-sass": "^7.0.1",
+    "sass-loader": "^13.0.2"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "@babel/eslint-parser"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ]
+}

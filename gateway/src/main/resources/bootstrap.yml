@@ -1,0 +1,15 @@
+# Tomcat
+server:
+  port: 9500
+
+# Spring
+spring:
+  application:
+    # 应用名称
+    name: gateway
+  profiles:
+    # 环境配置
+    active: dev
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true

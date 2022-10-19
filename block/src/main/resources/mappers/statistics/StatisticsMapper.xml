@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.block.mapper.StatisticsMapper">
+
+    <select id="virtualMinersCount" resultType="long">
+        select count(1) from device where miner_type=1
+    </select>
+
+    <select id="lightSolarMinersCount" resultType="long">
+        select count(1) from device where miner_type=4
+    </select>
+
+    <select id="poggChallengesCount" resultType="long">
+        select count(1) from pogg_challenge_record
+    </select>
+
+    <select id="transactionsCount" resultType="long">
+        select count(1) from transaction
+    </select>
+
+    <select id="tokenSupplyCount" resultType="double">
+        select sum(balance) from account
+    </select>
+
+    <select id="minerStats" resultType="com.aitos.xenon.block.domain.MinerStatistics">
+        select sum(total_energy_generation) as totalChargeVol ,sum(power) as totalPowerLow ,count(id) as miners from device;
+    </select>
+
+</mapper>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.account.mapper.AccountMapper">
+
+    <sql id="tableName">account</sql>
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into <include refid="tableName"/> (address,balance,account_type,nonce,earning_mint,earning_service,withdraw_amount,create_time)
+        value (#{address},#{balance},#{accountType},0,0,0,0,#{createTime})
+    </insert>
+
+    <update id="update">
+        update <include refid="tableName"/>
+        <set>
+            <if test="balance != null and balance !=''">
+                balance=#{balance},
+            </if>
+            <if test="nonce != null and nonce !=''">
+                nonce=#{nonce},
+            </if>
+            update_time=#{updateTime}
+        </set>
+        where address=#{address}
+    </update>
+
+    <update id="updateBalance">
+        update <include refid="tableName"/>
+        <set>
+            <if test="balance != null and balance !=''">
+                balance=balance+#{balance},
+            </if>
+            update_time=#{updateTime}
+        </set>
+        where id=#{id}
+    </update>
+    <update id="updateEarning">
+        update <include refid="tableName"/>
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="earning_mint =case" suffix="end,">
+                <foreach collection="rewards" item="item" index="index">
+                    when address=#{item.address} then earning_mint+#{item.amount}
+                </foreach>
+            </trim>
+        </trim>
+        where address in
+        <foreach collection="rewards" index="index" item="item" separator="," open="(" close=")">
+            #{item.address}
+        </foreach>
+    </update>
+    <update id="withdraw">
+        update <include refid="tableName"/>
+            set earning_mint=earning_mint-#{amount},
+            withdraw_amount=withdraw_amount+#{amount},
+            nonce=nonce+1,
+            update_time=#{updateTime}
+        where address=#{address}
+    </update>
+
+    <select id="findListByPage" resultType="com.aitos.xenon.account.domain.Account">
+        select * from <include refid="tableName"/>
+        <where>
+            del_flag=0
+            <if test="queryParams.address != null and queryParams.address !=''">
+                and  (
+                address like concat('%', #{address}, '%')
+                )
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+    <select id="findByAddress" resultType="com.aitos.xenon.account.api.domain.vo.AccountVo">
+        select * from <include refid="tableName"/> where address=#{address}
+    </select>
+    <select id="list" resultType="com.aitos.xenon.account.api.domain.vo.AccountVo">
+        select a.*,d.amount_miner from account a left join
+            (select owner_address,count(1) AS amount_miner from device where owner_address is NOT NULL group by owner_address) d
+        on a.address =d.owner_address
+        <where>
+            <if test="queryParams.address!=null and queryParams.address!=''">
+                a.address=#{queryParams.address}
+            </if>
+            <if test="queryParams.accountType!=null">
+               and a.account_type=#{queryParams.accountType}
+            </if>
+        </where>
+        order by a.create_time desc
+    </select>
+    <select id="findListByIds" resultType="com.aitos.xenon.account.domain.Account">
+        select * from <include refid="tableName"/> where id in <foreach collection="idsList" open="(" close=")" separator="," item="id">#{id}</foreach>
+    </select>
+
+
+</mapper>
