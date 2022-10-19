@@ -1,6 +1,7 @@
 package com.aitos.xenon.jsonrpc.controller;
 
 import com.aitos.xenon.core.constant.ApiStatus;
+import com.aitos.xenon.core.utils.IpUtils;
 import com.aitos.xenon.jsonrpc.common.ReflectUtils;
 import com.aitos.xenon.jsonrpc.common.SpringContextUtil;
 import com.aitos.xenon.jsonrpc.domain.dto.RpcRequest;
@@ -22,7 +23,8 @@ public class JsonRpcController {
 
     @PostMapping
     public RpcResult rpcPost(@RequestBody String body, HttpServletRequest request){
-        log.info("rpcPost,ip={},body={}",request.getRemoteAddr(),body);
+        String ip = IpUtils.getIpAddr(request);
+        log.info("rpcPost,ip={},body={}",ip,body);
         RpcResult rpcResult = checkParams(body);
         if(rpcResult!=null){
             return rpcResult;
@@ -32,7 +34,8 @@ public class JsonRpcController {
 
     @GetMapping
     public RpcResult rpcGet(String body, HttpServletRequest request){
-        log.info("rpcPost,ip={},body={}",request.getRemoteAddr(),body);
+         String ip = IpUtils.getIpAddr(request);
+        log.info("rpcPost,ip={},body={}",ip,body);
         RpcResult rpcResult = checkParams(body);
         if(rpcResult!=null){
             return rpcResult;
