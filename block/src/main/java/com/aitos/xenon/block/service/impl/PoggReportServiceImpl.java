@@ -8,6 +8,7 @@ import com.aitos.xenon.block.api.domain.dto.PoggReportSearchDto;
 import com.aitos.xenon.block.api.domain.vo.BlockVo;
 import com.aitos.xenon.block.api.domain.vo.PoggReportDataVo;
 import com.aitos.xenon.block.domain.Block;
+import com.aitos.xenon.block.domain.PoggReportPowerData;
 import com.aitos.xenon.block.domain.PoggReportSubtotal;
 import com.aitos.xenon.block.domain.PoggReportSubtotalStatistics;
 import com.aitos.xenon.block.mapper.PoggReportMapper;
@@ -118,6 +119,11 @@ public class PoggReportServiceImpl implements PoggReportService {
     @Override
     public List<PoggReportSubtotalStatistics> findSubtotalStatisticsList(long startEpoch, long endEpoch) {
         return poggReportMapper.findSubtotalStatisticsList(startEpoch, endEpoch);
+    }
+
+    @Override
+    public List<PoggReportPowerData> findPowerDataListByEpoch(String address, long startEpoch, long endEpoch) {
+        return poggReportMapper.findPowerDataListByEpoch(address, startEpoch, endEpoch);
     }
 
     @Override
