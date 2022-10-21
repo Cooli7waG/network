@@ -18,6 +18,8 @@ import com.aitos.xenon.core.utils.BeanConvertor;
 import com.aitos.xenon.core.utils.Location;
 import com.aitos.xenon.device.api.RemoteDeviceService;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
 import feign.RetryableException;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.LongValue;
@@ -428,16 +430,18 @@ public class PoggServiceImpl implements PoggService {
         // TODO(lq): 挪到配置文件里
         final Double SUIT_DISTANCE_MAX = 10.0;
 
+        Map<String, List<PoggReportPowerData>> suitableCompareMiners = new HashMap<String, List<PoggReportPowerData>>();
+
         // TODO(lq)：获取固定范围内的 miner 位置信息，而非全部。
         // 获取所有 miner 位置
         Result<HashMap>  minerLocationResult= remoteDeviceService.getMinerLocation();
         if (minerLocationResult.getCode() != ApiStatus.SUCCESS.getCode()) {
             log.error("getMinerLocation failed");
-            return null;
+            return suitableCompareMiners;
         }
         if (minerLocationResult.getData() == null) {
-            log.info("getMinerLocation found no miner");
-            return null;
+            log.error("getMinerLocation found no miner");
+            return suitableCompareMiners;
         }
         HashMap<String, Location> minerLocations = minerLocationResult.getData();
         log.debug("getMinerLocation found {} miners", minerLocations.size());
@@ -453,6 +457,12 @@ public class PoggServiceImpl implements PoggService {
             }
             return true;
         }).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (a,b)->b));
+        log.debug("locationSuitMiners size: {}", locationSuitMiners.size());
+
+        if (locationSuitMiners.size() == 0) {
+            log.debug("not found location suitable miner");
+            return suitableCompareMiners;
+        }
 
         // 获取备选 miner 在 epoch 区间内的所有功率数据
         Map<String, List<PoggReportPowerData>> locationSuitMinerPowerData = new HashMap<String, List<PoggReportPowerData>>();
@@ -463,9 +473,13 @@ public class PoggServiceImpl implements PoggService {
 
         // 根据位置和数据筛选出合适的对比 miner
         List<String> suitableMiner = findSuitableMinerWithLocationAndPower(targetMinerLocation, locationSuitMiners, locationSuitMinerPowerData);
+        log.debug("suitableMiner size: {}", suitableMiner.size());
+        if (suitableMiner.size() == 0) {
+            log.debug("not found suitable miner");
+            return suitableCompareMiners;
+        }
 
         // 组装
-        Map<String, List<PoggReportPowerData>> suitableCompareMiners = new HashMap<String, List<PoggReportPowerData>>();
         suitableMiner.forEach(item -> {
             suitableCompareMiners.put(item, locationSuitMinerPowerData.get(item));
         }); 
@@ -551,6 +565,7 @@ public class PoggServiceImpl implements PoggService {
     public Double[] calculateSimilarity(List<PoggReportPowerData> target, Map<String, List<PoggReportPowerData>> compare, long startEpoch, long endEpoch) {
         // 填充 target miner 的数据并标准化
         Double[] targetMinerPowerData = standardizePowerData(fillPowerDataInWindowZeroArray(target, startEpoch, endEpoch));
+        log.debug("targetMinerPowerData after standardize and fill: {}", JSONObject.toJSONString(targetMinerPowerData));
 
         // 填充 compare miner 的数据并标准化
         Map<String, Double[]> compareMinerPowerData = new HashMap<String, Double[]>();
@@ -558,13 +573,15 @@ public class PoggServiceImpl implements PoggService {
             Long[] minerPowerData = fillPowerDataInWindowZeroArray(value, startEpoch, endEpoch);
             compareMinerPowerData.put(key, standardizePowerData(minerPowerData));
         });
+        log.debug("compareMinerPowerData after standardize and fill: {}", JSONObject.toJSONString(targetMinerPowerData));
 
         // 相似度计算
-        List<Double> similarity = compareMinerPowerData.entrySet().stream().map(item -> {
+        List<Double> similarityList = compareMinerPowerData.entrySet().stream().map(item -> {
             return calculateVectorCosineSimilarity(targetMinerPowerData, item.getValue());
         }).collect(Collectors.toList());
+        log.debug("similarityList: {}", JSONObject.toJSONString(similarityList));
 
-        return similarity.toArray(new Double[similarity.size()]);
+        return similarityList.toArray(new Double[similarityList.size()]);
     }
 
     /**
@@ -624,6 +641,7 @@ public class PoggServiceImpl implements PoggService {
         poggAuthenticity.setLocation(location);
         poggAuthenticity.setPowerData(poggReportPowerDatas);
         poggAuthenticity.setCompareMinerPowerData(suitableCompareMiners);
+        log.debug("poggAuthenticity: {}", JSONObject.toJSONString(poggAuthenticity));
 
         return poggAuthenticity;
     }
