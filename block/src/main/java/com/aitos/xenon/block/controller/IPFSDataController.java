@@ -27,7 +27,7 @@ public class IPFSDataController {
     private PoggReportService poggReportService;
 
     @PostMapping("/reportData")
-    public Result<HashMap<String,Object>> register(@RequestBody IPFSSearchDto ipfsSearchDto){
+    public Result<HashMap<String,Object>> reportData(@RequestBody IPFSSearchDto ipfsSearchDto){
         LocalDateTime startTime=ipfsSearchDto.getStartDate().atTime(0,0,0);
         LocalDateTime endTime=ipfsSearchDto.getEndDate().atTime(23,59,59);
         long totalEnergyGeneration = poggReportService.findTotalEnergyGeneration(startTime, endTime, ipfsSearchDto.getOwnerAddress());
@@ -40,7 +40,7 @@ public class IPFSDataController {
     }
 
     @PostMapping("/block")
-    public Result<String> register(@RequestBody IPFSSearchBlockCidDto iPFSSearchBlockCidDto){
+    public Result<String> block(@RequestBody IPFSSearchBlockCidDto iPFSSearchBlockCidDto){
         Result<String> blockCid = remoteIPFSService.getBlockCid(iPFSSearchBlockCidDto);
         return blockCid;
     }
