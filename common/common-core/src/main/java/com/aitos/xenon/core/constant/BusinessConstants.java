@@ -212,10 +212,15 @@ public interface BusinessConstants
         /**
          * 异常-有光照但上报数据为0
          */
-        int NORMAL_EMPTY_DATA = 3;
+        int ABNORMAL_EMPTY_DATA = 3;
         /**
          * 没有查询到REPORT数据
          */
         int UNKNOWN_NOT_REPORT = 4;
+
+        /**
+         * 异常-无光照有数据但是数据不为0
+         */
+        int ABNORMAL_DATA_ERROR = 5;
     }
 }
