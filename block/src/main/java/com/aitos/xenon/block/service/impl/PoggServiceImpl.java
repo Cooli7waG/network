@@ -499,16 +499,16 @@ public class PoggServiceImpl implements PoggService {
     public Long[] fillPowerDataInWindowZeroArray(List<PoggReportPowerData> data, long startEpoch, long endEpoch) {
         // TODO(lq): 挪到配置文件里
         final int EPOCH_RECORD_NUM_MAX = 12; // 每个 epoch 为 1 小时，每个 epoch 最多 12 条。 
-        final int WINDOW_RECORD_NUM_MAX = 24 * 7 * 12; // 窗口期为 1 周
+        int windowRecordNumMax = (int) ((endEpoch - startEpoch + 1) * 12);
 
-        Long[] windowPowerData = new Long[WINDOW_RECORD_NUM_MAX];
-        Arrays.fill(windowPowerData, 0.0);
+        Long[] windowPowerData = new Long[windowRecordNumMax];
+        Arrays.fill(windowPowerData, Long.valueOf(0));
         int lastIndex = 0;
         long lastEpoch = startEpoch;
         for (int i = 0; i < data.size(); i++) {
             PoggReportPowerData p = data.get(i);
             Long epoch = p.getEpoch();
-            if (epoch.longValue() > endEpoch) {
+            if (epoch.longValue() > endEpoch || epoch.longValue() < startEpoch) {
                 continue;
             }
             if (epoch.longValue() != lastEpoch) {
@@ -518,6 +518,7 @@ public class PoggServiceImpl implements PoggService {
             windowPowerData[index.intValue() * EPOCH_RECORD_NUM_MAX + lastIndex] = p.getPower();
             lastIndex++; lastEpoch++;
         }
+        // System.out.printf("windowPowerData: %s\n", JSONObject.toJSONString(windowPowerData));
         return windowPowerData;
     }
 
