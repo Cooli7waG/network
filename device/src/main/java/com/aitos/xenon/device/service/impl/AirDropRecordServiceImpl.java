@@ -369,6 +369,8 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
                 HashMap<String,Object> customMap=new HashMap<>();
                 pushMessageDto.setCustomMap(customMap);
                 customMap.put("url",claimGameMinerUrl);
+                customMap.put("owner",applyGameMiner.getOwner());
+                customMap.put("miner",minerAddress);
                 Result result = remoteGameMinerService.pushMail(pushMessageDto);
                 log.info("邮件发送结果:{}",JSON.toJSONString(result));
             }catch (Exception e){
