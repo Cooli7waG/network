@@ -39,7 +39,7 @@ public class ScheduledService {
      * 每120分钟执行一次
      */
     //@Scheduled(cron = "0 0 0/2 * * *")
-    @Scheduled(cron = "0 0/30 * * * *")
+    @Scheduled(cron = "0 0 0/1 * * *")
     public void minerRunStatus(){
         List<DeviceVo> deviceVoList = deviceService.getAllMiner();
         for (DeviceVo deviceVo : deviceVoList) {
@@ -89,11 +89,17 @@ public class ScheduledService {
                                 updateMinerRunStatus(deviceVo, BusinessConstants.RunStatus.NORMAL);
                             }else {
                                 log.error("Miner[{}] 有光照，有数据，数据不正常[power:{}]",deviceVo.getAddress(),data.getPower());
-                                updateMinerRunStatus(deviceVo, BusinessConstants.RunStatus.NORMAL_EMPTY_DATA);
+                                updateMinerRunStatus(deviceVo, BusinessConstants.RunStatus.ABNORMAL_EMPTY_DATA);
                             }
                         }else {
-                            log.error("Miner[{}] 无光照，有数据，nowMilli:{}  reportMilli:{}",deviceVo.getAddress(),nowMilli,reportMilli);
-                            updateMinerRunStatus(deviceVo, BusinessConstants.RunStatus.NORMAL);
+                            long power = data.getPower();
+                            if(power>0){
+                                log.error("Miner[{}] 无光照，有数据，数据不正常[power:{}] - nowMilli:{}  reportMilli:{}",power,deviceVo.getAddress(),nowMilli,reportMilli);
+                                updateMinerRunStatus(deviceVo, BusinessConstants.RunStatus.ABNORMAL_DATA_ERROR);
+                            }else {
+                                updateMinerRunStatus(deviceVo, BusinessConstants.RunStatus.NORMAL);
+                                log.error("Miner[{}] 无光照，有数据，nowMilli:{}  reportMilli:{}",deviceVo.getAddress(),nowMilli,reportMilli);
+                            }
                         }
                     }
                 }catch (Exception e){
