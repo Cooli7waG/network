@@ -13,6 +13,6 @@ spring:
         file-extension: yml
         # 共享配置
         shared-configs:
-          - mysql-dev.yml
-          - redis-dev.yml
-          - global-params-dev.yml
+          - mysql-test.yml
+          - redis-test.yml
+          - global-params-test.yml

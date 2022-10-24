@@ -177,6 +177,7 @@ public class AirDropRecordController {
     }
 
     @PostMapping("/gameminer/claim")
+    @Deprecated
     public Result claimGameMiner(@RequestBody String claimGameMiner){
         log.info("DeviceController.claimGameMiner:{}",claimGameMiner);
         String result = airDropRecordService.claimGameMiner(claimGameMiner);
