@@ -3,6 +3,7 @@ package com.aitos.xenon.block.mapper;
 import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
 import com.aitos.xenon.block.api.domain.dto.PoggReportSearchDto;
 import com.aitos.xenon.block.api.domain.vo.PoggReportDataVo;
+import com.aitos.xenon.block.domain.PoggReportPowerData;
 import com.aitos.xenon.block.domain.PoggReportSubtotal;
 import com.aitos.xenon.block.domain.PoggReportSubtotalStatistics;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -33,6 +34,8 @@ public interface PoggReportMapper {
     PoggReportSubtotal findSubtotalByEpoch(@Param("address") String address, @Param("epoch") Long epoch);
 
     List<PoggReportSubtotalStatistics> findSubtotalStatisticsList(@Param("startEpoch")long startEpoch,@Param("endEpoch") long endEpoch);
+
+    List<PoggReportPowerData> findPowerDataListByEpoch(@Param("address")String address, @Param("startEpoch")long startEpoch,@Param("endEpoch") long endEpoch);
 
     double avgPower(@Param("address")String address);
 

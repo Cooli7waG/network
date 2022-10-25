@@ -3,6 +3,7 @@ package com.aitos.xenon.block.service;
 import com.aitos.xenon.block.api.domain.dto.PoggReportDto;
 import com.aitos.xenon.block.api.domain.dto.PoggReportSearchDto;
 import com.aitos.xenon.block.api.domain.vo.PoggReportDataVo;
+import com.aitos.xenon.block.domain.PoggReportPowerData;
 import com.aitos.xenon.block.domain.PoggReportSubtotal;
 import com.aitos.xenon.block.domain.PoggReportSubtotalStatistics;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -33,6 +34,15 @@ public interface PoggReportService {
      * @return
      */
     List<PoggReportSubtotalStatistics> findSubtotalStatisticsList(long startEpoch,long endEpoch);
+
+    /**
+     * 获取 miner 在 epoch 区间内的所有功率数据
+     * @param address
+     * @param startEpoch
+     * @param endEpoch
+     * @return
+     */
+    List<PoggReportPowerData> findPowerDataListByEpoch(String address, long startEpoch, long endEpoch);
 
     long findTotalEnergyGeneration(LocalDateTime startTime, LocalDateTime endTime, String ownerAddress);
     /**

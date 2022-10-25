@@ -53,6 +53,16 @@
         ) t2
     </select>
 
+    <select id="findPowerDataListByEpoch" resultType="com.aitos.xenon.block.domain.PoggReportPowerData">
+        SELECT address, epoch, power, timestamp
+        FROM pogg_report
+        WHERE address = #{address}
+            and epoch &gt;= #{startEpoch}-1
+            and epoch &lt;= #{endEpoch}
+        ORDER BY epoch, timestamp asc
+    </select>
+
+
 
     <insert id="saveSubtotal">
         INSERT INTO pogg_report_subtotal (address,
