@@ -17,7 +17,6 @@
         <module>remote-api</module>
         <module>block</module>
         <module>fundation</module>
-        <module>message-push</module>
     </modules>
 
     <properties>
