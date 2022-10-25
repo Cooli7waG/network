@@ -9,6 +9,7 @@ public class BlockVo {
        private Long id;
        private String hash;
        private  Long height;
+       private  Long amountTransaction;
 
        /**
         * 成块间隔，上一个块成块时间到本次成块时间间隔
