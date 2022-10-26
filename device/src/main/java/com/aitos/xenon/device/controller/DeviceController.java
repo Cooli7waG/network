@@ -157,6 +157,9 @@ public class DeviceController {
     @GetMapping("/{minerAddress}")
     public Result<DeviceVo> findByAddress(@PathVariable("minerAddress")String minerAddress){
         DeviceVo deviceVo= deviceService.queryByMiner(minerAddress);
+        // 去掉
+        deviceVo.setAvgPower(null);
+        deviceVo.setTotalEnergyGeneration(null);
         return Result.ok(deviceVo);
     }
 

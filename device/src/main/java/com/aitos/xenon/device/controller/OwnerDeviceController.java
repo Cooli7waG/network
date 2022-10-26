@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author xymoc
  */
 @RestController
-@RequestMapping("/owner/device")
+@RequestMapping("/owner")
 @Slf4j
 @RefreshScope
 public class OwnerDeviceController {
@@ -41,5 +42,19 @@ public class OwnerDeviceController {
         IPage<DeviceVo> listPage= deviceService.list(queryParams);
         Page<DeviceVo> deviceVoPage=new Page<DeviceVo>(listPage.getTotal(),listPage.getRecords());
         return Result.ok(deviceVoPage);
+    }
+
+    /**
+     * 根据miner address 查询miner 信息
+     * @param minerAddress
+     * @return
+     */
+    @GetMapping("/{ownerAddress}/{minerAddress}")
+    public Result<DeviceVo> findByAddress(@PathVariable("minerAddress")String minerAddress,@PathVariable("ownerAddress")String ownerAddress){
+        if(!StringUtils.hasText(ownerAddress)){
+            return Result.failed(ApiStatus.PARAMETER_FORMATE_ERROR.getMsg());
+        }
+        DeviceVo deviceVo= deviceService.queryByMiner(minerAddress);
+        return Result.ok(deviceVo);
     }
 }
