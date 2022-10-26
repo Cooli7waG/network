@@ -30,6 +30,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -177,6 +178,16 @@ public class DeviceServiceImpl implements DeviceService {
     public IPage<DeviceVo> list(DeviceSearchDto queryParams) {
         Page<DeviceVo> page=new Page<DeviceVo>(queryParams.getOffset(),queryParams.getLimit());
         IPage<DeviceVo> pageResult=deviceMapper.list(page,queryParams);
+        //
+        if(!StringUtils.hasText(queryParams.getOwner())){
+            for (DeviceVo record : pageResult.getRecords()) {
+                // 平均发电量
+                record.setAvgPower(null);
+                // 累计发电量
+                record.setTotalEnergyGeneration(null);
+            }
+        }
+        //
         return pageResult;
     }
 
