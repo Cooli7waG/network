@@ -20,8 +20,9 @@
     <select id="list" resultType="com.aitos.xenon.account.api.domain.vo.TransactionVo">
         select * from transaction
         <where>
+            and tx_type != 8
             <if test="queryParams.height!=null">
-                height=#{queryParams.height}
+                and height=#{queryParams.height}
             </if>
             <if test="queryParams.hash!=null and queryParams.hash!=''">
                 and hash=#{queryParams.hash}
