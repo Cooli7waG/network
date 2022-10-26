@@ -504,22 +504,26 @@ public class PoggServiceImpl implements PoggService {
 
         Long[] windowPowerData = new Long[windowRecordNumMax];
         Arrays.fill(windowPowerData, Long.valueOf(0));
-        int lastIndex = 0;
-        long lastEpoch = startEpoch;
+        Map<Long, Long> epochRecordMap = new HashMap<Long, Long>();
+
         for (int i = 0; i < data.size(); i++) {
             PoggReportPowerData p = data.get(i);
             Long epoch = p.getEpoch();
             if (epoch.longValue() > endEpoch || epoch.longValue() < startEpoch) {
                 continue;
             }
-            if (epoch.longValue() != lastEpoch) {
-                lastIndex = 0;
+            Long epochIndex =  epoch - startEpoch;
+            Long epochRecordIndex = epochRecordMap.get(epoch);
+            if (epochRecordIndex == null) {
+                epochRecordIndex = Long.valueOf(0);
             }
-            Long index =  epoch - startEpoch;
-            windowPowerData[index.intValue() * EPOCH_RECORD_NUM_MAX + lastIndex] = p.getPower();
-            lastIndex++; lastEpoch++;
+            windowPowerData[epochIndex.intValue() * EPOCH_RECORD_NUM_MAX + epochRecordIndex.intValue()] = p.getPower();
+            epochRecordIndex = epochRecordIndex + 1;
+            epochRecordMap.put(epoch, epochRecordIndex);
+            // System.out.printf("epoch: %d, : epochRecordIndex: %d, power: %d,\n", epoch, epochRecordIndex, p.getPower());
         }
-        // System.out.printf("windowPowerData: %s\n", JSONObject.toJSONString(windowPowerData));
+
+        // System.out.printf("startEpoch: %d, endEpoch: %d, data.size: %d, window.size: %d, windowPowerData: %s\n", startEpoch, endEpoch, data.size(), windowRecordNumMax, JSONObject.toJSONString(windowPowerData));
         return windowPowerData;
     }
 
