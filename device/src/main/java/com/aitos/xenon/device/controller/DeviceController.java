@@ -155,7 +155,7 @@ public class DeviceController {
      * @return
      */
     @GetMapping("/{minerAddress}")
-    public Result<DeviceVo> findByAddress(@RequestParam("minerAddress")String minerAddress){
+    public Result<DeviceVo> findByAddress(@PathVariable("minerAddress")String minerAddress){
         DeviceVo deviceVo= deviceService.queryByMiner(minerAddress);
         return Result.ok(deviceVo);
     }
