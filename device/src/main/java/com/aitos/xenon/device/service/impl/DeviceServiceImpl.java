@@ -25,6 +25,8 @@ import com.aitos.xenon.device.service.DeviceService;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.uber.h3core.H3Core;
+import com.uber.h3core.util.GeoCoord;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -251,9 +253,14 @@ public class DeviceServiceImpl implements DeviceService {
             List<DeviceVo> deviceList = deviceMapper.getAllMinerLocation();
             for (DeviceVo deviceVo : deviceList) {
                 if(deviceVo.getLatitude()!=null && deviceVo.getLongitude()!=null){
+                    H3Core h3Core = H3Core.newSystemInstance();
+                    long l1 = h3Core.geoToH3(deviceVo.getLatitude(), deviceVo.getLongitude(), 10);
+                    GeoCoord geoCoord = h3Core.h3ToGeo(l1);
+                    //
                     Location location = new Location();
-                    location.setLatitude(deviceVo.getLatitude());
-                    location.setLongitude(deviceVo.getLongitude());
+                    location.setLatitude(geoCoord.lat);
+                    location.setLongitude(geoCoord.lng);
+                    //
                     MINER_LOCATION_CACHE.put(deviceVo.getAddress(),location);
                 }
             }

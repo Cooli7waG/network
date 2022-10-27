@@ -99,7 +99,12 @@
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
-
+        <!-- H3 -->
+        <dependency>
+            <groupId>com.uber</groupId>
+            <artifactId>h3</artifactId>
+            <version>3.7.1</version>
+        </dependency>
     </dependencies>
 
     <build>
