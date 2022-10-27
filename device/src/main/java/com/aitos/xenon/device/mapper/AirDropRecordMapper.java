@@ -15,4 +15,6 @@ public interface AirDropRecordMapper {
     AirDropRecord  findNotClaimedByMinerAddress(@Param("minerAddress")String minerAddress);
 
     AirDropRecord findByMinerAddress(@Param("minerAddress")String minerAddress);
+
+    int countByEmail(@Param("email")String email);
 }

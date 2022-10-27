@@ -13,6 +13,8 @@ public class AccountVo {
 
     private String address;
 
+    private String email;
+
     private String balance;
 
     private Long nonce;

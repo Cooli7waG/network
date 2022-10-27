@@ -12,6 +12,8 @@ public class AirDropDto {
 
     private String ownerAddress;
 
+    private String email;
+
     private DeviceLocationDto location;
 
     private DeviceInfoDto minerInfo;

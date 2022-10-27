@@ -10,6 +10,8 @@ public class AirDropRecord extends BaseModel {
 
     private String minerAddress;
 
+    private String email;
+
     private Long expiration;
 
 

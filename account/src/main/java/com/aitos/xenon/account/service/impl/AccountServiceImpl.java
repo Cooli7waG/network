@@ -75,4 +75,13 @@ public class AccountServiceImpl implements AccountService {
     public void withdraw(String address, BigDecimal amount,LocalDateTime updateTime) {
         accountMapper.withdraw(address,amount,updateTime);
     }
+
+    @Override
+    public void updateEmail(String address, String email) {
+        Account account = new Account();
+        account.setUpdateTime(LocalDateTime.now());
+        account.setAddress(address);
+        account.setEmail(email);
+        accountMapper.update(account);
+    }
 }

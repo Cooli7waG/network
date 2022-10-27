@@ -32,4 +32,6 @@ public interface AccountService {
     void updateEarning(List<AccountReward>  accountRewardList);
 
     void withdraw(String address, BigDecimal amount, LocalDateTime updateTime);
+
+    void updateEmail(String address, String email);
 }

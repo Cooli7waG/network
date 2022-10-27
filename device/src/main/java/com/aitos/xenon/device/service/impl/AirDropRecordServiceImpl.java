@@ -263,7 +263,11 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
 
         int gameMinerSingleCount = deviceMapper.countByAddressAndMinerType(applyGameMiner.getOwner(), BusinessConstants.DeviceMinerType.GAME_MINER);
         if (gameMinerSingleCount >= systemConfigVo.getGameMinerSingleNumber()) {
-            throw new MinerSingleNumberException("单个用户可申请miner量超出限制");
+            throw new MinerSingleNumberException("单个用户[地址]可申请miner量超出限制");
+        }
+        int emailSingleCount = airDropRecordMapper.countByEmail(applyGameMiner.getEmail());
+        if (emailSingleCount >= systemConfigVo.getGameMinerSingleNumber()) {
+            throw new MinerSingleNumberException("单个用户[邮箱]可申请miner量超出限制");
         }
         // 调用game miner服务生成miner地址进行预注册
         Result<String> gameMinerResult = remoteGameMinerService.register();
@@ -307,6 +311,7 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
         AirDropDto airDropDto = new AirDropDto();
         airDropDto.setMinerAddress(minerAddress);
         airDropDto.setOwnerAddress(applyGameMiner.getOwner());
+        airDropDto.setEmail(applyGameMiner.getEmail());
         airDropDto.setVersion(1);
         // 30天
         Result<Long> blockHeight = remoteBlockService.getBlockHeight();
