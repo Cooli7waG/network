@@ -26,6 +26,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.uber.h3core.H3Core;
+import com.uber.h3core.H3CoreLoader;
 import com.uber.h3core.util.GeoCoord;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -64,31 +65,31 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void save(DeviceRegisterDto deviceRegister) {
-        Device device= BeanConvertor.toBean(deviceRegister,Device.class);
+        Device device = BeanConvertor.toBean(deviceRegister, Device.class);
 
         device.setEarningMint(BigDecimal.valueOf(0));
         device.setEarningService(BigDecimal.valueOf(0));
         device.setCreateTime(LocalDateTime.now());
         deviceMapper.save(device);
         //
-        AccountRegisterDto accountRegisterDto =new AccountRegisterDto();
+        AccountRegisterDto accountRegisterDto = new AccountRegisterDto();
         accountRegisterDto.setAddress(device.getAddress());
         accountRegisterDto.setAccountType(BusinessConstants.AccountType.MINER);
         accountRegisterDto.setBalance(new BigDecimal("0"));
         accountRegisterDto.setNonce(0L);
         accountRegisterDto.setEmail(deviceRegister.getEmail());
-        Result result=remoteAccountService.register(accountRegisterDto);
-        if(result.getCode()!= ApiStatus.SUCCESS.getCode()){
-           throw new DeviceExistedException("设备账户已经存在");
+        Result result = remoteAccountService.register(accountRegisterDto);
+        if (result.getCode() != ApiStatus.SUCCESS.getCode()) {
+            throw new DeviceExistedException("设备账户已经存在");
         }
 
-        Result<Long> blockVoResult= remoteBlockService.getBlockHeight();
+        Result<Long> blockVoResult = remoteBlockService.getBlockHeight();
         //记录交易信息
-        TransactionDto transactionDto=new TransactionDto();
+        TransactionDto transactionDto = new TransactionDto();
         transactionDto.setFromAddress(device.getAddress());
         transactionDto.setHeight(blockVoResult.getData());
         transactionDto.setData(deviceRegister.getTxData());
-        String txHash=DigestUtils.sha256Hex(deviceRegister.getTxData());
+        String txHash = DigestUtils.sha256Hex(deviceRegister.getTxData());
         transactionDto.setHash(txHash);
         transactionDto.setTxType(BusinessConstants.TXType.TX_REGISTER_MINER);
         remoteTransactionService.transaction(transactionDto);
@@ -96,7 +97,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public Device findByAddress(String address) {
-        Device  device= deviceMapper.findByAddress(address);
+        Device device = deviceMapper.findByAddress(address);
         return device;
     }
 
@@ -113,20 +114,20 @@ public class DeviceServiceImpl implements DeviceService {
             throw new PayerAccountNotEnoughException("账户额度不够");
         }*/
 
-        Result<AccountVo>  ownerAccountVoResult= remoteAccountService.findByAddress(deviceBindDto.getOwnerAddress());
+        Result<AccountVo> ownerAccountVoResult = remoteAccountService.findByAddress(deviceBindDto.getOwnerAddress());
         log.info("bind.ownerAccountVoResult=", JSON.toJSONString(ownerAccountVoResult));
-        if(ownerAccountVoResult.getData()==null){
-            AccountRegisterDto accountRegisterDto=new AccountRegisterDto();
+        if (ownerAccountVoResult.getData() == null) {
+            AccountRegisterDto accountRegisterDto = new AccountRegisterDto();
             accountRegisterDto.setAddress(deviceBindDto.getOwnerAddress());
             accountRegisterDto.setAccountType(BusinessConstants.AccountType.WALLET);
-            Result<Long> registerResult=remoteAccountService.register(accountRegisterDto);
+            Result<Long> registerResult = remoteAccountService.register(accountRegisterDto);
             log.info("bind.registerResult=", JSON.toJSONString(registerResult));
-            if(registerResult.getCode()!=ApiStatus.SUCCESS.getCode()){
+            if (registerResult.getCode() != ApiStatus.SUCCESS.getCode()) {
                 throw new OwnerAccountNotExistException("owner账户创建失败");
             }
         }
 
-        Device device=new Device();
+        Device device = new Device();
         device.setId(deviceBindDto.getDeviceId());
         device.setAddress(deviceBindDto.getMinerAddress());
         device.setOwnerAddress(deviceBindDto.getOwnerAddress());
@@ -147,18 +148,18 @@ public class DeviceServiceImpl implements DeviceService {
         device.setStatus(BusinessConstants.DeviceStatus.BOUND);
         deviceMapper.bind(device);
         //更新缓存的miner地理位置
-        try{
+        try {
             this.getMinerLocation();
-        }catch (Exception e){
-            log.error("更新地理位置失败：{}",e.getMessage());
+        } catch (Exception e) {
+            log.error("更新地理位置失败：{}", e.getMessage());
         }
 
-        Result<Long> blockVoResult= remoteBlockService.getBlockHeight();
-        if(blockVoResult.getCode()!= ApiStatus.SUCCESS.getCode()){
+        Result<Long> blockVoResult = remoteBlockService.getBlockHeight();
+        if (blockVoResult.getCode() != ApiStatus.SUCCESS.getCode()) {
             throw new ServiceException(blockVoResult.getMsg());
         }
         //记录交易信息
-        TransactionDto transactionDto=new TransactionDto();
+        TransactionDto transactionDto = new TransactionDto();
         transactionDto.setFromAddress(device.getAddress());
         transactionDto.setHeight(blockVoResult.getData());
         transactionDto.setData(deviceBindDto.getTxData());
@@ -166,7 +167,7 @@ public class DeviceServiceImpl implements DeviceService {
         transactionDto.setHash(deviceBindDto.getTxHash());
         transactionDto.setTxType(BusinessConstants.TXType.TX_ONBOARD_MINER);
         Result<String> transaction = remoteTransactionService.transaction(transactionDto);
-        if(transaction.getCode()!= ApiStatus.SUCCESS.getCode()){
+        if (transaction.getCode() != ApiStatus.SUCCESS.getCode()) {
             throw new ServiceException(transaction.getMsg());
         }
     }
@@ -179,10 +180,10 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public IPage<DeviceVo> list(DeviceSearchDto queryParams) {
-        Page<DeviceVo> page=new Page<DeviceVo>(queryParams.getOffset(),queryParams.getLimit());
-        IPage<DeviceVo> pageResult=deviceMapper.list(page,queryParams);
+        Page<DeviceVo> page = new Page<DeviceVo>(queryParams.getOffset(), queryParams.getLimit());
+        IPage<DeviceVo> pageResult = deviceMapper.list(page, queryParams);
         //
-        if(!StringUtils.hasText(queryParams.getOwner())){
+        if (!StringUtils.hasText(queryParams.getOwner())) {
             for (DeviceVo record : pageResult.getRecords()) {
                 // 平均发电量
                 record.setAvgPower(null);
@@ -196,28 +197,28 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public List<Device> queryByOwner(String ownerAddress) {
-        List<Device> list=deviceMapper.findByOwnerAddress(ownerAddress);
+        List<Device> list = deviceMapper.findByOwnerAddress(ownerAddress);
         return list;
     }
 
     @Override
     public DeviceVo queryByMiner(String minerAddress) {
-        DeviceVo device=deviceMapper.queryByMiner(minerAddress);
+        DeviceVo device = deviceMapper.queryByMiner(minerAddress);
         if (device != null) {
             Result<Double> avgPowerResult = remotePoggService.avgPower(minerAddress);
-            log.info("queryByMiner.avgPowerResult={}",JSON.toJSONString(avgPowerResult));
-            if(avgPowerResult.getCode()==ApiStatus.SUCCESS.getCode()){
+            log.info("queryByMiner.avgPowerResult={}", JSON.toJSONString(avgPowerResult));
+            if (avgPowerResult.getCode() == ApiStatus.SUCCESS.getCode()) {
                 device.setAvgPower(avgPowerResult.getData());
-            }else{
+            } else {
                 device.setAvgPower(0D);
             }
             Result<AccountRewardStatisticsVo> accountStatistics = remoteAccountRewardService.statistics(device.getAddress());
-            log.info("queryByMiner.result={}",JSON.toJSONString(accountStatistics));
-            if(accountStatistics.getCode()==ApiStatus.SUCCESS.getCode()){
+            log.info("queryByMiner.result={}", JSON.toJSONString(accountStatistics));
+            if (accountStatistics.getCode() == ApiStatus.SUCCESS.getCode()) {
                 AccountRewardStatisticsVo accountRewardStatisticsVo = accountStatistics.getData();
                 device.setTotalReward(accountRewardStatisticsVo.getTotalReward());
                 device.setAvgReward(accountRewardStatisticsVo.getAvgReward());
-            }else{
+            } else {
                 device.setTotalReward(BigDecimal.valueOf(0));
                 device.setAvgReward(BigDecimal.valueOf(0));
             }
@@ -232,40 +233,47 @@ public class DeviceServiceImpl implements DeviceService {
 
     /**
      * 根据owner地址查询miner列表
+     *
      * @param queryParams
      * @return
      */
     @Override
     public IPage<DeviceVo> getMinersByOwnerAddress(DeviceSearchDto queryParams) {
-        Page<DeviceVo> page=new Page<DeviceVo>(queryParams.getOffset(),queryParams.getLimit());
-        IPage<DeviceVo> pageResult=deviceMapper.getMinersByOwnerAddress(page,queryParams);
+        Page<DeviceVo> page = new Page<DeviceVo>(queryParams.getOffset(), queryParams.getLimit());
+        IPage<DeviceVo> pageResult = deviceMapper.getMinersByOwnerAddress(page, queryParams);
         return pageResult;
     }
 
     /**
      * 获取所有miner位置信息
+     *
      * @return
      */
     @Override
     public HashMap getMinerLocation() {
         long l = System.currentTimeMillis();
-        if(MINER_LOCATION_CACHE.size()==0 || l>MINER_LOCATION_CACHE_EXPIRING){
+        if (MINER_LOCATION_CACHE.size() == 0 || l > MINER_LOCATION_CACHE_EXPIRING) {
             List<DeviceVo> deviceList = deviceMapper.getAllMinerLocation();
-            for (DeviceVo deviceVo : deviceList) {
-                if(deviceVo.getLatitude()!=null && deviceVo.getLongitude()!=null){
-                    H3Core h3Core = H3Core.newSystemInstance();
-                    long l1 = h3Core.geoToH3(deviceVo.getLatitude(), deviceVo.getLongitude(), 10);
-                    GeoCoord geoCoord = h3Core.h3ToGeo(l1);
-                    //
-                    Location location = new Location();
-                    location.setLatitude(geoCoord.lat);
-                    location.setLongitude(geoCoord.lng);
-                    //
-                    MINER_LOCATION_CACHE.put(deviceVo.getAddress(),location);
+            try {
+                H3Core h3Core = H3Core.newInstance();
+                for (DeviceVo deviceVo : deviceList) {
+                    if (deviceVo.getLatitude() != null && deviceVo.getLongitude() != null) {
+                        long l1 = h3Core.geoToH3(deviceVo.getLatitude(), deviceVo.getLongitude(), 10);
+                        GeoCoord geoCoord = h3Core.h3ToGeo(l1);
+                        //
+                        Location location = new Location();
+                        location.setLatitude(geoCoord.lat);
+                        location.setLongitude(geoCoord.lng);
+                        //
+                        MINER_LOCATION_CACHE.put(deviceVo.getAddress(), location);
+                    }
                 }
+                log.info("更新Miner位置信息:{}", JSON.toJSONString(MINER_LOCATION_CACHE));
+                MINER_LOCATION_CACHE_EXPIRING = l + (2 * 60 * 1000);
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.warn("更新Miner位置信息失败->转换H3失败");
             }
-            log.info("更新Miner位置信息:{}",JSON.toJSONString(MINER_LOCATION_CACHE));
-            MINER_LOCATION_CACHE_EXPIRING = l + (2*60*1000);
         }
         return MINER_LOCATION_CACHE;
     }
@@ -282,6 +290,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     /**
      * 根据owner查询miner列表
+     *
      * @param address
      * @return
      */
@@ -297,25 +306,27 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public int countByAddressAndMinerType(String ownerAddress, int minerType) {
-        return deviceMapper.countByAddressAndMinerType(ownerAddress,minerType);
+        return deviceMapper.countByAddressAndMinerType(ownerAddress, minerType);
     }
 
     /**
      * 获取所有miner（已绑定）
+     *
      * @return
      */
     @Override
-    public List<DeviceVo> getAllMiner(){
+    public List<DeviceVo> getAllMiner() {
         return deviceMapper.getAllMiner();
     }
 
     /**
      * 修改miner 运行状态
+     *
      * @param id
      * @param runStatus
      */
     @Override
     public void updateMinerRunStatus(Long id, int runStatus) {
-        deviceMapper.updateMinerRunStatus(id,runStatus);
+        deviceMapper.updateMinerRunStatus(id, runStatus);
     }
 }
