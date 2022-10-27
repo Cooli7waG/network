@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -258,7 +259,7 @@ public class DeviceServiceImpl implements DeviceService {
                 H3Core h3Core = H3Core.newInstance();
                 for (DeviceVo deviceVo : deviceList) {
                     if (deviceVo.getLatitude() != null && deviceVo.getLongitude() != null) {
-                        long l1 = h3Core.geoToH3(deviceVo.getLatitude(), deviceVo.getLongitude(), 10);
+                        long l1 = h3Core.geoToH3(deviceVo.getLatitude(), deviceVo.getLongitude(), 8);
                         GeoCoord geoCoord = h3Core.h3ToGeo(l1);
                         //
                         Location location = new Location();
