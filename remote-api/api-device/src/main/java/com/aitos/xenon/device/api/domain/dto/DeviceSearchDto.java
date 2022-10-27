@@ -7,5 +7,6 @@ import lombok.Data;
 public class DeviceSearchDto extends QueryParams {
 
     private String address;
+    private String owner;
 
 }

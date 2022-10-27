@@ -59,9 +59,7 @@ public class DeviceController {
     @PostMapping("/register")
     public Result register(@RequestBody DeviceRegisterDto deviceRegister){
         //TODO 此处不能只验证一个字段
-        log.info("DeviceController.register address:{}",deviceRegister.getAddress());
-        log.info("DeviceController.register FoundationSignature:{}",deviceRegister.getFoundationSignature());
-        log.info("DeviceController.register foundationPublicKey:{}",foundationPublicKey);
+
         Boolean verify= Ecdsa.verifyByAddress(foundationPublicKey,deviceRegister.getAddress(),deviceRegister.getFoundationSignature(), DataCoder.BASE58);
         //JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(deviceRegister));
         //jsonObject.remove("foundationSignature");
@@ -155,8 +153,11 @@ public class DeviceController {
      * @return
      */
     @GetMapping("/{minerAddress}")
-    public Result<DeviceVo> findByAddress(@RequestParam("minerAddress")String minerAddress){
+    public Result<DeviceVo> findByAddress(@PathVariable("minerAddress")String minerAddress){
         DeviceVo deviceVo= deviceService.queryByMiner(minerAddress);
+        // 去掉平均发电量和累计发电量
+        deviceVo.setAvgPower(null);
+        deviceVo.setTotalEnergyGeneration(null);
         return Result.ok(deviceVo);
     }
 
