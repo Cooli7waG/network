@@ -74,6 +74,7 @@ public class DeviceServiceImpl implements DeviceService {
         accountRegisterDto.setAccountType(BusinessConstants.AccountType.MINER);
         accountRegisterDto.setBalance(new BigDecimal("0"));
         accountRegisterDto.setNonce(0L);
+        accountRegisterDto.setEmail(deviceRegister.getEmail());
         Result result=remoteAccountService.register(accountRegisterDto);
         if(result.getCode()!= ApiStatus.SUCCESS.getCode()){
            throw new DeviceExistedException("设备账户已经存在");

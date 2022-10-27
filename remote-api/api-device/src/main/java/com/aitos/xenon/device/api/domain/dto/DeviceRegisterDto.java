@@ -18,4 +18,6 @@ public class DeviceRegisterDto {
     private String txData;
 
     private String txHash;
+
+    private String email;
 }

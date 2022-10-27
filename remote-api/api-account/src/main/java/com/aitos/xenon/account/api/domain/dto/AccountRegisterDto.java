@@ -10,6 +10,8 @@ public class AccountRegisterDto extends BaseModel {
 
     private String address;
 
+    private String email;
+
     private BigDecimal balance;
 
     private Long nonce;

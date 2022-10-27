@@ -7,8 +7,8 @@
     <sql id="tableName">account</sql>
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        insert into <include refid="tableName"/> (address,balance,account_type,nonce,earning_mint,earning_service,withdraw_amount,create_time)
-        value (#{address},#{balance},#{accountType},0,0,0,0,#{createTime})
+        insert into <include refid="tableName"/> (address,email,balance,account_type,nonce,earning_mint,earning_service,withdraw_amount,create_time)
+        value (#{address},#{email},#{balance},#{accountType},0,0,0,0,#{createTime})
     </insert>
 
     <update id="update">

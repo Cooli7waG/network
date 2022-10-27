@@ -296,6 +296,7 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
         RemoteKMSSignVo remoteKMSSignVo = signResult.getData();
         String sign = SignatureProcessor.signBuild(new SignatureProcessor.Signature(remoteKMSSignVo.getR(), remoteKMSSignVo.getS(), remoteKMSSignVo.getRecid()));
         deviceRegisterDto.setFoundationSignature(sign);
+        deviceRegisterDto.setEmail(applyGameMiner.getEmail());
         //调用 miner register
         Result deviceRegister = remoteDeviceService.register(deviceRegisterDto);
         if (deviceRegister.getCode() != ApiStatus.SUCCESS.getCode()) {
