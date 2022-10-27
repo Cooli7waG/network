@@ -64,6 +64,7 @@ public enum ApiStatus implements ConstantsCode {
     BUSINESS_DEVICE_GMAE_MINER_TOTAL_NUMBER(3015,"Total miner exceeds limit"),
     BUSINESS_DEVICE_GMAE_MINER_SINGLE_NUMBER(3016,"The amount of miners that a single user can apply for exceeds the limit"),
     BUSINESS_NFT_CASTING_FAILED(3017,"nft casting failed"),
+    BUSINESS_DEVICE_GMAE_MINER_SINGLE_NUMBER_FOR_EMAIL(3018,"The amount of miners that a single email can apply for exceeds the limit"),
 
 
 
