@@ -158,6 +158,14 @@ public class DeviceController {
         // 去掉平均发电量和累计发电量
         deviceVo.setAvgPower(null);
         deviceVo.setTotalEnergyGeneration(null);
+        if (deviceVo.getLatitude() != null) {
+            String latitude = String.format("%.2f", deviceVo.getLatitude());
+            deviceVo.setLatitude(Double.parseDouble(latitude));
+        }
+        if (deviceVo.getLongitude() != null) {
+            String longitude = String.format("%.2f", deviceVo.getLongitude());
+            deviceVo.setLongitude(Double.parseDouble(longitude));
+        }
         return Result.ok(deviceVo);
     }
 

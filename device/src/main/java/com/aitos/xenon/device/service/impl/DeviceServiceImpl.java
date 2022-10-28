@@ -190,6 +190,14 @@ public class DeviceServiceImpl implements DeviceService {
                 record.setAvgPower(null);
                 // 累计发电量
                 record.setTotalEnergyGeneration(null);
+                if (record.getLatitude() != null) {
+                    String latitude = String.format("%.2f", record.getLatitude());
+                    record.setLatitude(Double.parseDouble(latitude));
+                }
+                if (record.getLongitude() != null) {
+                    String longitude = String.format("%.2f", record.getLongitude());
+                    record.setLongitude(Double.parseDouble(longitude));
+                }
             }
         }
         //
@@ -284,6 +292,14 @@ public class DeviceServiceImpl implements DeviceService {
         List<DeviceVo> deviceList = new ArrayList<>();
         for (String address : addressList) {
             DeviceVo byAddress = queryByMiner(address);
+            if (byAddress.getLatitude() != null) {
+                String latitude = String.format("%.2f", byAddress.getLatitude());
+                byAddress.setLatitude(Double.parseDouble(latitude));
+            }
+            if (byAddress.getLongitude() != null) {
+                String longitude = String.format("%.2f", byAddress.getLongitude());
+                byAddress.setLongitude(Double.parseDouble(longitude));
+            }
             deviceList.add(byAddress);
         }
         return deviceList;
