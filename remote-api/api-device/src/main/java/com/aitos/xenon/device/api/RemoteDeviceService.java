@@ -27,7 +27,7 @@ public interface RemoteDeviceService {
     Result register(@RequestBody DeviceRegisterDto deviceRegister);
 
     @PostMapping("/device/getMinerLocation")
-    Result<HashMap> getMinerLocation();
+    Result<HashMap<String, Location>> getMinerLocation();
 
     @PostMapping("/airdroprecord/airdrop")
     Result airdrop(@RequestBody String body);

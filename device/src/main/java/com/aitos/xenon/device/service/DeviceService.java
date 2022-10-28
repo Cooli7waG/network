@@ -1,5 +1,6 @@
 package com.aitos.xenon.device.service;
 
+import com.aitos.xenon.core.utils.Location;
 import com.aitos.xenon.device.api.domain.dto.*;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.aitos.xenon.device.domain.Device;
@@ -39,7 +40,7 @@ public interface DeviceService {
      * 获取所有miner位置信息
      * @return
      */
-    HashMap getMinerLocation();
+    HashMap<String, Location> getMinerLocation();
 
     List<DeviceVo> loadMinersInfo(ArrayList<String> addressList);
 

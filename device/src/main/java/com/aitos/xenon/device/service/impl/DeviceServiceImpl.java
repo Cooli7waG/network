@@ -60,7 +60,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Autowired
     private RemoteAccountRewardService remoteAccountRewardService;
 
-    private static HashMap MINER_LOCATION_CACHE = new HashMap();
+    private static HashMap<String, Location> MINER_LOCATION_CACHE = new HashMap<String, Location>();
     private static long MINER_LOCATION_CACHE_EXPIRING = 0L;
 
     @Override
@@ -259,7 +259,7 @@ public class DeviceServiceImpl implements DeviceService {
      * @return
      */
     @Override
-    public HashMap getMinerLocation() {
+    public HashMap<String, Location> getMinerLocation() {
         long l = System.currentTimeMillis();
         if (MINER_LOCATION_CACHE.size() == 0 || l > MINER_LOCATION_CACHE_EXPIRING) {
             List<DeviceVo> deviceList = deviceMapper.getAllMinerLocation();

@@ -434,7 +434,7 @@ public class PoggServiceImpl implements PoggService {
 
         // TODO(lq)：获取固定范围内的 miner 位置信息，而非全部。
         // 获取所有 miner 位置
-        Result<HashMap>  minerLocationResult= remoteDeviceService.getMinerLocation();
+        Result<HashMap<String, Location>>  minerLocationResult= remoteDeviceService.getMinerLocation();
         if (minerLocationResult.getCode() != ApiStatus.SUCCESS.getCode()) {
             log.error("getMinerLocation failed");
             return suitableCompareMiners;
