@@ -7,6 +7,7 @@ import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.model.Page;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
+import com.aitos.xenon.core.utils.Location;
 import com.aitos.xenon.device.api.domain.dto.*;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.aitos.xenon.device.domain.Device;
@@ -212,8 +213,8 @@ public class DeviceController {
      * @return
      */
     @PostMapping("/getMinerLocation")
-    public Result<HashMap> getMinerLocation(){
-        HashMap map = deviceService.getMinerLocation();
+    public Result<HashMap<String, Location>> getMinerLocation(){
+        HashMap<String, Location> map = deviceService.getMinerLocation();
         return Result.ok(map);
     }
 
