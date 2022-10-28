@@ -159,11 +159,11 @@ public class DeviceController {
         deviceVo.setAvgPower(null);
         deviceVo.setTotalEnergyGeneration(null);
         if (deviceVo.getLatitude() != null) {
-            String latitude = String.format("%.2f", deviceVo.getLatitude());
+            String latitude = String.format("%.1f", deviceVo.getLatitude());
             deviceVo.setLatitude(Double.parseDouble(latitude));
         }
         if (deviceVo.getLongitude() != null) {
-            String longitude = String.format("%.2f", deviceVo.getLongitude());
+            String longitude = String.format("%.1f", deviceVo.getLongitude());
             deviceVo.setLongitude(Double.parseDouble(longitude));
         }
         return Result.ok(deviceVo);
