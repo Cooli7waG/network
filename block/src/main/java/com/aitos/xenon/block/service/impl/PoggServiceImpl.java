@@ -315,8 +315,9 @@ public class PoggServiceImpl implements PoggService {
             double c = calCoefficient(systemConfig, s.getMinerType(), s.getEnergyGeneration());
             double t = authcs.get(i).getScore();
             double z = s.getTotalRecord();
-            totalRewardWeight.add(BigDecimal.valueOf(t * c * z));
+            totalRewardWeight = totalRewardWeight.add(BigDecimal.valueOf(t * c * z));
         }
+        log.debug("totalRewardWeight: {}", totalRewardWeight.toString());
         return totalRewardWeight;
     }
 
@@ -332,6 +333,7 @@ public class PoggServiceImpl implements PoggService {
 
         //单个miner 的奖励权重
         BigDecimal minerRewardWeight = BigDecimal.valueOf(authcScore * coefficient * minerRecordTotal);
+        log.debug("minerRewardWeight: {}", minerRewardWeight.toString());
 
         //每个miner奖励比例
         BigDecimal minerRewardRatio = minerRewardWeight.divide(totalRewardWeight, 8, RoundingMode.HALF_UP);
@@ -473,9 +475,8 @@ public class PoggServiceImpl implements PoggService {
 
         // 根据位置和数据筛选出合适的对比 miner
         List<String> suitableMiner = findSuitableMinerWithLocationAndPower(targetMinerLocation, locationSuitMiners, locationSuitMinerPowerData);
-        log.debug("suitableMiner size: {}", suitableMiner.size());
+        log.debug("miner: {}, suitableMiner size: {}", address, suitableMiner.size());
         if (suitableMiner.size() == 0) {
-            log.debug("not found suitable miner");
             return suitableCompareMiners;
         }
 
