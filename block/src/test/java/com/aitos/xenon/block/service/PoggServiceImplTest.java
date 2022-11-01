@@ -4,17 +4,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.math.BigDecimal;
 
 import org.junit.jupiter.api.*;
 
 import com.aitos.xenon.block.domain.PoggReportPowerData;
 import com.aitos.xenon.block.service.impl.PoggServiceImpl;
+import com.aitos.xenon.core.utils.SunRiseSet;
+import com.aitos.xenon.core.utils.SunRiseSetUtils.SunRiseAndSunset;
 import com.alibaba.fastjson.JSONObject;
 import com.opencsv.*;
 
@@ -469,6 +473,58 @@ public class PoggServiceImplTest {
             } catch (Exception e) {
                 System.out.printf("somethine wrong: %s\n", e.toString());
                 assert (false);
+            }
+        }
+    }
+
+    @Test
+    public void test_getDayTime() {
+        {
+            // 北京：纬度 39.9432725，经度 116.3474879
+            double lat = 39.9432725;
+            double lng = 116.3474879;
+            {
+
+                String t = SunRiseSet.getSunrise(new BigDecimal(lng),new BigDecimal(lat),new Date());
+                System.out.printf("beijing，SunRise, timeHourMinute: %s\n",
+                        JSONObject.toJSONString(t, true));
+            }
+            {
+                String t = SunRiseSet.getSunset(new BigDecimal(lng),new BigDecimal(lat),new Date());
+                System.out.printf("beijing，SunSet, timeHourMinute: %s\n",
+                        JSONObject.toJSONString(t, true));
+            }
+        }
+        {
+            // 新加坡：纬度 1.28333，经度 103.85
+            double lat = 1.28333;
+            double lng = 103.85;
+            {
+
+                String t = SunRiseSet.getSunrise(new BigDecimal(lng),new BigDecimal(lat),new Date());
+                System.out.printf("Singapore，SunRise, timeHourMinute: %s\n",
+                        JSONObject.toJSONString(t, true));
+            }
+            {
+                String t = SunRiseSet.getSunset(new BigDecimal(lng),new BigDecimal(lat),new Date());
+                System.out.printf("Singapore，SunSet, timeHourMinute: %s\n",
+                        JSONObject.toJSONString(t, true));
+            }
+        }
+        {
+            // 纽约：纬度: 40.6643, 经度: -73.9385
+            double lat = 40.6643;
+            double lng = -73.9385;
+            {
+
+                String t = SunRiseSet.getSunrise(new BigDecimal(lng),new BigDecimal(lat),new Date());
+                System.out.printf("NewYork, SunRise, timeHourMinute: %s\n",
+                        JSONObject.toJSONString(t, true));
+            }
+            {
+                String t = SunRiseSet.getSunset(new BigDecimal(lng),new BigDecimal(lat),new Date());
+                System.out.printf("NewYork, SunSet, timeHourMinute: %s\n",
+                        JSONObject.toJSONString(t, true));
             }
         }
     }
