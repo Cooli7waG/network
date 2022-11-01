@@ -63,7 +63,9 @@ public class DeviceServiceImpl implements DeviceService {
         rpcResult.setVersion(1);
         rpcResult.setCode(totalEnergyResult.getCode());
         rpcResult.setMessage(totalEnergyResult.getMsg());
-        rpcResult.setResult(totalEnergy);
+        HashMap map = new HashMap();
+        map.put("totalEnergy",totalEnergy);
+        rpcResult.setResult(map);
         return rpcResult;
     }
 
