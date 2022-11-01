@@ -228,6 +228,18 @@ public class SunRiseSet {
 
     }
 
+    public static String calTimeZone(double currentLon) {
+        int timeZone;
+        int shangValue = (int) (currentLon / 15);
+        double yushuValue = Math.abs(currentLon % 15);
+        if (yushuValue <= 7.5) {
+            timeZone = shangValue;
+        } else {
+            timeZone = shangValue + (currentLon > 0 ? 1 : -1);
+        }
+        return timeZone >= 0 ? "+" + Math.abs(timeZone) : "-" + Math.abs(timeZone);
+    }
+
     // 日出
     public static String getSunrise(BigDecimal longitude, BigDecimal latitude, Date sunTime) {
         if (sunTime != null && longitude != null && latitude != null) {

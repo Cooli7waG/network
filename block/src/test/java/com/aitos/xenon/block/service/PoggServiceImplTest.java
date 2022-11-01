@@ -17,6 +17,7 @@ import org.junit.jupiter.api.*;
 
 import com.aitos.xenon.block.domain.PoggReportPowerData;
 import com.aitos.xenon.block.service.impl.PoggServiceImpl;
+import com.aitos.xenon.core.utils.Location;
 import com.aitos.xenon.core.utils.SunRiseSet;
 import com.aitos.xenon.core.utils.SunRiseSetUtils.SunRiseAndSunset;
 import com.alibaba.fastjson.JSONObject;
@@ -485,12 +486,12 @@ public class PoggServiceImplTest {
             double lng = 116.3474879;
             {
 
-                String t = SunRiseSet.getSunrise(new BigDecimal(lng),new BigDecimal(lat),new Date());
+                String t = SunRiseSet.getSunrise(new BigDecimal(lng), new BigDecimal(lat), new Date());
                 System.out.printf("beijing，SunRise, timeHourMinute: %s\n",
                         JSONObject.toJSONString(t, true));
             }
             {
-                String t = SunRiseSet.getSunset(new BigDecimal(lng),new BigDecimal(lat),new Date());
+                String t = SunRiseSet.getSunset(new BigDecimal(lng), new BigDecimal(lat), new Date());
                 System.out.printf("beijing，SunSet, timeHourMinute: %s\n",
                         JSONObject.toJSONString(t, true));
             }
@@ -501,12 +502,12 @@ public class PoggServiceImplTest {
             double lng = 103.85;
             {
 
-                String t = SunRiseSet.getSunrise(new BigDecimal(lng),new BigDecimal(lat),new Date());
+                String t = SunRiseSet.getSunrise(new BigDecimal(lng), new BigDecimal(lat), new Date());
                 System.out.printf("Singapore，SunRise, timeHourMinute: %s\n",
                         JSONObject.toJSONString(t, true));
             }
             {
-                String t = SunRiseSet.getSunset(new BigDecimal(lng),new BigDecimal(lat),new Date());
+                String t = SunRiseSet.getSunset(new BigDecimal(lng), new BigDecimal(lat), new Date());
                 System.out.printf("Singapore，SunSet, timeHourMinute: %s\n",
                         JSONObject.toJSONString(t, true));
             }
@@ -517,15 +518,28 @@ public class PoggServiceImplTest {
             double lng = -73.9385;
             {
 
-                String t = SunRiseSet.getSunrise(new BigDecimal(lng),new BigDecimal(lat),new Date());
+                String t = SunRiseSet.getSunrise(new BigDecimal(lng), new BigDecimal(lat), new Date());
                 System.out.printf("NewYork, SunRise, timeHourMinute: %s\n",
                         JSONObject.toJSONString(t, true));
             }
             {
-                String t = SunRiseSet.getSunset(new BigDecimal(lng),new BigDecimal(lat),new Date());
+                String t = SunRiseSet.getSunset(new BigDecimal(lng), new BigDecimal(lat), new Date());
                 System.out.printf("NewYork, SunSet, timeHourMinute: %s\n",
                         JSONObject.toJSONString(t, true));
             }
         }
+    }
+
+    @Test
+    public void test_checkSunShine() {
+        PoggReportPowerData powerdata = new PoggReportPowerData();
+        powerdata.setTimestamp(Long.valueOf("1666348200000"));
+        powerdata.setPower(Long.valueOf("100"));
+        Location location = new Location();
+        location.setLatitude(Double.valueOf(1.28333));
+        location.setLongitude(Double.valueOf(103.85));
+        boolean b = poggServiceImpl.checkSunShine(powerdata, location);
+        System.out.printf("b: %s\n",
+                JSONObject.toJSONString(b, true));
     }
 }
