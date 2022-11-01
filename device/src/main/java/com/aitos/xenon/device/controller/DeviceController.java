@@ -183,6 +183,18 @@ public class DeviceController {
     }
 
     /**
+     * 主要用于获取设备的累计发电量数据
+     * @param minerAddress
+     * @return
+     */
+    @Deprecated
+    @GetMapping("/totalEnergy")
+    public Result<Long> totalEnergy(@RequestParam("minerAddress")String minerAddress){
+        DeviceVo deviceVo = deviceService.queryByMiner(minerAddress);
+        return Result.ok(deviceVo.getTotalEnergyGeneration());
+    }
+
+    /**
      * 分页查询miner信息接口
      * @param queryParams
      * @return

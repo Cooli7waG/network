@@ -6,6 +6,7 @@ import com.aitos.xenon.device.api.RemoteDeviceService;
 import com.aitos.xenon.jsonrpc.domain.vo.RpcResult;
 import com.aitos.xenon.jsonrpc.service.DeviceService;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,4 +50,22 @@ public class DeviceServiceImpl implements DeviceService {
         }
         return rpcResult;
     }
+
+    @Override
+    public RpcResult totalEnergy(String params) {
+        JSONObject jsonObject = JSON.parseObject(params);
+        Result<Long> totalEnergyResult = remoteDeviceService.totalEnergy(jsonObject.getString("address"));
+        Long totalEnergy = null;
+        RpcResult  rpcResult=new RpcResult();
+        if(totalEnergyResult.getCode()==ApiStatus.SUCCESS.getCode()){
+            totalEnergy = totalEnergyResult.getData();
+        }
+        rpcResult.setVersion(1);
+        rpcResult.setCode(totalEnergyResult.getCode());
+        rpcResult.setMessage(totalEnergyResult.getMsg());
+        rpcResult.setResult(totalEnergy);
+        return rpcResult;
+    }
+
+
 }

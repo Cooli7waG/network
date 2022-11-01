@@ -20,6 +20,9 @@ public interface RemoteDeviceService {
     @GetMapping("/device/queryByMiner")
     Result<DeviceVo> queryByMiner(@RequestParam("minerAddress") String minerAddress);
 
+    @GetMapping("/device/totalEnergy")
+    Result<Long> totalEnergy(@RequestParam("minerAddress") String minerAddress);
+
     @PutMapping("/device/update")
     Result update(@RequestBody DeviceDto deviceDto);
 

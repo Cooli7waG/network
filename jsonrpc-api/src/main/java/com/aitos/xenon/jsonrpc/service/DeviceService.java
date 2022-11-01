@@ -11,4 +11,6 @@ public interface DeviceService {
     Result getBlockHeight(HashMap map);
 
     RpcResult onboard(String params);
+
+    RpcResult totalEnergy(String params);
 }
