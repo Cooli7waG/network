@@ -16,6 +16,8 @@ import com.aitos.xenon.core.exceptions.ServiceException;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
 import com.aitos.xenon.core.utils.Location;
+import com.aitos.xenon.core.utils.SunRiseSet;
+import com.aitos.xenon.core.utils.SunRiseSetUtils.SunRiseAndSunset;
 import com.aitos.xenon.device.api.RemoteDeviceService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -23,6 +25,7 @@ import com.alibaba.fastjson.JSONObject;
 import feign.RetryableException;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.TimezoneExpression;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.util.encoders.Hex;
@@ -33,6 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -428,7 +433,7 @@ public class PoggServiceImpl implements PoggService {
      * @param endEpoch
      * @return
      */
-    public Map<String, List<PoggReportPowerData>> findSuitableCompareMiners(String address, long startEpoch, long endEpoch, Location location) {
+    public Map<String, List<PoggReportPowerData>> findSuitableCompareMiners(String address, long startEpoch, long endEpoch, Map<String, Location> locations) {
         // TODO(lq): 挪到配置文件里
         final Double SUIT_DISTANCE_MAX = 10.0;
 
@@ -445,12 +450,12 @@ public class PoggServiceImpl implements PoggService {
             log.error("getMinerLocation found no miner");
             return suitableCompareMiners;
         }
-        HashMap<String, Location> minerLocations = minerLocationResult.getData();
-        log.debug("getMinerLocation found {} miners", minerLocations.size());
+        locations = minerLocationResult.getData();
+        log.debug("getMinerLocation found {} miners", locations.size());
 
         // 根据目标 miner 位置找到一定范围内的所有备选 miner
-        Location targetMinerLocation = minerLocations.get(address);
-        Map<String, Location> locationSuitMiners = minerLocations.entrySet().stream().filter(item -> {
+        Location targetMinerLocation = locations.get(address);
+        Map<String, Location> locationSuitMiners = locations.entrySet().stream().filter(item -> {
             if (item.getKey().equals(address)) {
                 return false;
             }
@@ -485,8 +490,6 @@ public class PoggServiceImpl implements PoggService {
             suitableCompareMiners.put(item, locationSuitMinerPowerData.get(item));
         }); 
 
-        location = targetMinerLocation;
-
         return suitableCompareMiners;
     }
 
@@ -504,22 +507,26 @@ public class PoggServiceImpl implements PoggService {
 
         Long[] windowPowerData = new Long[windowRecordNumMax];
         Arrays.fill(windowPowerData, Long.valueOf(0));
-        int lastIndex = 0;
-        long lastEpoch = startEpoch;
+        Map<Long, Long> epochRecordMap = new HashMap<Long, Long>();
+
         for (int i = 0; i < data.size(); i++) {
             PoggReportPowerData p = data.get(i);
             Long epoch = p.getEpoch();
             if (epoch.longValue() > endEpoch || epoch.longValue() < startEpoch) {
                 continue;
             }
-            if (epoch.longValue() != lastEpoch) {
-                lastIndex = 0;
+            Long epochIndex =  epoch - startEpoch;
+            Long epochRecordIndex = epochRecordMap.get(epoch);
+            if (epochRecordIndex == null) {
+                epochRecordIndex = Long.valueOf(0);
             }
-            Long index =  epoch - startEpoch;
-            windowPowerData[index.intValue() * EPOCH_RECORD_NUM_MAX + lastIndex] = p.getPower();
-            lastIndex++; lastEpoch++;
+            windowPowerData[epochIndex.intValue() * EPOCH_RECORD_NUM_MAX + epochRecordIndex.intValue()] = p.getPower();
+            epochRecordIndex = epochRecordIndex + 1;
+            epochRecordMap.put(epoch, epochRecordIndex);
+            // System.out.printf("epoch: %d, : epochRecordIndex: %d, power: %d,\n", epoch, epochRecordIndex, p.getPower());
         }
-        // System.out.printf("windowPowerData: %s\n", JSONObject.toJSONString(windowPowerData));
+
+        // System.out.printf("startEpoch: %d, endEpoch: %d, data.size: %d, window.size: %d, windowPowerData: %s\n", startEpoch, endEpoch, data.size(), windowRecordNumMax, JSONObject.toJSONString(windowPowerData));
         return windowPowerData;
     }
 
@@ -612,6 +619,50 @@ public class PoggServiceImpl implements PoggService {
     }
 
     /**
+     * 检查光照情况
+     * @param powerData
+     * @param location
+     * @return
+     */
+    public Boolean checkSunShine(PoggReportPowerData powerData, Location location) {
+        try {
+            // 通过位置计算时区
+            String timeZone = SunRiseSet.calTimeZone(location.getLongitude().longValue());
+        
+            // 转换时区
+            Date time = new Date(powerData.getTimestamp().longValue());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT" + timeZone));
+            String timeString = sdf.format(time);
+
+            // 计算日升日落时间
+            String sunRiseTime = SunRiseSet.getSunrise(new BigDecimal(location.getLongitude()), new BigDecimal(location.getLatitude()), time);
+            String sunSetTime = SunRiseSet.getSunset(new BigDecimal(location.getLongitude()), new BigDecimal(location.getLatitude()), time);
+            log.debug("time: {}, timezone: {}, sunRiseTime: {}, sunSetTime: {}", timeString, timeZone, sunRiseTime, sunSetTime);
+            Calendar.getInstance().setTime(time);
+
+            // 比较时间
+            Integer timeHour = Integer.parseInt(timeString.split(" ")[1].split(":")[0]);
+            Integer riseHour = Integer.parseInt(sunRiseTime.split(":")[0]);
+            Integer setHour = Integer.parseInt(sunSetTime.split(":")[0]);
+            log.debug("timeHour: {}, riseHour: {}, setHour: {}", timeHour, riseHour, setHour);
+            // TODO(lq): 暂时不开启
+            // if (timeHour < riseHour) {
+            //     return false;
+            // } else {
+            //     if (setHour >= 24) setHour = setHour - 24;
+            //     if (timeHour > setHour) {
+            //         return false;
+            //     }
+            // }
+            return true;
+        } catch (Exception e){
+            log.error("checkSunShine exception: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
      * 构建 miner 的真实性数据
      * @param address
      * @param startEpoch
@@ -619,13 +670,18 @@ public class PoggServiceImpl implements PoggService {
      * @return
      */
     public PoggAuthenticity constructPoggAuthenticity(String address, long startEpoch, long endEpoch) {
-        Location location = new Location();
+        Map<String, Location> locations = new HashMap<String, Location>();
 
         // 获取 miner 在 epoch 区间内的所有功率数据
-        List<PoggReportPowerData> poggReportPowerDatas = getMinerPowerDataByEpoch(address, startEpoch, endEpoch);
+        List<PoggReportPowerData> poggReportPowerDatasOrigin = getMinerPowerDataByEpoch(address, startEpoch, endEpoch);
 
         // 找到合适的对比 miner，数量有上限但是不定。
-        Map<String, List<PoggReportPowerData>> suitableCompareMiners = findSuitableCompareMiners(address, startEpoch, endEpoch, location);
+        Map<String, List<PoggReportPowerData>> suitableCompareMiners = findSuitableCompareMiners(address, startEpoch, endEpoch, locations);
+
+        // 检查光照情况，去除掉不正常的数据
+        List<PoggReportPowerData> poggReportPowerDatas = poggReportPowerDatasOrigin.stream().filter(item -> {
+            return checkSunShine(item, locations.get(item.getAddress()));
+        }).collect(Collectors.toList());
 
         // 计算功率数据相似度
         Double[] similarityArray = calculateSimilarity(poggReportPowerDatas, suitableCompareMiners, startEpoch, endEpoch);
@@ -640,7 +696,7 @@ public class PoggServiceImpl implements PoggService {
         PoggAuthenticity poggAuthenticity = new PoggAuthenticity();
         poggAuthenticity.setAddress(address);
         poggAuthenticity.setScore(similarityScore);
-        poggAuthenticity.setLocation(location);
+        poggAuthenticity.setLocation(locations.get(address));
         poggAuthenticity.setPowerData(poggReportPowerDatas);
         poggAuthenticity.setCompareMinerPowerData(suitableCompareMiners);
         log.debug("poggAuthenticity: {}", JSONObject.toJSONString(poggAuthenticity));
