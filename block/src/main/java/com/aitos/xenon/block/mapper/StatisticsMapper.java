@@ -10,4 +10,6 @@ public interface StatisticsMapper {
     long transactionsCount();
     double tokenSupplyCount();
     MinerStatistics minerStats();
+
+    double sumTokenSupply();
 }
