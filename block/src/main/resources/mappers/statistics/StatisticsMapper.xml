@@ -28,4 +28,8 @@
         select sum(total_energy_generation) as totalChargeVol ,sum(power) as totalPowerLow ,count(id) as miners from device;
     </select>
 
+    <select id="sumTokenSupply" resultType="java.lang.Double">
+        SELECT SUM(amount) FROM account_reward
+    </select>
+
 </mapper>

@@ -156,9 +156,8 @@ public class DeviceController {
     @GetMapping("/{minerAddress}")
     public Result<DeviceVo> findByAddress(@PathVariable("minerAddress")String minerAddress){
         DeviceVo deviceVo= deviceService.queryByMiner(minerAddress);
-        // 去掉平均发电量和累计发电量
+        // 去掉平均发电量
         deviceVo.setAvgPower(null);
-        deviceVo.setTotalEnergyGeneration(null);
         if (deviceVo.getLatitude() != null) {
             String latitude = String.format("%.1f", deviceVo.getLatitude());
             deviceVo.setLatitude(Double.parseDouble(latitude));

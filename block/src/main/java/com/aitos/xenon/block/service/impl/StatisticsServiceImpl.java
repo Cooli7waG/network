@@ -22,10 +22,15 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private final String uSDBmtMarketPrice="1";
 
+    private final String totalBMTMarket = "10000000000";
+
     @Override
     public BlockChainStatistics blockchainstats() {
-        BlockChainStatistics  blockChainStatistics=new BlockChainStatistics();
+        BlockChainStatistics blockChainStatistics=new BlockChainStatistics();
         blockChainStatistics.setUSDBmtMarketPrice(uSDBmtMarketPrice);
+        blockChainStatistics.setTotalBMTMarket(totalBMTMarket);
+        Double tokenSupply =  statisticsMapper.sumTokenSupply();
+        blockChainStatistics.setTokenSupply(tokenSupply.toString());
         return blockChainStatistics;
     }
 
