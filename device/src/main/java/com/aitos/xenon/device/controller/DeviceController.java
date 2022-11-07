@@ -158,14 +158,16 @@ public class DeviceController {
         DeviceVo deviceVo= deviceService.queryByMiner(minerAddress);
         // 去掉平均发电量
         deviceVo.setAvgPower(null);
-        if (deviceVo.getLatitude() != null) {
+        /*if (deviceVo.getLatitude() != null) {
             String latitude = String.format("%.1f", deviceVo.getLatitude());
             deviceVo.setLatitude(Double.parseDouble(latitude));
         }
         if (deviceVo.getLongitude() != null) {
             String longitude = String.format("%.1f", deviceVo.getLongitude());
             deviceVo.setLongitude(Double.parseDouble(longitude));
-        }
+        }*/
+        deviceVo.setLatitude(null);
+        deviceVo.setLongitude(null);
         return Result.ok(deviceVo);
     }
 
