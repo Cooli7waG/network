@@ -12,8 +12,10 @@ import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
 import com.aitos.xenon.core.utils.Location;
 import com.aitos.xenon.core.utils.MetaMaskUtils;
+import com.aitos.xenon.core.utils.ValidatorUtils;
 import com.aitos.xenon.device.api.RemoteGameMinerService;
 import com.aitos.xenon.device.api.domain.dto.AirDropDto;
+import com.aitos.xenon.device.api.domain.dto.ApplyGameMiner;
 import com.aitos.xenon.device.api.domain.dto.ClaimDto;
 import com.aitos.xenon.device.api.domain.dto.NftSignDto;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
@@ -181,6 +183,9 @@ public class AirDropRecordController {
     @Deprecated
     public Result claimGameMiner(@RequestBody String claimGameMiner){
         log.info("DeviceController.claimGameMiner:{}",claimGameMiner);
+        ApplyGameMiner applyGameMiner = JSON.parseObject(claimGameMiner, ApplyGameMiner.class);
+        ValidatorUtils.validateFast(applyGameMiner);
+
         String result = airDropRecordService.claimGameMiner(claimGameMiner);
         return Result.ok(result);
     }
