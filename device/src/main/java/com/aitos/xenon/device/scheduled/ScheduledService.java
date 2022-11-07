@@ -62,7 +62,8 @@ public class ScheduledService {
                 try{
                     PoggReportDataVo data = poggReportDataVoResult.getData();
                     long nowMilli = now.getTime();
-                    long reportMilli = data.getCreateTime().toInstant(ZoneOffset.ofHours(0)).toEpochMilli();
+                    long reportMilli = data.getDeviceTime().toInstant(ZoneOffset.ofHours(0)).toEpochMilli();
+                    //long reportMilli = data.getCreateTime().toInstant(ZoneOffset.ofHours(0)).toEpochMilli();
                     //
                     Date reportDate = new Date(reportMilli);
                     log.info("reportDate:{}   checkData:{}",sdfTime.format(reportDate),sdfTime.format(now));
