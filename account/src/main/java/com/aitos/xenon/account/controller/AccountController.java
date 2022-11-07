@@ -20,6 +20,7 @@ import com.aitos.xenon.core.model.QueryParams;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
 import com.aitos.xenon.core.utils.MetaMaskUtils;
+import com.aitos.xenon.device.api.RemoteDeviceService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
@@ -57,6 +58,11 @@ public class AccountController {
 
     @Autowired
     private RemoteBlockService remoteBlockService;
+
+    @Autowired
+    private RemoteDeviceService deviceService;
+
+
 
     /**
      * 账户注册接口

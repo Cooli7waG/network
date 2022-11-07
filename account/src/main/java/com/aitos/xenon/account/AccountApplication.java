@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableFeignClients(basePackages ={
         "com.aitos.xenon.block.api",
+        "com.aitos.xenon.device.api",
         "com.aitos.xenon.account.api"
 })
 @MapperScan("com.aitos.xenon.account.mapper")

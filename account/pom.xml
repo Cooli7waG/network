@@ -65,6 +65,11 @@
             <artifactId>api-block</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.aitos</groupId>
+            <artifactId>api-device</artifactId>
+        </dependency>
+
         <!--<dependency>
             <groupId>com.aitos</groupId>
             <artifactId>common-crypto</artifactId>
