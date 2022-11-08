@@ -297,6 +297,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public void updateMinerLocation(String minerAddress,String latitude,String longitude) {
+        log.info("updateMinerLocation minerAddress[{}]  -  Location[{},{}]",minerAddress,latitude,longitude);
         try{
             H3Core h3Core = H3Core.newInstance();
             long l1 = h3Core.geoToH3(Double.parseDouble(latitude), Double.parseDouble(longitude), 8);

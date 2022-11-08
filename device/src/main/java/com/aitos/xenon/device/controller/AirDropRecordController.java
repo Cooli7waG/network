@@ -119,6 +119,16 @@ public class AirDropRecordController {
         return Result.ok(result);
     }
 
+    @PostMapping("/gameminer/applyWithMobile")
+    public Result applyGameMinerWithMobile(@RequestBody String applyGameMiner){
+        if(!applyActive){
+            return Result.failed(ApiStatus.BUSINESS_AIRDROP_NOT_ACTIVE.getMsg());
+        }
+        log.info("applyGameMinerWithMobile:{}",applyGameMiner);
+        String result = airDropRecordService.applyGameMinerWithMobile(applyGameMiner);
+        return Result.ok(result);
+    }
+
     @PostMapping("/claim")
     public Result claim(@RequestBody String body) throws Exception {
         log.info("claim.body:{}",body);

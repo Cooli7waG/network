@@ -234,6 +234,66 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
     @Override
     public synchronized String applyGameMiner(String str) {
         ApplyGameMiner applyGameMiner = JSON.parseObject(str, ApplyGameMiner.class);
+        String minerAddress = apply(str);
+        //TODO 发送邮件等通知owner
+        HashMap<String, String> hashMap = new HashMap();
+        hashMap.put("minerAddress", minerAddress);
+        hashMap.put("ownerAddress", applyGameMiner.getOwner());
+        //log.info("领取地址：http://localhost:8080/claim/"+ Base64Utils.encodeToString(JSON.toJSONString(hashMap).getBytes(StandardCharsets.UTF_8)));
+        String claimGameMinerUrl = webClaimUrl + Base64Utils.encodeToString(JSON.toJSONString(hashMap).getBytes(StandardCharsets.UTF_8));
+        log.info("领取地址：{}", claimGameMinerUrl);
+        try {
+            PushMessageDto pushMessageDto = new PushMessageDto();
+            pushMessageDto.setTemplateId(1L);
+            pushMessageDto.setTitile("You Game Miner Apply Result");
+            pushMessageDto.setTo(applyGameMiner.getEmail());
+            HashMap<String, Object> customMap = new HashMap<>();
+            pushMessageDto.setCustomMap(customMap);
+            customMap.put("url", claimGameMinerUrl);
+            customMap.put("owner", applyGameMiner.getOwner());
+            customMap.put("miner", minerAddress);
+            Result result = remoteGameMinerService.pushMail(pushMessageDto);
+            log.info("邮件发送结果:{}", JSON.toJSONString(result));
+        } catch (Exception e) {
+            log.error("邮件发送失败！");
+        }
+        //
+        return ApiStatus.SUCCESS.getMsg();
+    }
+
+    /**
+     * 手机版申请GamingMiner
+     * @param str
+     * @return
+     */
+    @Override
+    public String applyGameMinerWithMobile(String str) {
+        ApplyGameMiner applyGameMiner = JSON.parseObject(str, ApplyGameMiner.class);
+        String minerAddress = apply(str);
+        //TODO 发送邮件等通知owner
+        try {
+            PushMessageDto pushMessageDto = new PushMessageDto();
+            pushMessageDto.setTemplateId(2L);
+            pushMessageDto.setTitile("You Game Miner Apply Result");
+            pushMessageDto.setTo(applyGameMiner.getEmail());
+            HashMap<String, Object> customMap = new HashMap<>();
+            pushMessageDto.setCustomMap(customMap);
+            int code= (int)((Math.random()*9+1)*100000);
+            customMap.put("code", code);
+            log.info("applyGameMinerWithMobile code:{}",code);
+            customMap.put("owner", applyGameMiner.getOwner());
+            customMap.put("miner", minerAddress);
+            Result result = remoteGameMinerService.pushMail(pushMessageDto);
+            log.info("邮件发送结果:{}", JSON.toJSONString(result));
+        } catch (Exception e) {
+            log.error("邮件发送失败！");
+        }
+        //
+        return minerAddress;
+    }
+
+    private String apply(String str){
+        ApplyGameMiner applyGameMiner = JSON.parseObject(str, ApplyGameMiner.class);
         // 当需要签名校验时进行验证
         if (applyPersonalSign) {
             //恢复owner公钥
@@ -361,30 +421,7 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
             log.info("remoteDeviceService.airdrop error:{}", JSON.toJSONString(deviceRegister));
             throw new MinerApplyException("miner airdrop failed");
         }
-        //TODO 发送邮件等通知owner
-        HashMap<String, String> hashMap = new HashMap();
-        hashMap.put("minerAddress", minerAddress);
-        hashMap.put("ownerAddress", applyGameMiner.getOwner());
-        //log.info("领取地址：http://localhost:8080/claim/"+ Base64Utils.encodeToString(JSON.toJSONString(hashMap).getBytes(StandardCharsets.UTF_8)));
-        String claimGameMinerUrl = webClaimUrl + Base64Utils.encodeToString(JSON.toJSONString(hashMap).getBytes(StandardCharsets.UTF_8));
-        log.info("领取地址：{}", claimGameMinerUrl);
-        try {
-            PushMessageDto pushMessageDto = new PushMessageDto();
-            pushMessageDto.setTemplateId(1L);
-            pushMessageDto.setTitile("You Game Miner Apply Result");
-            pushMessageDto.setTo(applyGameMiner.getEmail());
-            HashMap<String, Object> customMap = new HashMap<>();
-            pushMessageDto.setCustomMap(customMap);
-            customMap.put("url", claimGameMinerUrl);
-            customMap.put("owner", applyGameMiner.getOwner());
-            customMap.put("miner", minerAddress);
-            Result result = remoteGameMinerService.pushMail(pushMessageDto);
-            log.info("邮件发送结果:{}", JSON.toJSONString(result));
-        } catch (Exception e) {
-            log.error("邮件发送失败！");
-        }
-        //
-        return ApiStatus.SUCCESS.getMsg();
+        return minerAddress;
     }
 
     /**

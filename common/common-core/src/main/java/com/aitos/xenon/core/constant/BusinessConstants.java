@@ -235,4 +235,8 @@ public interface BusinessConstants
          */
         long ARKREEN_MINER_LOCATION_CACHE_EXPIRATION = 7200;
     }
+
+    interface CodeSource{
+        String keyWord = "1234567890";
+    }
 }

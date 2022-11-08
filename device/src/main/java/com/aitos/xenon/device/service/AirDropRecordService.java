@@ -27,4 +27,11 @@ public interface AirDropRecordService {
      * @return
      */
     String claimGameMiner(String claimGameMiner);
+
+    /**
+     * 手机版申请GamingMiner
+     * @param applyGameMiner
+     * @return
+     */
+    String applyGameMinerWithMobile(String applyGameMiner);
 }
