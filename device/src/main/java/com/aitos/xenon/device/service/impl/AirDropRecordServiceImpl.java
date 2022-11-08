@@ -14,6 +14,7 @@ import com.aitos.xenon.account.api.domain.vo.RemoteKMSSignVo;
 import com.aitos.xenon.block.api.RemoteBlockService;
 import com.aitos.xenon.block.api.RemoteSystemConfigService;
 import com.aitos.xenon.block.api.domain.vo.SystemConfigVo;
+import com.aitos.xenon.common.redis.service.RedisService;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.constant.RandomLocation;
@@ -55,6 +56,7 @@ import org.springframework.util.Base64Utils;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -78,7 +80,8 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
     private RemoteGameMinerService remoteGameMinerService;
     @Autowired
     private RemoteSystemConfigService remoteSystemConfigService;
-
+    @Autowired
+    private RedisService redisService;
     @Autowired
     private RemoteKMSService remoteKMSService;
 
@@ -285,6 +288,7 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
             customMap.put("miner", minerAddress);
             Result result = remoteGameMinerService.pushMail(pushMessageDto);
             log.info("邮件发送结果:{}", JSON.toJSONString(result));
+            redisService.setCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE+minerAddress,""+code,BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE_EXPIRATION, TimeUnit.SECONDS);
         } catch (Exception e) {
             log.error("邮件发送失败！");
         }

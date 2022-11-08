@@ -6,6 +6,7 @@ import com.aitos.xenon.account.api.RemoteTokenService;
 import com.aitos.xenon.account.api.domain.dto.TokenServiceNftSignDto;
 import com.aitos.xenon.account.api.domain.dto.TokenServiceNftTokenIdDto;
 import com.aitos.xenon.block.api.RemoteBlockService;
+import com.aitos.xenon.common.redis.service.RedisService;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.model.Result;
@@ -53,7 +54,8 @@ public class AirDropRecordController {
     private DeviceService deviceService;
     @Autowired
     private RemoteBlockService blockService;
-
+    @Autowired
+    private RedisService redisService;
     @Autowired
     private RemoteTokenService remoteTokenService;
     @Autowired
@@ -178,6 +180,65 @@ public class AirDropRecordController {
         gameMiner.setLatitude(device.getLatitude());
         gameMiner.setLongitude(device.getLongitude());
 
+        Result start = remoteGameMinerService.start(gameMiner);
+        log.info("remoteGameMinerService.start:{}",JSON.toJSONString(start));
+        if(start.getCode() != ApiStatus.SUCCESS.getCode()){
+            return  Result.failed();
+        }
+        return Result.ok();
+    }
+
+    @PostMapping("/claimWithMobile")
+    public Result claimWithMobile(@RequestBody String body) throws Exception {
+        log.info("claimWithMobile.body:{}",body);
+        ClaimDto claimDto=JSON.parseObject(body,ClaimDto.class);
+        log.info("ClaimDto owner address:{}",claimDto.getOwnerAddress());
+        //检查code是否一致
+        if(!StringUtils.hasText(claimDto.getCode())){
+            return Result.failed(ApiStatus.CLAIM_GAMING_MINER_CODE_MISMATCH);
+        }
+        String claimCode = redisService.getCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE + claimDto.getMinerAddress());
+        if(!claimDto.getCode().equals(claimCode)){
+            return Result.failed(ApiStatus.CLAIM_GAMING_MINER_CODE_MISMATCH);
+        }
+        //检查设备状态
+        Device device = deviceService.findByAddress(claimDto.getMinerAddress());
+        if(device==null){
+            return Result.failed(ApiStatus.BUSINESS_DEVICE_NOT_EXISTED);
+        }else if(device.getStatus()== BusinessConstants.DeviceStatus.BOUND){
+            return Result.failed(ApiStatus.BUSINESS_DEVICE_BOUND);
+        }
+        //检查空投状态
+        AirDropRecord airDropRecordTemp=airDropRecordService.findNotClaimedByMinerAddress(claimDto.getMinerAddress());
+        if(airDropRecordTemp==null){
+            return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_NOT_EXISTED);
+        }else if(!airDropRecordTemp.getMinerAddress().equals(claimDto.getMinerAddress())
+                ||!airDropRecordTemp.getOwnerAddress().equals(claimDto.getOwnerAddress())){
+            return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_NOT_EXISTED);
+        }
+        Result<Long> blockHeightResult = blockService.getBlockHeight();
+        if(airDropRecordTemp!=null&&airDropRecordTemp.getExpiration()<blockHeightResult.getData()){
+            return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_CLAIM_EXPIRED);
+        }
+        //检查nft铸造是否成功
+        TokenServiceNftTokenIdDto tokenServiceNftTokenIdDto=new TokenServiceNftTokenIdDto();
+        tokenServiceNftTokenIdDto.setMiner(claimDto.getMinerAddress());
+        tokenServiceNftTokenIdDto.setOwner(claimDto.getOwnerAddress());
+        Result<HashMap<String,String>> nftTokenIdResult = remoteTokenService.getNFTTokenId(tokenServiceNftTokenIdDto);
+        log.info("nftTokenIdResult.result={}",JSON.toJSONString(nftTokenIdResult));
+        if(nftTokenIdResult.getCode()!=ApiStatus.SUCCESS.getCode()){
+            return Result.failed(ApiStatus.BUSINESS_NFT_CASTING_FAILED);
+        }
+        String id = nftTokenIdResult.getData().get("id");
+        if(id.equals("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")){
+            return Result.failed(ApiStatus.BUSINESS_NFT_CASTING_FAILED);
+        }
+        airDropRecordService.claim(claimDto);
+        GameMiner gameMiner = new GameMiner();
+        gameMiner.setAddress(claimDto.getMinerAddress());
+        device = deviceService.findByAddress(claimDto.getMinerAddress());
+        gameMiner.setLatitude(device.getLatitude());
+        gameMiner.setLongitude(device.getLongitude());
         Result start = remoteGameMinerService.start(gameMiner);
         log.info("remoteGameMinerService.start:{}",JSON.toJSONString(start));
         if(start.getCode() != ApiStatus.SUCCESS.getCode()){

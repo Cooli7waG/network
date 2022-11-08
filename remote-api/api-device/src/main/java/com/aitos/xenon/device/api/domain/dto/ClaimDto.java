@@ -12,4 +12,6 @@ public class ClaimDto {
     private String ownerAddress;
 
     private String txHash;
+
+    private String code;
 }
