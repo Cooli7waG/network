@@ -5,6 +5,7 @@ import com.aitos.xenon.account.api.domain.vo.*;
 import com.aitos.xenon.account.domain.AccountReward;
 import com.aitos.xenon.account.mapper.AccountRewardMapper;
 import com.aitos.xenon.account.service.AccountRewardService;
+import com.aitos.xenon.core.constant.BusinessConstants;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AccountRewardServiceImpl implements AccountRewardService {
@@ -52,5 +55,14 @@ public class AccountRewardServiceImpl implements AccountRewardService {
         return accountRewardMapper.statisticsRewardsByOwnerAddress(ownerAddress,startTime,endTime);
     }
 
+    /**
+     * 根据owner地址统计每种miner类型的奖励
+     * @param ownerAddress
+     * @return
+     */
+    @Override
+    public List<AccountRewardStatisticsByOwnerVo> statisticsRewardsByOwnerAndMinerType(String ownerAddress) {
+        return accountRewardMapper.statisticsRewardsByOwnerAndMinerType(ownerAddress);
+    }
 
 }

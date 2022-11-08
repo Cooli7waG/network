@@ -15,4 +15,7 @@ public class AccountRewardStatisticsByOwnerVo {
      * 奖励
      */
     private BigDecimal reward;
+
+
+    private Integer minerType;
 }

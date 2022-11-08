@@ -35,4 +35,11 @@ public interface AccountRewardMapper {
     List<AccountRewardStatisticsDayVo> statisticsRewardByDay(@Param("address")String address,@Param("startTime") LocalDateTime startTime,@Param("endTime") LocalDateTime endTime);
 
     List<AccountRewardStatisticsByOwnerVo> statisticsRewardsByOwnerAddress(@Param("ownerAddress")String ownerAddress, @Param("startTime")LocalDateTime startTime, @Param("endTime")LocalDateTime endTime);
+
+    /**
+     * 根据owner地址统计每种miner类型的奖励
+     * @param ownerAddress
+     * @return
+     */
+    List<AccountRewardStatisticsByOwnerVo> statisticsRewardsByOwnerAndMinerType(@Param("ownerAddress")String ownerAddress);
 }

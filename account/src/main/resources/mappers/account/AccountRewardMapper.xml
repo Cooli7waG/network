@@ -40,4 +40,11 @@
         where owner_address =#{ownerAddress} and create_time between #{startTime} and #{endTime}
         group by address
     </select>
+
+    <select id="statisticsRewardsByOwnerAndMinerType" resultType="com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsByOwnerVo">
+        SELECT d.miner_type as miner_type ,SUM(a.amount) as reward FROM account_reward a
+                                                              LEFT JOIN device d on a.address = d.address
+        where a.owner_address = #{ownerAddress} and a.account_type = 2
+        group by d.miner_type
+    </select>
 </mapper>

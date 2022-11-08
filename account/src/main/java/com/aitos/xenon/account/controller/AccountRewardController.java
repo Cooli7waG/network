@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -52,6 +53,12 @@ public class AccountRewardController {
     @PostMapping("/statisticsRewardsByOwnerAddress")
     public Result<List<AccountRewardStatisticsByOwnerVo>> statisticsRewardsByOwnerAddress(@RequestBody AccountRewardStatisticsDto accountRewardStatisticsDto){
         List<AccountRewardStatisticsByOwnerVo> list=accountRewardService.statisticsRewardsByOwnerAddress(accountRewardStatisticsDto.getOwnerAddress(), accountRewardStatisticsDto.getStartTime(), accountRewardStatisticsDto.getEndTime());
+        return Result.ok(list);
+    }
+
+    @PostMapping("/statisticsRewardsByOwnerAndMinerType")
+    public Result<List<AccountRewardStatisticsByOwnerVo>> statisticsRewardsByOwnerAndMinerType(@RequestBody AccountRewardStatisticsDto accountRewardStatisticsDto){
+        List<AccountRewardStatisticsByOwnerVo> list=accountRewardService.statisticsRewardsByOwnerAndMinerType(accountRewardStatisticsDto.getOwnerAddress());
         return Result.ok(list);
     }
 

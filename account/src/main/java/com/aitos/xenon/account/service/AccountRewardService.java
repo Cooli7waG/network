@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.Param;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface AccountRewardService {
 
@@ -51,4 +52,11 @@ public interface AccountRewardService {
      * @return
      */
     List<AccountRewardStatisticsByOwnerVo> statisticsRewardsByOwnerAddress(String ownerAddress, LocalDateTime startTime, LocalDateTime endTime);
+
+    /**
+     * 根据owner地址统计每种miner类型的奖励
+     * @param ownerAddress
+     * @return
+     */
+    List<AccountRewardStatisticsByOwnerVo> statisticsRewardsByOwnerAndMinerType(String ownerAddress);
 }
