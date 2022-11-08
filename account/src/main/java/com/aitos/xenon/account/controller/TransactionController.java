@@ -11,10 +11,12 @@ import com.aitos.xenon.account.domain.Transaction;
 import com.aitos.xenon.account.domain.TransactionReport;
 import com.aitos.xenon.account.service.TransactionService;
 import com.aitos.xenon.core.constant.ApiStatus;
+import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.model.Page;
 import com.aitos.xenon.core.model.Result;
 import com.aitos.xenon.core.utils.BeanConvertor;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +55,13 @@ public class TransactionController {
     public Result<TransactionVo> query(String txHash){
         Transaction transaction=transactionService.query(txHash);
         TransactionVo transactionVo= BeanConvertor.toBean(transaction,TransactionVo.class);
+        if(transactionVo.getTxType() == BusinessConstants.TXType.TX_AIRDROP_MINER){
+            JSONObject jsonObject = JSON.parseObject(transactionVo.getData());
+            if(jsonObject.containsKey(BusinessConstants.SensitiveKey.EMAIL)){
+                jsonObject.remove(BusinessConstants.SensitiveKey.EMAIL);
+            }
+            transactionVo.setData(jsonObject.toJSONString());
+        }
         return Result.ok(transactionVo);
     }
 

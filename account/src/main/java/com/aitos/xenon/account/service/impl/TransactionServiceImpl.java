@@ -16,6 +16,7 @@ import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.exceptions.ServiceException;
 import com.aitos.xenon.core.model.Result;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
@@ -137,6 +138,16 @@ public class TransactionServiceImpl implements TransactionService {
     public IPage<TransactionVo> list(TransactionSearchDto queryParams) {
         Page<TransactionVo> page = new Page<TransactionVo>(queryParams.getOffset(), queryParams.getLimit());
         IPage<TransactionVo> pageResult = transactionMapper.list(page, queryParams);
+        List<TransactionVo> records = pageResult.getRecords();
+        for (TransactionVo record : records) {
+            if(record.getTxType() == BusinessConstants.TXType.TX_AIRDROP_MINER){
+                JSONObject jsonObject = JSON.parseObject(record.getData());
+                if(jsonObject.containsKey(BusinessConstants.SensitiveKey.EMAIL)){
+                    jsonObject.remove(BusinessConstants.SensitiveKey.EMAIL);
+                }
+                record.setData(jsonObject.toJSONString());
+            }
+        }
         return pageResult;
     }
 

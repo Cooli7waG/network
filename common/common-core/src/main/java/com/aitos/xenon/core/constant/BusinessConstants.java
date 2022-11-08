@@ -223,4 +223,8 @@ public interface BusinessConstants
          */
         int ABNORMAL_DATA_ERROR = 5;
     }
+
+    interface SensitiveKey {
+        String EMAIL = "email";
+    }
 }
