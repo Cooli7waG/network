@@ -174,6 +174,7 @@ public interface BusinessConstants
 
     interface MakerInfo {
         String GAME_MINER = "Arkreen";
+        String ARKREEN_MINER_LOCATION_CACHE = "ARKREEN_MINER_LOCATION_CACHE";
     }
 
     interface TxAddressType {
@@ -226,5 +227,12 @@ public interface BusinessConstants
 
     interface SensitiveKey {
         String EMAIL = "email";
+    }
+
+    interface RedisKeyConstant {
+        /**
+         * 2小时
+         */
+        long ARKREEN_MINER_LOCATION_CACHE_EXPIRATION = 7200;
     }
 }

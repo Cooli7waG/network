@@ -9,6 +9,7 @@ import com.aitos.xenon.account.api.domain.vo.AccountRewardStatisticsVo;
 import com.aitos.xenon.account.api.domain.vo.AccountVo;
 import com.aitos.xenon.block.api.RemoteBlockService;
 import com.aitos.xenon.block.api.RemotePoggService;
+import com.aitos.xenon.common.redis.service.RedisService;
 import com.aitos.xenon.core.constant.ApiStatus;
 import com.aitos.xenon.core.constant.BusinessConstants;
 import com.aitos.xenon.core.exceptions.ServiceException;
@@ -41,6 +42,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -56,12 +59,10 @@ public class DeviceServiceImpl implements DeviceService {
     private RemoteBlockService remoteBlockService;
     @Autowired
     private RemotePoggService remotePoggService;
-
+    @Autowired
+    private RedisService redisService;
     @Autowired
     private RemoteAccountRewardService remoteAccountRewardService;
-
-    private static HashMap<String, Location> MINER_LOCATION_CACHE = new HashMap<String, Location>();
-    private static long MINER_LOCATION_CACHE_EXPIRING = 0L;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -259,10 +260,14 @@ public class DeviceServiceImpl implements DeviceService {
      * @return
      */
     @Override
-    public HashMap<String, Location> getMinerLocation() {
+    public Map<String, Location> getMinerLocation() {
         long l = System.currentTimeMillis();
-        if (MINER_LOCATION_CACHE.size() == 0 || l > MINER_LOCATION_CACHE_EXPIRING) {
+        if(redisService.hasKey(BusinessConstants.MakerInfo.ARKREEN_MINER_LOCATION_CACHE)){
+            Map<String, Location> cacheMap = redisService.getCacheMap(BusinessConstants.MakerInfo.ARKREEN_MINER_LOCATION_CACHE);
+            return cacheMap;
+        }else {
             List<DeviceVo> deviceList = deviceMapper.getAllMinerLocation();
+            Map<String, Location> locationMap = new HashMap<>();
             try {
                 H3Core h3Core = H3Core.newInstance();
                 for (DeviceVo deviceVo : deviceList) {
@@ -274,17 +279,35 @@ public class DeviceServiceImpl implements DeviceService {
                         location.setLatitude(geoCoord.lat);
                         location.setLongitude(geoCoord.lng);
                         //
-                        MINER_LOCATION_CACHE.put(deviceVo.getAddress(), location);
+                        locationMap.put(deviceVo.getAddress(), location);
                     }
                 }
-                log.info("更新Miner位置信息:{}", JSON.toJSONString(MINER_LOCATION_CACHE));
-                MINER_LOCATION_CACHE_EXPIRING = l + (2 * 60 * 1000);
             } catch (Exception e) {
                 e.printStackTrace();
                 log.warn("更新Miner位置信息失败->转换H3失败");
             }
+            if(locationMap.size()>0){
+                log.info("更新Miner位置信息:{}", JSON.toJSONString(locationMap));
+                redisService.setCacheMap(BusinessConstants.MakerInfo.ARKREEN_MINER_LOCATION_CACHE,locationMap);
+                redisService.expire(BusinessConstants.MakerInfo.ARKREEN_MINER_LOCATION_CACHE,BusinessConstants.RedisKeyConstant.ARKREEN_MINER_LOCATION_CACHE_EXPIRATION,TimeUnit.SECONDS);
+            }
+            return locationMap;
         }
-        return MINER_LOCATION_CACHE;
+    }
+
+    @Override
+    public void updateMinerLocation(String minerAddress,String latitude,String longitude) {
+        try{
+            H3Core h3Core = H3Core.newInstance();
+            long l1 = h3Core.geoToH3(Double.parseDouble(latitude), Double.parseDouble(longitude), 8);
+            GeoCoord geoCoord = h3Core.h3ToGeo(l1);
+            Location location = new Location();
+            location.setLatitude(geoCoord.lat);
+            location.setLongitude(geoCoord.lng);
+            redisService.setCacheMapValue(BusinessConstants.MakerInfo.ARKREEN_MINER_LOCATION_CACHE,minerAddress,location);
+        }catch (Exception e){
+            log.error("updateMinerLocation failed:{}",e.getMessage());
+        }
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.aitos.xenon.device.api.domain.dto;
 
-import com.aitos.xenon.core.model.BaseModel;
 import com.alibaba.fastjson.annotation.JSONType;
 import lombok.Data;
 

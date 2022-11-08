@@ -14,10 +14,7 @@ import com.aitos.xenon.core.utils.Location;
 import com.aitos.xenon.core.utils.MetaMaskUtils;
 import com.aitos.xenon.core.utils.ValidatorUtils;
 import com.aitos.xenon.device.api.RemoteGameMinerService;
-import com.aitos.xenon.device.api.domain.dto.AirDropDto;
-import com.aitos.xenon.device.api.domain.dto.ApplyGameMiner;
-import com.aitos.xenon.device.api.domain.dto.ClaimDto;
-import com.aitos.xenon.device.api.domain.dto.NftSignDto;
+import com.aitos.xenon.device.api.domain.dto.*;
 import com.aitos.xenon.device.api.domain.vo.DeviceVo;
 import com.aitos.xenon.device.api.domain.vo.GameMiner;
 import com.aitos.xenon.device.domain.AirDropRecord;
@@ -104,7 +101,8 @@ public class AirDropRecordController {
         airDropRecordService.save(airDropDto);
         //更新缓存的miner地理位置
         try{
-            deviceService.getMinerLocation();
+            DeviceLocationDto location = airDropDto.getLocation();
+            deviceService.updateMinerLocation(airDropDto.getMinerAddress(),location.getLatitude(),location.getLongitude());
         }catch (Exception e){
             log.error("更新地理位置失败：{}",e.getMessage());
         }

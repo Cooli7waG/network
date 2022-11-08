@@ -32,8 +32,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/device")
@@ -232,8 +232,8 @@ public class DeviceController {
      * @return
      */
     @PostMapping("/getMinerLocation")
-    public Result<HashMap<String, Location>> getMinerLocation(){
-        HashMap<String, Location> map = deviceService.getMinerLocation();
+    public Result<Map<String, Location>> getMinerLocation(){
+        Map<String, Location> map = deviceService.getMinerLocation();
         return Result.ok(map);
     }
 

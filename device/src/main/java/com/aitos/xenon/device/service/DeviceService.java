@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface DeviceService {
 
@@ -40,7 +41,15 @@ public interface DeviceService {
      * 获取所有miner位置信息
      * @return
      */
-    HashMap<String, Location> getMinerLocation();
+    Map<String, Location> getMinerLocation();
+
+    /**
+     * 更新miner位置
+     * @param minerAddress
+     * @param latitude
+     * @param longitude
+     */
+    void updateMinerLocation(String minerAddress,String latitude,String longitude);
 
     List<DeviceVo> loadMinersInfo(ArrayList<String> addressList);
 
@@ -78,4 +87,5 @@ public interface DeviceService {
      * @param runStatus
      */
     void updateMinerRunStatus(Long id, int runStatus);
+
 }
