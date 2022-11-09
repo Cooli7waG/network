@@ -211,6 +211,8 @@ public class AirDropRecordController {
         if(!claimDto.getCode().equals(claimCode)){
             return Result.failed(ApiStatus.CLAIM_GAMING_MINER_CODE_MISMATCH);
         }
+        //
+        redisService.deleteObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE + claimDto.getOwnerAddress());
         //TODO 检查其他参数是否一致
         if(!jsonObject.getString("miner").equalsIgnoreCase(claimDto.getMinerAddress()) || !jsonObject.getString("owner").equalsIgnoreCase(claimDto.getOwnerAddress())){
             return Result.failed(ApiStatus.CLAIM_GAMING_MINER_INFO_MISMATCH);
@@ -282,6 +284,36 @@ public class AirDropRecordController {
 
     @PostMapping("/nftsign")
     public Result nftsign(@RequestBody NftSignDto nftSignDto){
+        AirDropRecord airDropRecordTemp=airDropRecordService.findNotClaimedByMinerAddress(nftSignDto.getMinerAddress());
+        if(airDropRecordTemp==null){
+            return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_NOT_EXISTED);
+        }else if(!airDropRecordTemp.getMinerAddress().equals(nftSignDto.getMinerAddress())
+                ||!airDropRecordTemp.getOwnerAddress().equals(nftSignDto.getOwnerAddress())){
+            return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_NOT_EXISTED);
+        }
+        TokenServiceNftSignDto tokenServiceNftSignDto= BeanConvertor.toBean(nftSignDto,TokenServiceNftSignDto.class);
+
+        long timestamp = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()/1000+7*24*60*60;
+        tokenServiceNftSignDto.setDeadline(timestamp);
+        log.info("nftSignature.params={}",JSON.toJSONString(tokenServiceNftSignDto));
+        Result<HashMap> nftSignatureResult = remoteTokenService.getNFTSignature(tokenServiceNftSignDto);
+        log.info("nftSignatureResult={}",JSON.toJSONString(nftSignatureResult));
+        return nftSignatureResult;
+    }
+
+    @PostMapping("/nftsignWithMobile")
+    public Result nftsignWithMobile(@RequestBody NftSignDto nftSignDto){
+        //检查code是否一致
+        if(!StringUtils.hasText(nftSignDto.getCode())){
+            return Result.failed(ApiStatus.CLAIM_GAMING_MINER_CODE_MISMATCH);
+        }
+        String jsonStr = redisService.getCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE + nftSignDto.getOwnerAddress());
+        JSONObject jsonObject = JSON.parseObject(jsonStr);
+        String claimCode = jsonObject.getString("code");
+        if(!nftSignDto.getCode().equals(claimCode)){
+            return Result.failed(ApiStatus.CLAIM_GAMING_MINER_CODE_MISMATCH);
+        }
+        //
         AirDropRecord airDropRecordTemp=airDropRecordService.findNotClaimedByMinerAddress(nftSignDto.getMinerAddress());
         if(airDropRecordTemp==null){
             return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_NOT_EXISTED);

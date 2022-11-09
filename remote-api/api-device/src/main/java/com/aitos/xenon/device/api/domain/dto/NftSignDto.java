@@ -8,4 +8,6 @@ public class NftSignDto {
     private String ownerAddress;
 
     private String minerAddress;
+
+    private String code;
 }
