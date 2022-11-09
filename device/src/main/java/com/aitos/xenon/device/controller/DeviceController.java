@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -233,7 +234,8 @@ public class DeviceController {
      */
     @PostMapping("/getMinerLocation")
     public Result<Map<String, Location>> getMinerLocation(){
-        Map<String, Location> map = deviceService.getMinerLocation();
+        //Map<String, Location> map = deviceService.getMinerLocation();
+        Map<String, Location> map=new HashMap<>();
         return Result.ok(map);
     }
 

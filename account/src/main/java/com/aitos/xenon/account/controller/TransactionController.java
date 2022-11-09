@@ -60,6 +60,16 @@ public class TransactionController {
             if(jsonObject.containsKey(BusinessConstants.SensitiveKey.EMAIL)){
                 jsonObject.remove(BusinessConstants.SensitiveKey.EMAIL);
             }
+            if(jsonObject.containsKey(BusinessConstants.SensitiveKey.LOCATION)){
+                jsonObject.remove(BusinessConstants.SensitiveKey.LOCATION);
+            }
+            transactionVo.setData(jsonObject.toJSONString());
+        }
+        if(transactionVo.getTxType() == BusinessConstants.TXType.TX_REGISTER_MINER){
+            JSONObject jsonObject = JSON.parseObject(transactionVo.getData());
+            if(jsonObject.containsKey(BusinessConstants.SensitiveKey.EMAIL)){
+                jsonObject.remove(BusinessConstants.SensitiveKey.EMAIL);
+            }
             transactionVo.setData(jsonObject.toJSONString());
         }
         return Result.ok(transactionVo);

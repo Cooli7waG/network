@@ -227,6 +227,7 @@ public interface BusinessConstants
 
     interface SensitiveKey {
         String EMAIL = "email";
+        String LOCATION = "location";
     }
 
     interface RedisKeyConstant {

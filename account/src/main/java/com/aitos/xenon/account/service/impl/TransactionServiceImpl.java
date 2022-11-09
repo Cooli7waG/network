@@ -145,6 +145,16 @@ public class TransactionServiceImpl implements TransactionService {
                 if(jsonObject.containsKey(BusinessConstants.SensitiveKey.EMAIL)){
                     jsonObject.remove(BusinessConstants.SensitiveKey.EMAIL);
                 }
+                if(jsonObject.containsKey(BusinessConstants.SensitiveKey.LOCATION)){
+                    jsonObject.remove(BusinessConstants.SensitiveKey.LOCATION);
+                }
+                record.setData(jsonObject.toJSONString());
+            }
+            if(record.getTxType() == BusinessConstants.TXType.TX_REGISTER_MINER){
+                JSONObject jsonObject = JSON.parseObject(record.getData());
+                if(jsonObject.containsKey(BusinessConstants.SensitiveKey.EMAIL)){
+                    jsonObject.remove(BusinessConstants.SensitiveKey.EMAIL);
+                }
                 record.setData(jsonObject.toJSONString());
             }
         }
