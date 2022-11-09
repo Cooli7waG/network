@@ -144,7 +144,6 @@ public class AirDropRecordController {
         log.info("claim.body:{}",body);
         ClaimDto claimDto=JSON.parseObject(body,ClaimDto.class);
         log.info("ClaimDto owner address:{}",claimDto.getOwnerAddress());
-
         //检查设备状态
         Device device = deviceService.findByAddress(claimDto.getMinerAddress());
         if(device==null){
@@ -160,11 +159,6 @@ public class AirDropRecordController {
                 ||!airDropRecordTemp.getOwnerAddress().equals(claimDto.getOwnerAddress())){
             return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_NOT_EXISTED);
         }
-        Result<Long> blockHeightResult = blockService.getBlockHeight();
-        if(airDropRecordTemp!=null&&airDropRecordTemp.getExpiration()<blockHeightResult.getData()){
-            return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_CLAIM_EXPIRED);
-        }
-
         //检查nft铸造是否成功
         TokenServiceNftTokenIdDto tokenServiceNftTokenIdDto=new TokenServiceNftTokenIdDto();
         tokenServiceNftTokenIdDto.setMiner(claimDto.getMinerAddress());
@@ -178,10 +172,7 @@ public class AirDropRecordController {
         if(id.equals("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")){
             return Result.failed(ApiStatus.BUSINESS_NFT_CASTING_FAILED);
         }
-
         airDropRecordService.claim(claimDto);
-
-
         GameMiner gameMiner = new GameMiner();
         gameMiner.setAddress(claimDto.getMinerAddress());
          device = deviceService.findByAddress(claimDto.getMinerAddress());
@@ -284,6 +275,7 @@ public class AirDropRecordController {
 
     @PostMapping("/nftsign")
     public Result nftsign(@RequestBody NftSignDto nftSignDto){
+        //检查空投状态
         AirDropRecord airDropRecordTemp=airDropRecordService.findNotClaimedByMinerAddress(nftSignDto.getMinerAddress());
         if(airDropRecordTemp==null){
             return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_NOT_EXISTED);
@@ -291,6 +283,12 @@ public class AirDropRecordController {
                 ||!airDropRecordTemp.getOwnerAddress().equals(nftSignDto.getOwnerAddress())){
             return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_NOT_EXISTED);
         }
+        // 检查是否过期
+        Result<Long> blockHeightResult = blockService.getBlockHeight();
+        if(airDropRecordTemp!=null&&airDropRecordTemp.getExpiration()<blockHeightResult.getData()){
+            return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_CLAIM_EXPIRED);
+        }
+        //
         TokenServiceNftSignDto tokenServiceNftSignDto= BeanConvertor.toBean(nftSignDto,TokenServiceNftSignDto.class);
 
         long timestamp = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()/1000+7*24*60*60;
@@ -324,6 +322,12 @@ public class AirDropRecordController {
                 ||!airDropRecordTemp.getOwnerAddress().equals(nftSignDto.getOwnerAddress())){
             return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_NOT_EXISTED);
         }
+        // 检查是否过期
+        Result<Long> blockHeightResult = blockService.getBlockHeight();
+        if(airDropRecordTemp!=null&&airDropRecordTemp.getExpiration()<blockHeightResult.getData()){
+            return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_CLAIM_EXPIRED);
+        }
+        //
         TokenServiceNftSignDto tokenServiceNftSignDto= BeanConvertor.toBean(nftSignDto,TokenServiceNftSignDto.class);
 
         long timestamp = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()/1000+7*24*60*60;
