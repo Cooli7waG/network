@@ -303,6 +303,8 @@ public class AirDropRecordController {
 
     @PostMapping("/nftsignWithMobile")
     public Result nftsignWithMobile(@RequestBody NftSignDto nftSignDto){
+        //
+        log.info("nftsignWithMobile nftSignDto:{}",JSON.toJSONString(nftSignDto));
         //检查code是否一致
         if(!StringUtils.hasText(nftSignDto.getCode())){
             return Result.failed(ApiStatus.CLAIM_GAMING_MINER_CODE_MISMATCH);
@@ -310,6 +312,7 @@ public class AirDropRecordController {
         String jsonStr = redisService.getCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE + nftSignDto.getOwnerAddress());
         JSONObject jsonObject = JSON.parseObject(jsonStr);
         String claimCode = jsonObject.getString("code");
+        log.info("redis Cache claimCode:{}",claimCode);
         if(!nftSignDto.getCode().equals(claimCode)){
             return Result.failed(ApiStatus.CLAIM_GAMING_MINER_CODE_MISMATCH);
         }
