@@ -129,7 +129,7 @@ public class AirDropRecordController {
     }
 
     @PostMapping("/gameminer/queryApplyStatus/{owner}")
-    public Result queryApplyStatus(@RequestParam("owner") String owner){
+    public Result queryApplyStatus(@PathVariable("owner") String owner){
         log.info("queryApplyStatus owner:{}",owner);
         if(redisService.hasKey(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE + owner)){
             String jsonStr = redisService.getCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE + owner);
