@@ -67,6 +67,7 @@ public enum ApiStatus implements ConstantsCode {
     BUSINESS_NFT_CASTING_FAILED(3017,"nft casting failed"),
     BUSINESS_DEVICE_GMAE_MINER_SINGLE_NUMBER_FOR_EMAIL(3018,"The amount of miners that a single email can apply for exceeds the limit"),
     CLAIM_GAMING_MINER_CODE_MISMATCH(3019,"claim code Mismatch"),
+    CLAIM_GAMING_MINER_INFO_MISMATCH(3020,"claim gaming miner info Mismatch"),
 
 
     // 账户相关

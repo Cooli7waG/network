@@ -31,10 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -131,6 +128,17 @@ public class AirDropRecordController {
         return Result.ok(result);
     }
 
+    @PostMapping("/gameminer/queryApplyStatus/{owner}")
+    public Result queryApplyStatus(@RequestParam("owner") String owner){
+        log.info("queryApplyStatus owner:{}",owner);
+        if(redisService.hasKey(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE + owner)){
+            String jsonStr = redisService.getCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE + owner);
+            JSONObject jsonObject = JSON.parseObject(jsonStr);
+            return Result.ok(jsonObject.getString("miner"));
+        }
+        return Result.ok();
+    }
+
     @PostMapping("/claim")
     public Result claim(@RequestBody String body) throws Exception {
         log.info("claim.body:{}",body);
@@ -197,9 +205,15 @@ public class AirDropRecordController {
         if(!StringUtils.hasText(claimDto.getCode())){
             return Result.failed(ApiStatus.CLAIM_GAMING_MINER_CODE_MISMATCH);
         }
-        String claimCode = redisService.getCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE + claimDto.getMinerAddress());
+        String jsonStr = redisService.getCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE + claimDto.getOwnerAddress());
+        JSONObject jsonObject = JSON.parseObject(jsonStr);
+        String claimCode = jsonObject.getString("code");
         if(!claimDto.getCode().equals(claimCode)){
             return Result.failed(ApiStatus.CLAIM_GAMING_MINER_CODE_MISMATCH);
+        }
+        //TODO 检查其他参数是否一致
+        if(!jsonObject.getString("miner").equalsIgnoreCase(claimDto.getMinerAddress()) || !jsonObject.getString("owner").equalsIgnoreCase(claimDto.getOwnerAddress())){
+            return Result.failed(ApiStatus.CLAIM_GAMING_MINER_INFO_MISMATCH);
         }
         //检查设备状态
         Device device = deviceService.findByAddress(claimDto.getMinerAddress());
@@ -246,7 +260,6 @@ public class AirDropRecordController {
         }
         return Result.ok();
     }
-
 
     @PostMapping("/gameminer/claim")
     @Deprecated

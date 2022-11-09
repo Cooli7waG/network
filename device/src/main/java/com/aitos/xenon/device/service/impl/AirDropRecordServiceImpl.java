@@ -288,7 +288,7 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
             customMap.put("miner", minerAddress);
             Result result = remoteGameMinerService.pushMail(pushMessageDto);
             log.info("邮件发送结果:{}", JSON.toJSONString(result));
-            redisService.setCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE+minerAddress,""+code,BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE_EXPIRATION, TimeUnit.SECONDS);
+            redisService.setCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE+applyGameMiner.getOwner(),JSON.toJSONString(customMap),BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE_EXPIRATION, TimeUnit.SECONDS);
         } catch (Exception e) {
             log.error("邮件发送失败！");
         }
