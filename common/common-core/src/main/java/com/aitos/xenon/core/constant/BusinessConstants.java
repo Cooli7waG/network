@@ -232,7 +232,7 @@ public interface BusinessConstants
 
     interface GamingMinerKey {
         String EMAIL = "email";
-        String CODE = "location";
+        String CODE = "code";
         String MINER = "miner";
         String OWNER = "owner";
         String PERSONAL_SIGN = "personalSign";
