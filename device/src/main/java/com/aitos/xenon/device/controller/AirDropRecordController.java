@@ -193,6 +193,10 @@ public class AirDropRecordController {
         if(start.getCode() != ApiStatus.SUCCESS.getCode()){
             return  Result.failed();
         }
+        if(redisService.hasKey(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CACHE + claimDto.getOwnerAddress())){
+            log.info("删除[{}]claim的redis缓存",claimDto.getOwnerAddress());
+            redisService.deleteObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CACHE + claimDto.getOwnerAddress());
+        }
         return Result.ok();
     }
 
