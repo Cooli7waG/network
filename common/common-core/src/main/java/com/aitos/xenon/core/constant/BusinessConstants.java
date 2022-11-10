@@ -230,14 +230,28 @@ public interface BusinessConstants
         String LOCATION = "location";
     }
 
+    interface GamingMinerKey {
+        String EMAIL = "email";
+        String CODE = "location";
+        String MINER = "miner";
+        String OWNER = "owner";
+        String PERSONAL_SIGN = "personalSign";
+        String VERIFICATION_CODE = "Your verification code with apply gaming miner";
+        String APPLY_RESULT = "You Game Miner Apply Result";
+    }
+
     interface RedisKeyConstant {
         /**
          * 2小时
          */
         long ARKREEN_MINER_LOCATION_CACHE_EXPIRATION = 7200;
 
-        String ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE = "ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE_";
-        // 1200
-        long ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE_EXPIRATION = 604800;
+        String ARKREEN_GAMING_MINER_APPLY_CODE_CACHE = "ARKREEN_GAMING_MINER_APPLY_CODE_CACHE_";
+        // 20分钟
+        long ARKREEN_GAMING_MINER_APPLY_CODE_CACHE_EXPIRATION = 20*60;
+
+        String ARKREEN_GAMING_MINER_CLAIM_CACHE = "ARKREEN_GAMING_MINER_CLAIM_CACHE_";
+        // 45天
+        long ARKREEN_GAMING_MINER_CLAIM_CACHE_EXPIRATION = 45*24*60*60;
     }
 }

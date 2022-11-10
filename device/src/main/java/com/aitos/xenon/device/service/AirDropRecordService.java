@@ -34,4 +34,11 @@ public interface AirDropRecordService {
      * @return
      */
     String applyGameMinerWithMobile(String applyGameMiner);
+
+    /**
+     * 用户申请gamingminer的验证码
+     * @param applyGameMiner
+     * @return
+     */
+    String applyVerificationCode(String applyGameMiner);
 }

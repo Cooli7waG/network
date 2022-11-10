@@ -128,13 +128,22 @@ public class AirDropRecordController {
         return Result.ok(result);
     }
 
+    @PostMapping("/gameminer/applyVerificationCode")
+    public Result applyVerificationCode(@RequestBody String applyGameMiner){
+        if(!applyActive){
+            return Result.failed(ApiStatus.BUSINESS_AIRDROP_NOT_ACTIVE.getMsg());
+        }
+        log.info("applyVerificationCode:{}",applyGameMiner);
+        String result = airDropRecordService.applyVerificationCode(applyGameMiner);
+        return Result.ok(result);
+    }
+
     @PostMapping("/gameminer/queryApplyStatus/{owner}")
     public Result queryApplyStatus(@PathVariable("owner") String owner){
         log.info("queryApplyStatus owner:{}",owner);
-        if(redisService.hasKey(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE + owner)){
-            String jsonStr = redisService.getCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE + owner);
-            JSONObject jsonObject = JSON.parseObject(jsonStr);
-            return Result.ok(jsonObject.getString("miner"));
+        if(redisService.hasKey(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CACHE + owner)){
+            String jsonStr = redisService.getCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CACHE + owner);
+            return Result.ok(jsonStr);
         }
         return Result.ok();
     }
@@ -187,80 +196,12 @@ public class AirDropRecordController {
         return Result.ok();
     }
 
-    @PostMapping("/claimWithMobile")
-    public Result claimWithMobile(@RequestBody String body) throws Exception {
-        log.info("claimWithMobile.body:{}",body);
-        ClaimDto claimDto=JSON.parseObject(body,ClaimDto.class);
-        log.info("ClaimDto owner address:{}",claimDto.getOwnerAddress());
-        //检查code是否一致
-        if(!StringUtils.hasText(claimDto.getCode())){
-            return Result.failed(ApiStatus.CLAIM_GAMING_MINER_CODE_MISMATCH);
-        }
-        String jsonStr = redisService.getCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE + claimDto.getOwnerAddress());
-        JSONObject jsonObject = JSON.parseObject(jsonStr);
-        String claimCode = jsonObject.getString("code");
-        if(!claimDto.getCode().equals(claimCode)){
-            return Result.failed(ApiStatus.CLAIM_GAMING_MINER_CODE_MISMATCH);
-        }
-        //
-        redisService.deleteObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE + claimDto.getOwnerAddress());
-        //TODO 检查其他参数是否一致
-        if(!jsonObject.getString("miner").equalsIgnoreCase(claimDto.getMinerAddress()) || !jsonObject.getString("owner").equalsIgnoreCase(claimDto.getOwnerAddress())){
-            return Result.failed(ApiStatus.CLAIM_GAMING_MINER_INFO_MISMATCH);
-        }
-        //检查设备状态
-        Device device = deviceService.findByAddress(claimDto.getMinerAddress());
-        if(device==null){
-            return Result.failed(ApiStatus.BUSINESS_DEVICE_NOT_EXISTED);
-        }else if(device.getStatus()== BusinessConstants.DeviceStatus.BOUND){
-            return Result.failed(ApiStatus.BUSINESS_DEVICE_BOUND);
-        }
-        //检查空投状态
-        AirDropRecord airDropRecordTemp=airDropRecordService.findNotClaimedByMinerAddress(claimDto.getMinerAddress());
-        if(airDropRecordTemp==null){
-            return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_NOT_EXISTED);
-        }else if(!airDropRecordTemp.getMinerAddress().equals(claimDto.getMinerAddress())
-                ||!airDropRecordTemp.getOwnerAddress().equals(claimDto.getOwnerAddress())){
-            return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_NOT_EXISTED);
-        }
-        Result<Long> blockHeightResult = blockService.getBlockHeight();
-        if(airDropRecordTemp!=null&&airDropRecordTemp.getExpiration()<blockHeightResult.getData()){
-            return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_CLAIM_EXPIRED);
-        }
-        //检查nft铸造是否成功
-        TokenServiceNftTokenIdDto tokenServiceNftTokenIdDto=new TokenServiceNftTokenIdDto();
-        tokenServiceNftTokenIdDto.setMiner(claimDto.getMinerAddress());
-        tokenServiceNftTokenIdDto.setOwner(claimDto.getOwnerAddress());
-        Result<HashMap<String,String>> nftTokenIdResult = remoteTokenService.getNFTTokenId(tokenServiceNftTokenIdDto);
-        log.info("nftTokenIdResult.result={}",JSON.toJSONString(nftTokenIdResult));
-        if(nftTokenIdResult.getCode()!=ApiStatus.SUCCESS.getCode()){
-            return Result.failed(ApiStatus.BUSINESS_NFT_CASTING_FAILED);
-        }
-        String id = nftTokenIdResult.getData().get("id");
-        if(id.equals("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")){
-            return Result.failed(ApiStatus.BUSINESS_NFT_CASTING_FAILED);
-        }
-        airDropRecordService.claim(claimDto);
-        GameMiner gameMiner = new GameMiner();
-        gameMiner.setAddress(claimDto.getMinerAddress());
-        device = deviceService.findByAddress(claimDto.getMinerAddress());
-        gameMiner.setLatitude(device.getLatitude());
-        gameMiner.setLongitude(device.getLongitude());
-        Result start = remoteGameMinerService.start(gameMiner);
-        log.info("remoteGameMinerService.start:{}",JSON.toJSONString(start));
-        if(start.getCode() != ApiStatus.SUCCESS.getCode()){
-            return  Result.failed();
-        }
-        return Result.ok();
-    }
-
     @PostMapping("/gameminer/claim")
     @Deprecated
     public Result claimGameMiner(@RequestBody String claimGameMiner){
         log.info("DeviceController.claimGameMiner:{}",claimGameMiner);
         ApplyGameMiner applyGameMiner = JSON.parseObject(claimGameMiner, ApplyGameMiner.class);
         ValidatorUtils.validateFast(applyGameMiner);
-
         String result = airDropRecordService.claimGameMiner(claimGameMiner);
         return Result.ok(result);
     }
@@ -276,45 +217,6 @@ public class AirDropRecordController {
     @PostMapping("/nftsign")
     public Result nftsign(@RequestBody NftSignDto nftSignDto){
         //检查空投状态
-        AirDropRecord airDropRecordTemp=airDropRecordService.findNotClaimedByMinerAddress(nftSignDto.getMinerAddress());
-        if(airDropRecordTemp==null){
-            return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_NOT_EXISTED);
-        }else if(!airDropRecordTemp.getMinerAddress().equals(nftSignDto.getMinerAddress())
-                ||!airDropRecordTemp.getOwnerAddress().equals(nftSignDto.getOwnerAddress())){
-            return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_NOT_EXISTED);
-        }
-        // 检查是否过期
-        Result<Long> blockHeightResult = blockService.getBlockHeight();
-        if(airDropRecordTemp!=null&&airDropRecordTemp.getExpiration()<blockHeightResult.getData()){
-            return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_CLAIM_EXPIRED);
-        }
-        //
-        TokenServiceNftSignDto tokenServiceNftSignDto= BeanConvertor.toBean(nftSignDto,TokenServiceNftSignDto.class);
-
-        long timestamp = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()/1000+7*24*60*60;
-        tokenServiceNftSignDto.setDeadline(timestamp);
-        log.info("nftSignature.params={}",JSON.toJSONString(tokenServiceNftSignDto));
-        Result<HashMap> nftSignatureResult = remoteTokenService.getNFTSignature(tokenServiceNftSignDto);
-        log.info("nftSignatureResult={}",JSON.toJSONString(nftSignatureResult));
-        return nftSignatureResult;
-    }
-
-    @PostMapping("/nftsignWithMobile")
-    public Result nftsignWithMobile(@RequestBody NftSignDto nftSignDto){
-        //
-        log.info("nftsignWithMobile nftSignDto:{}",JSON.toJSONString(nftSignDto));
-        //检查code是否一致
-        if(!StringUtils.hasText(nftSignDto.getCode())){
-            return Result.failed(ApiStatus.CLAIM_GAMING_MINER_CODE_MISMATCH);
-        }
-        String jsonStr = redisService.getCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE + nftSignDto.getOwnerAddress());
-        JSONObject jsonObject = JSON.parseObject(jsonStr);
-        String claimCode = jsonObject.getString("code");
-        log.info("redis Cache claimCode:{}",claimCode);
-        if(!nftSignDto.getCode().equals(claimCode)){
-            return Result.failed(ApiStatus.CLAIM_GAMING_MINER_CODE_MISMATCH);
-        }
-        //
         AirDropRecord airDropRecordTemp=airDropRecordService.findNotClaimedByMinerAddress(nftSignDto.getMinerAddress());
         if(airDropRecordTemp==null){
             return Result.failed(ApiStatus.BUSINESS_AIRDROPDEVICE_NOT_EXISTED);

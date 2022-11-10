@@ -13,6 +13,7 @@ public class ApplyGameMiner {
     private String name;
     private String email;
     private String owner;
+    private String code;
 
     @NotEmpty(message = "personalSign required")
     private String personalSign;

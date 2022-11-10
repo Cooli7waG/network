@@ -237,29 +237,23 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
     @Override
     public synchronized String applyGameMiner(String str) {
         ApplyGameMiner applyGameMiner = JSON.parseObject(str, ApplyGameMiner.class);
-        String minerAddress = apply(str);
-        //TODO 发送邮件等通知owner
+        // 当需要签名校验时进行验证
+        checkPersonalSign(str,applyGameMiner);
+        // 检查gaming miner数量限制
+        checkMinerLimit(applyGameMiner.getOwner(),applyGameMiner.getEmail());
+        // 申请
+        String minerAddress = apply(applyGameMiner.getOwner(),applyGameMiner.getEmail(),applyGameMiner.getPersonalSign());
+        // 发送邮件通知owner
         HashMap<String, String> hashMap = new HashMap();
         hashMap.put("minerAddress", minerAddress);
         hashMap.put("ownerAddress", applyGameMiner.getOwner());
-        //log.info("领取地址：http://localhost:8080/claim/"+ Base64Utils.encodeToString(JSON.toJSONString(hashMap).getBytes(StandardCharsets.UTF_8)));
         String claimGameMinerUrl = webClaimUrl + Base64Utils.encodeToString(JSON.toJSONString(hashMap).getBytes(StandardCharsets.UTF_8));
         log.info("领取地址：{}", claimGameMinerUrl);
-        try {
-            PushMessageDto pushMessageDto = new PushMessageDto();
-            pushMessageDto.setTemplateId(1L);
-            pushMessageDto.setTitile("You Game Miner Apply Result");
-            pushMessageDto.setTo(applyGameMiner.getEmail());
-            HashMap<String, Object> customMap = new HashMap<>();
-            pushMessageDto.setCustomMap(customMap);
-            customMap.put("url", claimGameMinerUrl);
-            customMap.put("owner", applyGameMiner.getOwner());
-            customMap.put("miner", minerAddress);
-            Result result = remoteGameMinerService.pushMail(pushMessageDto);
-            log.info("邮件发送结果:{}", JSON.toJSONString(result));
-        } catch (Exception e) {
-            log.error("邮件发送失败！");
-        }
+        HashMap<String, Object> customMap = new HashMap<>();
+        customMap.put("url", claimGameMinerUrl);
+        customMap.put("owner", applyGameMiner.getOwner());
+        customMap.put("miner", minerAddress);
+        pushEmail(applyGameMiner.getEmail(),BusinessConstants.GamingMinerKey.APPLY_RESULT,customMap,1L);
         //
         return ApiStatus.SUCCESS.getMsg();
     }
@@ -272,49 +266,91 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
     @Override
     public String applyGameMinerWithMobile(String str) {
         ApplyGameMiner applyGameMiner = JSON.parseObject(str, ApplyGameMiner.class);
-        String minerAddress = apply(str);
-        //TODO 发送邮件等通知owner
+        // 验证验证码
+        if(!redisService.hasKey(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_APPLY_CODE_CACHE+applyGameMiner.getOwner())){
+            throw new MinerApplyException("Verification Code Mismatch");
+        }
+        //
+        String jsonStr = redisService.getCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_APPLY_CODE_CACHE+applyGameMiner.getOwner());
+        JSONObject jsonObject = JSON.parseObject(jsonStr);
+        String code = jsonObject.getString(BusinessConstants.GamingMinerKey.CODE);
+        if(!code.equalsIgnoreCase(applyGameMiner.getCode())){
+            throw new MinerApplyException("Verification Code Mismatch");
+        }
+        //
+        String email = jsonObject.getString(BusinessConstants.GamingMinerKey.EMAIL);
+        String owner = jsonObject.getString(BusinessConstants.GamingMinerKey.OWNER);
+        if(!owner.equalsIgnoreCase(applyGameMiner.getOwner())){
+            throw new MinerApplyException("Account Address Mismatch");
+        }
+        // 检查gaming miner数量限制
+        checkMinerLimit(owner,email);
+        return apply(applyGameMiner.getOwner(),applyGameMiner.getEmail(),applyGameMiner.getPersonalSign());
+    }
+
+    @Override
+    public String applyVerificationCode(String str) {
+        ApplyGameMiner applyGameMiner = JSON.parseObject(str, ApplyGameMiner.class);
+        // 当需要签名校验时进行验证
+        checkPersonalSign(str,applyGameMiner);
+        // 检查gaming miner数量限制
+        checkMinerLimit(applyGameMiner.getOwner(),applyGameMiner.getEmail());
+        //
+        HashMap<String, Object> customMap = new HashMap<>();
+        int code= (int)((Math.random()*9+1)*100000);
+        customMap.put(BusinessConstants.GamingMinerKey.CODE, code);
+        log.info("apply gaming miner Verification Code:{}",code);
+        customMap.put(BusinessConstants.GamingMinerKey.OWNER, applyGameMiner.getOwner());
+        pushEmail(applyGameMiner.getEmail(),BusinessConstants.GamingMinerKey.VERIFICATION_CODE,customMap,3L);
+        //缓存验证码
+        customMap.put(BusinessConstants.GamingMinerKey.EMAIL,applyGameMiner.getEmail());
+        customMap.put(BusinessConstants.GamingMinerKey.PERSONAL_SIGN,applyGameMiner.getPersonalSign());
+        redisService.setCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_APPLY_CODE_CACHE+applyGameMiner.getOwner(),JSON.toJSONString(customMap),BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_APPLY_CODE_CACHE_EXPIRATION, TimeUnit.SECONDS);
+        return ApiStatus.SUCCESS.getMsg();
+    }
+
+    private void pushEmail(String email,String title,HashMap<String, Object> customMap,Long templateId){
         try {
             PushMessageDto pushMessageDto = new PushMessageDto();
-            pushMessageDto.setTemplateId(2L);
-            pushMessageDto.setTitile("You Game Miner Apply Result");
-            pushMessageDto.setTo(applyGameMiner.getEmail());
-            HashMap<String, Object> customMap = new HashMap<>();
+            pushMessageDto.setTemplateId(templateId);
+            pushMessageDto.setTitile(title);
+            pushMessageDto.setTo(email);
             pushMessageDto.setCustomMap(customMap);
-            int code= (int)((Math.random()*9+1)*100000);
-            customMap.put("code", code);
-            log.info("applyGameMinerWithMobile code:{}",code);
-            customMap.put("owner", applyGameMiner.getOwner());
-            customMap.put("miner", minerAddress);
             Result result = remoteGameMinerService.pushMail(pushMessageDto);
             log.info("邮件发送结果:{}", JSON.toJSONString(result));
-            redisService.setCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE+applyGameMiner.getOwner(),JSON.toJSONString(customMap),BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CODE_CACHE_EXPIRATION, TimeUnit.SECONDS);
         } catch (Exception e) {
             log.error("邮件发送失败！");
         }
-        //
-        return minerAddress;
     }
 
-    private String apply(String str){
-        ApplyGameMiner applyGameMiner = JSON.parseObject(str, ApplyGameMiner.class);
-        // 当需要签名校验时进行验证
+    /**
+     * 检查签名
+     * @param str
+     * @param applyGameMiner
+     */
+    private void checkPersonalSign(String str,ApplyGameMiner applyGameMiner){
         if (applyPersonalSign) {
             //恢复owner公钥
             JSONObject obj = JSON.parseObject(str, Feature.OrderedField);
             obj.remove("personalSign");
-            //
             byte[] message = MetaMaskUtils.getMessage(obj.toJSONString());
             byte[] srcPublicKey = Ecdsa.getPublicKey(message, applyGameMiner.getPersonalSign());
             String ownerAddress = Ecdsa.getAddress(srcPublicKey);
             log.info("applyGameMiner Recover ownerAddress:{}", ownerAddress);
             // 判断恢复的owner地址与报文内的是否一致
             if (!ownerAddress.equalsIgnoreCase(applyGameMiner.getOwner())) {
-                log.info("remoteGameMinerService.register error: recover owner address not equals owner address");
-                throw new MinerApplyException("miner apply failed");
+                log.info("applyVerificationCode:recover owner address not equals owner address");
+                throw new MinerApplyException("personal Sign verify failed");
             }
         }
-        // 检查gaming miner数量限制
+    }
+
+    /**
+     * 检查miner数量限制
+     * @param owner
+     * @param email
+     */
+    private void checkMinerLimit(String owner,String email){
         Result<SystemConfigVo> configResult = remoteSystemConfigService.findConfig();
         if (configResult.getCode() != ApiStatus.SUCCESS.getCode()) {
             throw new ServiceException("system config exception");
@@ -324,15 +360,17 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
         if (gameMinerCount >= systemConfigVo.getGameMinerTotalNumber()) {
             throw new MinerTotalNumberException("miner 总量超出 限制");
         }
-
-        int gameMinerSingleCount = deviceMapper.countByAddressAndMinerType(applyGameMiner.getOwner(), BusinessConstants.DeviceMinerType.GAME_MINER);
+        int gameMinerSingleCount = deviceMapper.countByAddressAndMinerType(owner, BusinessConstants.DeviceMinerType.GAME_MINER);
         if (gameMinerSingleCount >= systemConfigVo.getGameMinerSingleNumber()) {
             throw new MinerSingleNumberException("单个用户[地址]可申请miner量超出限制");
         }
-        int emailSingleCount = airDropRecordMapper.countByEmail(applyGameMiner.getEmail());
+        int emailSingleCount = airDropRecordMapper.countByEmail(email);
         if (emailSingleCount >= systemConfigVo.getGameMinerSingleNumber()) {
             throw new MinerSingleNumberException("单个用户[邮箱]可申请miner量超出限制");
         }
+    }
+
+    private String apply(String owner,String email,String personalSign){
         // 调用game miner服务生成miner地址进行预注册
         Result<String> gameMinerResult = remoteGameMinerService.register();
         if (gameMinerResult == null || gameMinerResult.getCode() != ApiStatus.SUCCESS.getCode()) {
@@ -347,7 +385,7 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
         deviceRegisterDto.setMaker(BusinessConstants.MakerInfo.GAME_MINER);
         deviceRegisterDto.setVersion(1);
         deviceRegisterDto.setMinerType(BusinessConstants.DeviceMinerType.GAME_MINER);
-        deviceRegisterDto.setTxData(applyGameMiner.getPersonalSign());
+        deviceRegisterDto.setTxData(personalSign);
         //TODO 适配device register 只签名一个字段
         //Result<String> fundationRegister = remoteFundationService.register(deviceRegisterDto.getAddress());
         byte[] hash = Hash.sha3(deviceRegisterDto.getAddress().getBytes());
@@ -361,10 +399,11 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
             log.info("remoteFundationService.register error:{}", JSON.toJSONString(signResult));
             throw new MinerApplyException("miner apply failed");
         }
+        //
         RemoteKMSSignVo remoteKMSSignVo = signResult.getData();
         String sign = SignatureProcessor.signBuild(new SignatureProcessor.Signature(remoteKMSSignVo.getR(), remoteKMSSignVo.getS(), remoteKMSSignVo.getRecid()));
         deviceRegisterDto.setFoundationSignature(sign);
-        deviceRegisterDto.setEmail(applyGameMiner.getEmail());
+        deviceRegisterDto.setEmail(email);
         //调用 miner register
         Result deviceRegister = remoteDeviceService.register(deviceRegisterDto);
         if (deviceRegister.getCode() != ApiStatus.SUCCESS.getCode()) {
@@ -374,11 +413,16 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
         //TODO 调用Miner AirDrop，部分数值暂时写死
         AirDropDto airDropDto = new AirDropDto();
         airDropDto.setMinerAddress(minerAddress);
-        airDropDto.setOwnerAddress(applyGameMiner.getOwner());
-        airDropDto.setEmail(applyGameMiner.getEmail());
+        airDropDto.setOwnerAddress(owner);
+        airDropDto.setEmail(email);
         airDropDto.setVersion(1);
         // 30天
         Result<Long> blockHeight = remoteBlockService.getBlockHeight();
+        Result<SystemConfigVo> configResult = remoteSystemConfigService.findConfig();
+        if (configResult.getCode() != ApiStatus.SUCCESS.getCode()) {
+            throw new ServiceException("system config exception");
+        }
+        SystemConfigVo systemConfigVo = configResult.getData();
         airDropDto.setExpiration(blockHeight.getData() + (systemConfigVo.getGameMinerApplyValidityPeriod() * 24 * 60));
         // 随机地理位置
         DeviceLocationDto deviceLocationDto = new DeviceLocationDto();
@@ -425,6 +469,8 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
             log.info("remoteDeviceService.airdrop error:{}", JSON.toJSONString(deviceRegister));
             throw new MinerApplyException("miner airdrop failed");
         }
+        //缓存数据
+        redisService.setCacheObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CACHE + owner,minerAddress,BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CACHE_EXPIRATION,TimeUnit.SECONDS);
         return minerAddress;
     }
 
@@ -453,6 +499,11 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
         Result start = remoteGameMinerService.start(gameMiner);
         log.info("remoteGameMinerService.start:{}", JSON.toJSONString(start));
         if (start.getCode() != ApiStatus.SUCCESS.getCode()) {
+            //
+            if(redisService.hasKey(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CACHE + claimDto.getOwnerAddress())){
+                redisService.deleteObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CACHE + claimDto.getOwnerAddress());
+            }
+            //
             return "success";
         }
         return null;
