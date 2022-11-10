@@ -39,7 +39,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountVo findByAddress(String address) {
-            AccountVo account = accountMapper.findByAddress(address);
+        AccountVo account = accountMapper.findByAddress(address);
+
         return account;
     }
 

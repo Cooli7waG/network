@@ -251,6 +251,7 @@ public class DeviceServiceImpl implements DeviceService {
     public IPage<DeviceVo> getMinersByOwnerAddress(DeviceSearchDto queryParams) {
         Page<DeviceVo> page = new Page<DeviceVo>(queryParams.getOffset(), queryParams.getLimit());
         IPage<DeviceVo> pageResult = deviceMapper.getMinersByOwnerAddress(page, queryParams);
+        List<DeviceVo> records = pageResult.getRecords();
         return pageResult;
     }
 

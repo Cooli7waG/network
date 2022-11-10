@@ -92,17 +92,6 @@ public class AccountController {
     }
 
     /**
-     * todo  该接口后续会被删除,请使用findByAddress
-     * @param address
-     * @return
-     */
-    @Deprecated
-    @GetMapping("/findByAddress/{address}")
-    public Result<AccountVo> findByAddress2(@PathVariable("address") String address){
-        AccountVo accountTemp=accountService.findByAddress(address);
-        return Result.ok(accountTemp);
-    }
-    /**
      * 根据账户地址查询nonce信息
      * @param address
      * @return

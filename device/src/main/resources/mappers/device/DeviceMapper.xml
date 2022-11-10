@@ -39,7 +39,12 @@
     </select>
 
     <select id="getMinersByOwnerAddress" resultType="com.aitos.xenon.device.api.domain.vo.DeviceVo">
-        select d.*,a.earning_mint,a.earning_service from <include refid="tableName"/> d left join account a on d.address=a.address
+        select d.address,d.ownerAddress,d.minerType,d.maker,
+               d.energy,d.capabilities,d.power,d.totalEnergyGeneration,
+               d.status,d.runStatus,d.makerId,d.name,
+               d.earningMint,d.terminate,d.createTime,d.updateTime,
+               a.earning_mint,a.earning_service
+        from <include refid="tableName"/> d left join account a on d.address=a.address
           <where>
               <if test="queryParams.address!=null and queryParams.address!=''">
                   d.owner_address=#{queryParams.address}
