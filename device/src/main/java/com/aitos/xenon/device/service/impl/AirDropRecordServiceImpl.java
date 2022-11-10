@@ -285,7 +285,14 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
         }
         // 检查gaming miner数量限制
         checkMinerLimit(owner,email);
-        return apply(applyGameMiner.getOwner(),applyGameMiner.getEmail(),applyGameMiner.getPersonalSign());
+        String minerAddress =  apply(applyGameMiner.getOwner(),applyGameMiner.getEmail(),applyGameMiner.getPersonalSign());
+        //ARKREEN_GAMING_MINER_APPLY_CODE_CACHE_0x7e22eff00fb878319606aa085316e72e19e9761b
+        if(redisService.hasKey(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_APPLY_CODE_CACHE+owner)){
+            log.info("删除[{}]验证码redis缓存",owner);
+            redisService.deleteObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_APPLY_CODE_CACHE+owner);
+        }
+        //
+        return minerAddress;
     }
 
     @Override
@@ -500,6 +507,7 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
         log.info("remoteGameMinerService.start:{}", JSON.toJSONString(start));
         if (start.getCode() == ApiStatus.SUCCESS.getCode()) {
             if(redisService.hasKey(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CACHE + claimDto.getOwnerAddress())){
+                log.info("删除[{}]claim的redis缓存",claimDto.getOwnerAddress());
                 redisService.deleteObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CACHE + claimDto.getOwnerAddress());
             }
             return "success";
