@@ -498,12 +498,10 @@ public class AirDropRecordServiceImpl implements AirDropRecordService {
         //
         Result start = remoteGameMinerService.start(gameMiner);
         log.info("remoteGameMinerService.start:{}", JSON.toJSONString(start));
-        if (start.getCode() != ApiStatus.SUCCESS.getCode()) {
-            //
+        if (start.getCode() == ApiStatus.SUCCESS.getCode()) {
             if(redisService.hasKey(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CACHE + claimDto.getOwnerAddress())){
                 redisService.deleteObject(BusinessConstants.RedisKeyConstant.ARKREEN_GAMING_MINER_CLAIM_CACHE + claimDto.getOwnerAddress());
             }
-            //
             return "success";
         }
         return null;
