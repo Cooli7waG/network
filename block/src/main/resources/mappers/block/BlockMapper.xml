@@ -21,6 +21,11 @@
         select b.*,t.amountTransaction from block b left join
             (select height,count(1) AS amountTransaction from transaction group by height order by height desc) t
             on b.height =t.height
+        <where>
+            <if test="queryParams.height!=null and queryParams.height!=''">
+                b.height=#{queryParams.height}
+            </if>
+        </where>
         order by b.create_time desc
     </select>
     <select id="findListByHeight" resultType="com.aitos.xenon.block.api.domain.vo.BlockVo">
