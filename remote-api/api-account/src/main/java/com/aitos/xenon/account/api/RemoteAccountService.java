@@ -20,7 +20,7 @@ public interface RemoteAccountService {
     @PostMapping("/account/register")
     Result<Long> register(@RequestBody AccountRegisterDto accountRegisterDto);
 
-    @GetMapping("/account/findByAddress/{address}")
+    @GetMapping("/account/{address}")
     Result<AccountVo> findByAddress( @PathVariable("address") String address);
 
     @GetMapping("/account/nonce/{address}")
