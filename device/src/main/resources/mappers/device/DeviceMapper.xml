@@ -47,8 +47,11 @@
                d.run_status,d.name,d.terminate,d.create_time,d.update_time,a.earning_mint,a.earning_service
         from <include refid="tableName"/> d left join account a on d.address=a.address
           <where>
+              <if test="queryParams.owner!=null and queryParams.owner!=''">
+                  d.owner_address=#{queryParams.owner}
+              </if>
               <if test="queryParams.address!=null and queryParams.address!=''">
-                  d.owner_address=#{queryParams.address}
+                  d.address=#{queryParams.address}
               </if>
               <if test="queryParams.minerType!=null and queryParams.minerType!=''">
                   d.miner_type=#{queryParams.minerType}
