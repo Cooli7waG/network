@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aitos.xenon.device.mapper.ReportDeviceInfoMapper">
+
+    <sql id="tableName">device_report_info</sql>
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into <include refid="tableName"/> (miner,timestamp,location_type,latitude,longitude,h3index,power,manufacturer,device_type,device_uid,create_time)
+        value (#{miner},#{timestamp},#{locationType},#{latitude},#{longitude},#{h3index},#{power},#{manufacturer},#{deviceType},#{deviceUid},#{createTime})
+    </insert>
+
+</mapper>
