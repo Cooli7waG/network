@@ -29,13 +29,13 @@
         select d.*,a.earning_mint,a.earning_service,a.balance from <include refid="tableName"/> d left join account a on d.address=a.address
           <where>
               <if test="queryParams.owner!=null and queryParams.owner!=''">
-                  d.owner_address=#{queryParams.owner}
+                  and d.owner_address=#{queryParams.owner}
               </if>
               <if test="queryParams.address!=null and queryParams.address!=''">
-                  d.address=#{queryParams.address}
+                  and d.address=#{queryParams.address}
               </if>
               <if test="queryParams.minerType!=null and queryParams.minerType!=''">
-                  d.miner_type=#{queryParams.minerType}
+                  and d.miner_type=#{queryParams.minerType}
               </if>
           </where>
          order by create_time desc
@@ -48,13 +48,13 @@
         from <include refid="tableName"/> d left join account a on d.address=a.address
           <where>
               <if test="queryParams.owner!=null and queryParams.owner!=''">
-                  d.owner_address=#{queryParams.owner}
+                  and d.owner_address=#{queryParams.owner}
               </if>
               <if test="queryParams.address!=null and queryParams.address!=''">
-                  d.address=#{queryParams.address}
+                  and d.address=#{queryParams.address}
               </if>
               <if test="queryParams.minerType!=null and queryParams.minerType!=''">
-                  d.miner_type=#{queryParams.minerType}
+                  and d.miner_type=#{queryParams.minerType}
               </if>
           </where>
          order by create_time desc
