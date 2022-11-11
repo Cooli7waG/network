@@ -8,5 +8,5 @@ public class DeviceSearchDto extends QueryParams {
 
     private String address;
     private String owner;
-
+    private Integer minerType;
 }

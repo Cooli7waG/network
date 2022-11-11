@@ -34,6 +34,9 @@
               <if test="queryParams.address!=null and queryParams.address!=''">
                   d.address=#{queryParams.address}
               </if>
+              <if test="queryParams.minerType!=null and queryParams.minerType!=''">
+                  d.miner_type=#{queryParams.minerType}
+              </if>
           </where>
          order by create_time desc
     </select>
@@ -46,6 +49,9 @@
           <where>
               <if test="queryParams.address!=null and queryParams.address!=''">
                   d.owner_address=#{queryParams.address}
+              </if>
+              <if test="queryParams.minerType!=null and queryParams.minerType!=''">
+                  d.miner_type=#{queryParams.minerType}
               </if>
           </where>
          order by create_time desc
