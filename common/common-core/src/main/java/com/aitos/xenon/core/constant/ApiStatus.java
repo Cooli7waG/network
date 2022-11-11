@@ -68,6 +68,7 @@ public enum ApiStatus implements ConstantsCode {
     BUSINESS_DEVICE_GMAE_MINER_SINGLE_NUMBER_FOR_EMAIL(3018,"The amount of miners that a single email can apply for exceeds the limit"),
     CLAIM_GAMING_MINER_CODE_MISMATCH(3019,"claim code Mismatch"),
     CLAIM_GAMING_MINER_INFO_MISMATCH(3020,"claim gaming miner info Mismatch"),
+    DEVICE_REPORT_INFO_SIGN_ERROR(3021,"device report info data sign error"),
 
 
     // 账户相关

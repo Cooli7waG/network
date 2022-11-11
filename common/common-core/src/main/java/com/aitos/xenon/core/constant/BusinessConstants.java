@@ -136,6 +136,11 @@ public interface BusinessConstants
          */
         int TX_WITHDRAW=11;
 
+        /**
+         * tx_reportDeviceInfo
+         */
+        int TX_REPORTDEVICEINFO=12;
+
     }
     /**
      * pogg commit 状态
