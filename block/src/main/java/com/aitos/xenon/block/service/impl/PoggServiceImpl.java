@@ -443,15 +443,18 @@ public class PoggServiceImpl implements PoggService {
         // 获取所有 miner 位置
         Result<HashMap<String, Location>>  minerLocationResult= remoteDeviceService.getMinerLocation();
         if (minerLocationResult.getCode() != ApiStatus.SUCCESS.getCode()) {
-            log.error("getMinerLocation failed");
+            log.error("getMinerLocation failed, errorCode: {}", minerLocationResult.getCode());
             return suitableCompareMiners;
         }
         if (minerLocationResult.getData() == null) {
-            log.error("getMinerLocation found no miner");
+            log.error("getMinerLocation failed, data null");
             return suitableCompareMiners;
         }
         locations = minerLocationResult.getData();
         log.debug("getMinerLocation found {} miners", locations.size());
+        if (locations.size() == 0) {
+            return suitableCompareMiners;
+        }
 
         // 根据目标 miner 位置找到一定范围内的所有备选 miner
         Location targetMinerLocation = locations.get(address);
@@ -625,41 +628,36 @@ public class PoggServiceImpl implements PoggService {
      * @return
      */
     public Boolean checkSunShine(PoggReportPowerData powerData, Location location) {
-        try {
-            // 通过位置计算时区
-            String timeZone = SunRiseSet.calTimeZone(location.getLongitude().longValue());
+        // 通过位置计算时区
+        String timeZone = SunRiseSet.calTimeZone(location.getLongitude().longValue());
         
-            // 转换时区
-            Date time = new Date(powerData.getTimestamp().longValue());
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            sdf.setTimeZone(TimeZone.getTimeZone("GMT" + timeZone));
-            String timeString = sdf.format(time);
+        // 转换时区
+        Date time = new Date(powerData.getTimestamp().longValue());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT" + timeZone));
+        String timeString = sdf.format(time);
 
-            // 计算日升日落时间
-            String sunRiseTime = SunRiseSet.getSunrise(new BigDecimal(location.getLongitude()), new BigDecimal(location.getLatitude()), time);
-            String sunSetTime = SunRiseSet.getSunset(new BigDecimal(location.getLongitude()), new BigDecimal(location.getLatitude()), time);
-            log.debug("time: {}, timezone: {}, sunRiseTime: {}, sunSetTime: {}", timeString, timeZone, sunRiseTime, sunSetTime);
-            Calendar.getInstance().setTime(time);
+        // 计算日升日落时间
+        String sunRiseTime = SunRiseSet.getSunrise(new BigDecimal(location.getLongitude()), new BigDecimal(location.getLatitude()), time);
+        String sunSetTime = SunRiseSet.getSunset(new BigDecimal(location.getLongitude()), new BigDecimal(location.getLatitude()), time);
+        log.debug("time: {}, timezone: {}, sunRiseTime: {}, sunSetTime: {}", timeString, timeZone, sunRiseTime, sunSetTime);
+        Calendar.getInstance().setTime(time);
 
-            // 比较时间
-            Integer timeHour = Integer.parseInt(timeString.split(" ")[1].split(":")[0]);
-            Integer riseHour = Integer.parseInt(sunRiseTime.split(":")[0]);
-            Integer setHour = Integer.parseInt(sunSetTime.split(":")[0]);
-            log.debug("timeHour: {}, riseHour: {}, setHour: {}", timeHour, riseHour, setHour);
-            // TODO(lq): 暂时不开启
-            // if (timeHour < riseHour) {
-            //     return false;
-            // } else {
-            //     if (setHour >= 24) setHour = setHour - 24;
-            //     if (timeHour > setHour) {
-            //         return false;
-            //     }
-            // }
-            return true;
-        } catch (Exception e){
-            log.error("checkSunShine exception: {}", e.getMessage());
-            return false;
-        }
+        // 比较时间
+        Integer timeHour = Integer.parseInt(timeString.split(" ")[1].split(":")[0]);
+        Integer riseHour = Integer.parseInt(sunRiseTime.split(":")[0]);
+        Integer setHour = Integer.parseInt(sunSetTime.split(":")[0]);
+        log.debug("timeHour: {}, riseHour: {}, setHour: {}", timeHour, riseHour, setHour);
+        // TODO(lq): 暂时不开启
+        // if (timeHour < riseHour) {
+        //     return false;
+        // } else {
+        //     if (setHour >= 24) setHour = setHour - 24;
+        //     if (timeHour > setHour) {
+        //         return false;
+        //     }
+        // }
+        return true;
     }
 
     /**
@@ -670,27 +668,35 @@ public class PoggServiceImpl implements PoggService {
      * @return
      */
     public PoggAuthenticity constructPoggAuthenticity(String address, long startEpoch, long endEpoch) {
+        Double similarityScore;
         Map<String, Location> locations = new HashMap<String, Location>();
-
-        // 获取 miner 在 epoch 区间内的所有功率数据
-        List<PoggReportPowerData> poggReportPowerDatasOrigin = getMinerPowerDataByEpoch(address, startEpoch, endEpoch);
-
-        // 找到合适的对比 miner，数量有上限但是不定。
-        Map<String, List<PoggReportPowerData>> suitableCompareMiners = findSuitableCompareMiners(address, startEpoch, endEpoch, locations);
-
-        // 检查光照情况，去除掉不正常的数据
-        List<PoggReportPowerData> poggReportPowerDatas = poggReportPowerDatasOrigin.stream().filter(item -> {
-            return checkSunShine(item, locations.get(item.getAddress()));
-        }).collect(Collectors.toList());
-
-        // 计算功率数据相似度
-        Double[] similarityArray = calculateSimilarity(poggReportPowerDatas, suitableCompareMiners, startEpoch, endEpoch);
-
-        // 根据相似度进行投票
-        int voteNum = voteToSimilarity(similarityArray);
+        List<PoggReportPowerData> poggReportPowerDatas = new ArrayList<PoggReportPowerData>();
+        Map<String, List<PoggReportPowerData>> suitableCompareMiners = new HashMap<String, List<PoggReportPowerData>>();
         
-        // 根据投票计算 miner 相似度得分
-        Double similarityScore = calSimilarityScore(voteNum);
+        try {
+            // 获取 miner 在 epoch 区间内的所有功率数据
+            List<PoggReportPowerData> poggReportPowerDatasOrigin = getMinerPowerDataByEpoch(address, startEpoch, endEpoch);
+
+            // 找到合适的对比 miner，数量有上限但是不定。
+            suitableCompareMiners = findSuitableCompareMiners(address, startEpoch, endEpoch, locations);
+
+            // 检查光照情况，去除掉不正常的数据
+            poggReportPowerDatas = poggReportPowerDatasOrigin.stream().filter(item -> {
+                return checkSunShine(item, locations.get(item.getAddress()));
+            }).collect(Collectors.toList());
+
+            // 计算功率数据相似度
+            Double[] similarityArray = calculateSimilarity(poggReportPowerDatas, suitableCompareMiners, startEpoch, endEpoch);
+
+            // 根据相似度进行投票
+            int voteNum = voteToSimilarity(similarityArray);
+        
+            // 根据投票计算 miner 相似度得分
+            similarityScore = calSimilarityScore(voteNum);
+        } catch (Exception e){
+            log.error("exception: {}, address: {}, startEpoch: {}, endEpoch: {}", e.getMessage(), address, startEpoch, endEpoch);
+            similarityScore = Double.valueOf(0.5);
+        }
 
         // 构建结构体
         PoggAuthenticity poggAuthenticity = new PoggAuthenticity();
